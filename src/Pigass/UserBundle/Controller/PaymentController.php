@@ -9,7 +9,7 @@
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Pigass\RegisterBundle\Controller;
+namespace Pigass\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller,
     Symfony\Component\HttpFoundation\Request;
@@ -20,12 +20,6 @@ use Payum\Core\Request\GetHumanStatus;
 
 class PaymentController extends Controller
 {
-    /** @DI\Inject */
-    private $request;
-
-    /** @DI\Inject */
-    private $router;
-
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
@@ -44,7 +38,7 @@ class PaymentController extends Controller
     public function prepareAction($gateway, $memberid)
     {
         $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
-        $membership = $this->em->getRepository('PigassRegisterBundle:Membership')->find($memberid);
+        $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($memberid);
 
         if (!$membership or $membership->getPerson()->getUser() !== $user)
             throw $this->createNotFoundException('Impossible d\'effectuer la transaction. Contactez un administrateur.');
@@ -54,7 +48,7 @@ class PaymentController extends Controller
         elseif ($gateway == 2)
             $gateway = 'paypal';
 
-        $storage = $this->get('payum')->getStorage('Pigass\RegisterBundle\Entity\Payment');
+        $storage = $this->get('payum')->getStorage('Pigass\UserBundle\Entity\Payment');
 
         $payment = $storage->create();
 
@@ -93,7 +87,7 @@ class PaymentController extends Controller
             if ($gateway == 'offline') {
                  $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée un fois le chèque reçu.');
             } else {
-                $membership = $this->em->getRepository('PigassRegisterBundle:Membership')->find($payment->getClientId());
+                $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
                 $membership->setPayedOn(new \DateTime('now'));
                 $membership->setPayment($payment);
                 $membership->setMethod($gateway);

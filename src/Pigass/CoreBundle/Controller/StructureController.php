@@ -27,12 +27,6 @@ use Pigass\CoreBundle\Entity\Structure,
  */
 class StructureController extends Controller
 {
-    /** @DI\Inject */
-    private $request;
-
-    /** @DI\Inject */
-    private $router;
-
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
@@ -87,10 +81,10 @@ class StructureController extends Controller
      * @Template("PigassCoreBundle:Structure:edit.html.twig")
      * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
      */
-    public function editAction(Structure $structure)
+    public function editAction(Structure $structure, Request $request)
     {
         $form = $this->createForm(new StructureType(), $structure);
-        $formHandler = new StructureHandler($form, $this->request, $this->em);
+        $formHandler = new StructureHandler($form, $request, $this->em);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');

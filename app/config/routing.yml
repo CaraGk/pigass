@@ -1,12 +1,10 @@
 PigassRegister:
-    resource: "@PigassRegisterBundle/Controller/"
+    resource: "@PigassCoreBundle/Controller/"
     type:     annotation
-    prefix:   /
 
 PigassParameter:
     resource: "@PigassParameterBundle/Controller/"
     type:     annotation
-    prefix:   /
 
 PigassUser:
   resource: "@PigassUserBundle/Controller/"

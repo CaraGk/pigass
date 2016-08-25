@@ -35,9 +35,6 @@ use Pigass\UserBundle\Form\PersonType,
 class PersonController extends Controller
 {
     /** @DI\Inject */
-    private $request;
-
-    /** @DI\Inject */
     private $router;
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
@@ -56,21 +53,21 @@ class PersonController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function indexAction($slug)
+    public function indexAction($slug, Request $request)
     {
         $username = $this->get('security.token_storage')->getToken()->getUsername();
         $user = $this->um->findUserByUsername($username);
-        $search = $this->request->query->get('search', null);
+        $search = $request->query->get('search', null);
         $paginator = $this->get('knp_paginator');
         $persons_query = $this->em->getRepository('PigassUserBundle:Person')->getAll($search);
         $persons_count = $this->em->getRepository('PigassUserBundle:Person')->countAll(true, $search);
-        $persons = $paginator->paginate($persons_query, $this->request->query->get('page', 1), 20);
+        $persons = $paginator->paginate($persons_query, $request->query->get('page', 1), 20);
 
         $member_list = null;
         if ($this->pm->findParamByName('reg_active')->getValue())
         {
             if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_SUPERTEACHER') and $this->pm->findParamByName('reg_teacher_access')->getValue())) {
-                foreach ($members = $this->em->getRepository('PigassRegisterBundle:Membership')->getCurrentForPersonArray() as $member) {
+                foreach ($members = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPersonArray() as $member) {
                     $member_list[] = $member['id'];
                 }
             }
@@ -91,13 +88,13 @@ class PersonController extends Controller
      * @Template("PigassUserBundle:Person:edit.html.twig")
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
         $mod_simul = $this->pm->findParamByName('simul_active');
 
         $person = new person();
         $form = $this->createForm(new PersonType($mod_simul->getValue()), $person);
-        $formHandler = new PersonHandler($form, $this->request, $this->em, $this->um);
+        $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Individu "' . $person . '" enregistré.');
@@ -118,12 +115,12 @@ class PersonController extends Controller
      * @Template("PigassUserBundle:Person:edit.html.twig")
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function editAction(Person $person)
+    public function editAction(Person $person, Request $request)
     {
         $mod_simul = $this->pm->findParamByName('simul_active');
 
         $form = $this->createForm(new PersonType($mod_simul->getValue()), $person);
-        $formHandler = new PersonHandler($form, $this->request, $this->em, $this->um);
+        $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Individu "' . $person . '" modifié.');
@@ -142,12 +139,12 @@ class PersonController extends Controller
      * @Route("/person/{id}/delete", name="user_person_delete", requirements={"id" = "\d+"})
      * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
      */
-    public function deleteAction(Person $person)
+    public function deleteAction(Person $person, Request $request)
     {
-        $search = $this->request->query->get('search', null);
+        $search = $request->query->get('search', null);
 
-        if(true == $this->pm->findParamByName('reg_active')->getValue()) {
-            if($memberships = $this->em->getRepository('PigassRegisterBundle:Membership')->findBy(array('person' => $person))) {
+        if (true == $this->pm->findParamByName('reg_active')->getValue()) {
+            if ($memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person))) {
                 foreach($memberships as $membership) {
                     $this->em->remove($membership);
                 }
@@ -168,9 +165,9 @@ class PersonController extends Controller
      * @Route("/person/{id}/promote", name="user_person_promote", requirements={"id" = "\d+"})
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function promoteAction(Person $person)
+    public function promoteAction(Person $person, Request $request)
     {
-        $search = $this->request->query->get('search', null);
+        $search = $request->query->get('search', null);
         $user = $person->getUser();
         $user->addRole('ROLE_STRUCTURE');
 
@@ -186,9 +183,9 @@ class PersonController extends Controller
      * @Route("/person/{id}/demote", name="user_person_demote", requirements={"id" = "\d+"})
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function demoteAction(Person $person)
+    public function demoteAction(Person $person, Request $request)
     {
-        $search = $this->request->query->get('search', null);
+        $search = $request->query->get('search', null);
         $user = $person->getUser();
         if( $user->hasRole('ROLE_ADMIN') )
             $user->removeRole('ROLE_ADMIN');
@@ -223,7 +220,7 @@ class PersonController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_MEMBER')")
      */
-    public function editMeAction()
+    public function editMeAction(Request $request)
     {
         $user = $this->get('security.token_storage')->getToken()->getUsername();
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user);
@@ -232,7 +229,7 @@ class PersonController extends Controller
             throw $this->createNotFoundException('Unable to find person entity.');
 
         $form = $this->createForm(new PersonUserType(), $person);
-        $formHandler = new PersonHandler($form, $this->request, $this->em, $this->um);
+        $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Votre compte a bien été modifié.');
@@ -250,7 +247,7 @@ class PersonController extends Controller
      * @Route("/firstuser", name="user_person_install")
      * @Template()
      */
-    public function installAction()
+    public function installAction(Request $request)
     {
         if ($em->getRepository('PigassUserBundle:User')->findAll()) {
             return $this->redirect($this->generateUrl('homepage'));
@@ -258,7 +255,7 @@ class PersonController extends Controller
 
         $user = $this->um->createUser();
         $form = $this->createForm(new UserAdminType($user));
-        $formHandler = new UserHandler($form, $this->request, $this->um);
+        $formHandler = new UserHandler($form, $request, $this->um);
 
         if ( $formHandler->process() ) {
             $this->get('session')->getFlashBag()->add('notice', 'Administrateur "' . $user->getUsername() . '" enregistré. Vous pouvez maintenant vous identifier.');

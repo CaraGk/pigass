@@ -66,7 +66,7 @@ class Parameter extends BaseParameter
 
     /**
      * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure")
-     * @JoinColumn(name="structure_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
      */
     private $structure;
 

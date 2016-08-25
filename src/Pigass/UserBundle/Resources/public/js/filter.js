@@ -10,15 +10,15 @@
 $(document).ready(function() {
     var hideAll = function () {
         for (var i = 1; i < 10; i++) {
-            $('#pigass_registerbundle_filtertype_value_' + i).hide();
-            $("label[for='pigass_registerbundle_filtertype_value_" + i + "']").hide();
+            $('#pigass_userbundle_filtertype_value_' + i).hide();
+            $("label[for='pigass_userbundle_filtertype_value_" + i + "']").hide();
         }
     }
 
     hideAll();
 
-    $('#pigass_registerbundle_filtertype_question').change(function() {
+    $('#pigass_userbundle_filtertype_question').change(function() {
         hideAll();
-        $('#pigass_registerbundle_filtertype_value_' + $(this).val()).show();
+        $('#pigass_userbundle_filtertype_value_' + $(this).val()).show();
     });
 });

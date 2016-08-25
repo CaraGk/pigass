@@ -33,7 +33,7 @@ class Gateway extends BaseGatewayConfig
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Structure", inversedBy="gateways", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure", inversedBy="gateways", cascade={"persist"})
      * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
      *
      * @var Structure $structure

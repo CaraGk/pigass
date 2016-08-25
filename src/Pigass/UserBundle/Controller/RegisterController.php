@@ -9,7 +9,7 @@
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Pigass\RegisterBundle\Controller;
+namespace Pigass\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
@@ -37,10 +37,7 @@ use Pigass\UserBundle\Form\FilterType,
 class RegisterController extends Controller
 {
     /** @DI\Inject */
-    private $request;
-
-    /** @DI\Inject */
-    private $router;
+    private $session;
 
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
@@ -58,11 +55,11 @@ class RegisterController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function indexAction($slug)
+    public function indexAction($slug, Request $request)
     {
-        $limit = $this->request->query->get('limit', null);
+        $limit = $request->query->get('limit', null);
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
-        $membership_filters = $this->request->getSession()->get('gregister_membership_filter', array(
+        $membership_filters = $session->get('gregister_membership_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
@@ -82,10 +79,10 @@ class RegisterController extends Controller
      * @Route("/member/{id}/validate", name="user_register_validate", requirements={"id" = "\d+"})
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
-    public function validateAction(Membership $membership)
+    public function validateAction(Membership $membership, Request $request)
     {
-        $userid = $this->request->query->get('userid', null);
-        $view = $this->request->query->get('view', null);
+        $userid = $request->query->get('userid', null);
+        $view = $request->query->get('view', null);
 
         if (!$membership or $membership->getPayedOn() != null)
             throw $this->createNotFoundException('Unable to find Membership entity');
@@ -108,10 +105,10 @@ class RegisterController extends Controller
      * @Route("/member/{id}/delete", name="user_register_delete", requirements={"id" = "\d+"})
      * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
      */
-    public function deleteAction(Membership $membership)
+    public function deleteAction(Membership $membership, Request $request)
     {
-        $userid = $this->request->query->get('userid', null);
-        $view = $this->request->query->get('view', null);
+        $userid = $request->query->get('userid', null);
+        $view = $request->query->get('view', null);
 
         if (!$membership or $membership->getPayedOn() != null)
             throw $this->createNotFoundException('Unable to find Membership entity');
@@ -290,7 +287,7 @@ class RegisterController extends Controller
      * @Route("/register/", name="user_register_register")
      * @Template()
      */
-    public function registerAction()
+    public function registerAction(Request $request)
     {
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $this->get('session')->getFlashBag()->add('error', 'Utilisateur déjà enregistré');
@@ -301,7 +298,7 @@ class RegisterController extends Controller
         $token = $tokenGenerator->generateToken();
 
         $form = $this->createForm(new RegisterType($this->pm->findParamByName('simul_active')->getValue()));
-        $form_handler = new RegisterHandler($form, $this->request, $this->em, $this->um, $this->pm->findParamByName('reg_payment')->getValue(), $token, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
+        $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $this->pm->findParamByName('reg_payment')->getValue(), $token, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($username = $form_handler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Utilisateur ' . $username . ' créé.');
@@ -320,9 +317,9 @@ class RegisterController extends Controller
      * @Route("/register/send/{email}", name="user_register_confirmation_send", requirements={"email" = ".+\@.+\.\w+" })
      * @Template()
      */
-    public function sendConfirmationAction($email)
+    public function sendConfirmationAction($email, Request $request)
     {
-        $username = $this->request->query->get('username');
+        $username = $request->query->get('username');
         $user = $this->um->findUserByUsername($email);
 
         if(!$user)
@@ -353,13 +350,13 @@ class RegisterController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or hasRole('ROLE_STRUCTURE')")
      */
-    public function joinAction()
+    public function joinAction(Request $request)
     {
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))
             return $this->redirect($this->generateUrl('user_register_register'));
 
         $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
-        $userid = $this->request->query->get('userid');
+        $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 
         if (null !== $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person)) {
@@ -372,7 +369,7 @@ class RegisterController extends Controller
         }
 
         $form = $this->createForm(new JoinType());
-        $form_handler = new JoinHandler($form, $this->request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
+        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($membership = $form_handler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
@@ -393,16 +390,16 @@ class RegisterController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_MEMBER')")
      */
-    public function questionAction()
+    public function questionAction(Request $request)
     {
         $username = $this->get('security.token_storage')->getToken()->getUsername();
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($username);
 
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
-        $membership = $this->em->getRepository('Pigass\RegisterBundle\Entity\Membership')->getCurrentForPerson($person);
+        $membership = $this->em->getRepository('Pigass\UserBundle\Entity\Membership')->getCurrentForPerson($person);
 
         $form = $this->createForm(new QuestionType($questions));
-        $form_handler = new QuestionHandler($form, $this->request, $this->em, $membership, $questions);
+        $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
         if($form_handler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
 
@@ -421,10 +418,10 @@ class RegisterController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or hasRole('ROLE_STRUCTURE')")
      */
-    public function listAction()
+    public function listAction(Request $request)
     {
         $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
-        $userid = $this->request->query->get('userid');
+        $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 
         if ($userid == null && $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person)) {
@@ -451,10 +448,10 @@ class RegisterController extends Controller
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or hasRole('ROLE_STRUCTURE')")
      */
-    public function showInfosAction(Membership $membership)
+    public function showInfosAction(Membership $membership, Request $request)
     {
         $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
-        $userid = $this->request->query->get('userid');
+        $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 
         if (!$membership) {

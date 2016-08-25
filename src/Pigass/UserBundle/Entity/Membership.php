@@ -53,7 +53,7 @@ class Membership
     private $method;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Structure", inversedBy="memberships", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure", cascade={"persist"})
      * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
      *
      * @var Structure $structure

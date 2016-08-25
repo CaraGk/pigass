@@ -25,7 +25,7 @@ use Pigass\ParameterBundle\Form\ParametersHandler;
 class AdminController extends Controller
 {
     /**
-    * @Route("/", name="GParameter_PAIndex")
+    * @Route("/", name="parameter_admin_index")
     * @Template()
     */
     public function indexAction()

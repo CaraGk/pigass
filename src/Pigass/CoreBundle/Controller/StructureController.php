@@ -19,6 +19,7 @@ use JMS\DiExtraBundle\Annotation as DI,
 use Pigass\CoreBundle\Entity\Structure,
     Pigass\CoreBundle\Form\StructureType,
     Pigass\CoreBundle\Form\StructureHandler;
+use Pigass\ParameterBundle\Entity\Parameter;
 
 /**
  * Structure controller.
@@ -63,7 +64,30 @@ class StructureController extends Controller
         $form = $this->createForm(new StructureType(), $structure);
         $formHandler = new StructureHandler($form, $this->$request, $this->em);
 
-        if ($formHandler->process()) {
+        if ($structure = $formHandler->process()) {
+            $now = new \DateTime('now');
+            $parameters = array(
+                0 => array('Name' => 'reg_date', 'Value' => $now, 'Active' => true, 'ActivatesAt' => $now, 'Label' => 'Date anniversaire des adhésions', 'Category' => 'Module Adhesion', 'Type' => 1, 'More' => null, 'Structure' => $structure),
+                1 => array('Name' => 'reg_periodicity', 'Value' => '+ 1 year', 'Active' => true, 'ActivatesAt' => $now, 'Label' => 'Périodicité des adhésions', 'Category' => 'Module Adhesion', 'Type' => 3, 'More' => 'a:6:{s:9:"+ 1 month";s:6:"1 mois";s:10:"+ 2 months";s:6:"2 mois";s:10:"+ 6 months";s:6:"6 mois";s:8:"+ 1 year";s:4:"1 an";s:9:"+ 2 years";s:5:"2 ans";s:9:"+ 3 years";s:5:"3 ans";}', 'Structure' => $structure),
+                2 => array('Name' => 'reg_payment', 'Value' => 60, 'Active' => true, 'ActivatesAt' => $now, 'Label' => 'Montant de la cotisation (EUR)', 'Category' => 'Module Adhesion', 'Type' => 1, 'More' => null, 'Structure' => $structure),
+            );
+            foreach ($parameters as $parameter) {
+                $structure_parameter = new Parameter();
+                foreach ($parameter as $name => $value) {
+                    $structure_parameter->get$name($value);
+                }
+                $this->em->persist($structure_parameter);
+            }
+
+            $gateway = new Gateway();
+            $gateway->setStructure($structure);
+            $gateway->setReadableName('Chèque ou espèces');
+            $gateway->setGatewayName($structure->getSlug() . '_offline');
+            $gateway->setFactoryName('offline');
+            $this->em->persist($gateway);
+
+            $this->em->flush();
+
             $this->get('session')->getFlashBag()->add('notice', 'Structure "' . $structure . '" enregistrée.');
             return $this->redirect($this->generateUrl('core_structure_index'));
         }

@@ -6,7 +6,7 @@ imports:
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: en
+    locale: fr
 
 framework:
     #esi:             ~
@@ -28,6 +28,7 @@ framework:
         # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         handler_id:  session.handler.native_file
         save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
+        cookie_lifetime: 3600
     fragments:       ~
     http_method_override: true
     assets: ~
@@ -66,3 +67,76 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+# Assetic Configuration
+assetic:
+    debug:          %kernel.debug%
+    use_controller: %kernel.debug%
+    bundles:        [MopaBootstrapBundle]
+    # java: /usr/bin/java
+    filters:
+        cssrewrite: ~
+
+# User control configuration
+fos_user:
+  db_driver:     orm
+  firewall_name: main
+  user_class:    Pigass\UserBundle\Entity\User
+  from_email:
+    address:     %mailer_mail%
+    sender_name: Administrateur
+  registration:
+      confirmation:
+          enabled: true
+
+# Application's parameters configuration
+kdb_parameters:
+  db_driver: orm
+  class:     Pigass\ParameterBundle\Entity\Parameter
+
+# Pagination configuration
+knp_paginator:
+  page_range: 5                       # default page range used in pagination control
+  default_options:
+    page_name:           page         # page query parameter name
+    sort_field_name:     sort         # sort field query parameter name
+    sort_direction_name: direction    # sort direction query parameter name
+    distinct:            true         # ensure distinct results, useful when ORM queries are using GROUP BY statements
+    filter_field_name:   filterField
+    filter_value_name:   filterValue
+  template:
+    pagination: MopaBootstrapBundle:Pagination:sliding.html.twig       # sliding pagination controls template
+    filtration: KnpPaginatorBundle:Pagination:filtration.html.twig
+    sortable:   KnpPaginatorBundle:Pagination:sortable_link.html.twig # sort link template
+
+mopa_bootstrap:
+    form: 
+        show_legend: false
+        show_child_legend: false
+        render_required_asterisk: true
+        collection:
+            widget_remove_btn:
+                icon: trash
+                icon_inverted: true
+            widget_add_btn:
+                icon: plus-sign
+    menu: ~
+    navbar: ~
+    initializr: 
+        meta: 
+            keywords: "choix de stage, simulation, interne, internat, évalutations de stage"
+            author_name: "Pierre-François Angrand"
+            nofollow: false
+            noindex: false
+
+payum:
+    storages:
+        Pigass\UserBundle\Entity\Payment: { doctrine: orm }
+    security:
+        token_storage:
+            Pigass\UserBundle\Entity\PaymentToken: { doctrine: orm }
+    dynamic_gateways:
+        sonata_admin: false
+        config_storage:
+            Pigass\UserBundle\Entity\Gateway: { doctrine: orm }
+

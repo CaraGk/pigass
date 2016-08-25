@@ -1,0 +1,29 @@
+{% extends '::base.html.twig' %}
+
+{% block title %}{{ parent() }}{% endblock %}
+
+{% block nav %}
+    <div class="header">Général</div>
+    {{ mopa_bootstrap_menu('anon') }}
+    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        {% if is_granted('ROLE_MEMBER') %}
+            <div class="header">Membre</div>
+            {{ mopa_bootstrap_menu('student') }}
+        {% elseif is_granted('ROLE_STRUCTURE') %}
+            <div class="header">Structure</div>
+            {{ mopa_bootstrap_menu('teacher') }}
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="header">Administation</div>
+            {{ mopa_bootstrap_menu('admin') }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block headline %}{% endblock %}
+
+{% block action %}{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block javascripts %}{{ parent() }}{% endblock %}

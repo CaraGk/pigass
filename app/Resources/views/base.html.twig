@@ -1,13 +1,142 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    </head>
+{% extends 'MopaBootstrapBundle::base_initializr.html.twig' %}
+
+{% block head_style %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    {{ parent() }}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    {% stylesheets
+        '@GessehCoreBundle/Resources/public/css/main.css'
+        '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css'
+    %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+    {% endstylesheets %}
+{% endblock head_style %}
+
+{% block head_script %}
+    {% javascripts
+        'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'
+    %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    {% endjavascripts %}
+{% endblock head_script %}
+
+{% block title %}
+    {{ kparam('title') }}
+{% endblock title %}
+
+{% block favicon %}
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+{% endblock favicon %}
+
+{% block head_bottom %}
+    <meta name="application-name" content="PIGASS" />
+{% endblock head_bottom %}
+
+{% block body_tag %}
     <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
-    </body>
-</html>
+{% endblock body_tag %}
+
+{% block container_div_start %}
+    <div class="container-fluid">
+{% endblock container_div_start %}
+
+{% block navbar %}
+{% endblock navbar %}
+
+{% block page_header %}
+<header id="header" class="row" style="background-color: {{ kparam('header_color') }};">
+    <span class="hidden-xs col-sm-1">
+        {% block logo %}<a href="{{ path('homepage') }}"><img src="{{ asset('bundles/gessehcore/images/entete.png') }}" alt="logo" /></a>{% endblock logo %}
+    </span>
+    <h1 class="col-sm-4">{% block headline %}{% endblock headline %}</h1>
+    <aside id="menu" class="col-sm-7">
+        {% block nav %}
+        {% endblock nav %}
+    </aside>
+</header>
+{% endblock page_header %}
+
+{% block flashes %}{{ parent() }}{% endblock flashes %}
+
+{% block content_row %}
+<div class="row">
+    <aside id="submenu">
+        <ul class="btn-group">
+            {% block action %}{% endblock action %}
+        </ul>
+    </aside>
+    <section id="content" class="col-lg-10 col-sm-9 col-xs-12">
+        <div class="content">
+            {% block content %}{% endblock content %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block footer_tag_start %}
+<footer id="footer" class="row">
+{% endblock footer_tag_start %}
+
+{% block footer %}
+<ul class="col-sm-6 col-xs-12 text-center">
+    <li><a href="https://github.com/CaraGk/pigass/issues">Reporter un bug ou un souhait</a></li>
+</ul>
+<div class="miniature col-sm-6 col-xs-12">
+    <a href="https://github.com/CaraGk/pigass"><img src="{{ asset('bundles/gessehcore/images/gesseh_logo_small.png') }}" alt="pigass" /></a> powered by <a href="http://symfony.com/"><img src="{{ asset('bundles/gessehcore/images/symfony_logo.png') }}" alt="symfony 2" /></a>
+</div>
+{% endblock footer %}
+
+{% block foot_script_assetic %}
+
+{% block javascripts %}
+{% javascripts
+'@MopaBootstrapBundle/Resources/public/js/*.js'
+'@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.js'
+'@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.fr.js'
+%}
+<script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
+
+<script type="text/javascript">
+    $(function(){
+        $('[data-provider="datepicker"]').datetimepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy',
+            language: 'fr',
+            minView: 'month',
+            pickerPosition: 'bottom-left',
+            todayBtn: true,
+            startView: 'month'
+        });
+
+        $('[data-provider="datetimepicker"]').datetimepicker({
+            autoclose: true,
+            format: 'dd/mm/yyyy hh:ii',
+            language: 'fr',
+            pickerPosition: 'bottom-left',
+            todayBtn: true
+        });
+
+        $('[data-provider="timepicker"]').datetimepicker({
+            autoclose: true,
+            format: 'hh:ii',
+            formatViewType: 'time',
+            maxView: 'day',
+            minView: 'hour',
+            pickerPosition: 'bottom-left',
+            startView: 'day'
+        });
+
+        // Restore value from hidden input
+        $('input[type=hidden]', '.date').each(function(){
+            if($(this).val()) {
+                $(this).parent().datetimepicker('setValue');
+            }
+        });
+
+    });
+</script>
+{% endblock javascripts %}
+
+{% endblock foot_script_assetic %}

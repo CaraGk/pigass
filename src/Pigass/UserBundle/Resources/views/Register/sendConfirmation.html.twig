@@ -1,0 +1,9 @@
+{% extends 'PigassCoreBundle::layout.html.twig' %}
+
+{% block headline %}Adhésion - Validation{% endblock %}
+
+{% block content %}
+    Un email de confirmation a été envoyé à l'adresse {{ email }}. Cliquez sur le lien présent dans l'email pour activer votre compte.
+
+    En cas de non-réception du mail, <a href="{{ path('user_register_confirmation_send', {'email': email}) }}">renvoyer la confirmation</a>.
+{% endblock %}

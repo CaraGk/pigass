@@ -1,0 +1,14 @@
+{% extends "PigassCoreBundle::layout.html.twig" %}
+
+{% block headline %}Modifier mes informations personnelles{% endblock %}
+
+{% block action %}
+  <ul>
+    <li><a href="{{ path('homepage') }}" title="Retour à l'accueil">Retour</a></li>
+    <li><a href="{{ path('fos_user_change_password') }}" title="Modifier le mot de passe">Mot de passe</a></li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+  {{ form(form) }}
+{% endblock %}

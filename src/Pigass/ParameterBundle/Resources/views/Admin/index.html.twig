@@ -1,0 +1,11 @@
+{% extends 'GessehCoreBundle::layout.html.twig' %}
+
+{% block headline %}Paramètres{% endblock %}
+
+{% block content %}
+  {{ form(parameter_form) }}
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'PigassCoreBundle::layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - Structures
+{% endblock %}
+
+{% block headline %}
+    Structures
+{% endblock %}
+
+{% block content %}
+    <ul class="entities structures">
+        {% for structure in structures %}
+            <li class="entity structure row">
+                {{ structure.name }} ({{ structure.slug }})
+            </li>
+        {% else %}
+            <li class="noentity structure">
+                Aucun stage à afficher
+            </li>
+        {% endfor %}
+    </ul>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/pigasscore/js/confirm.js') }}" type="text/javascript"></script>
+{% endblock %}

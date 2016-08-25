@@ -275,4 +275,28 @@ class Membership
     {
         return $this->infos;
     }
+
+    /**
+     * Set structure
+     *
+     * @param \Pigass\CoreBundle\Entity\Structure $structure
+     *
+     * @return Membership
+     */
+    public function setStructure(\Pigass\CoreBundle\Entity\Structure $structure = null)
+    {
+        $this->structure = $structure;
+
+        return $this;
+    }
+
+    /**
+     * Get structure
+     *
+     * @return \Pigass\CoreBundle\Entity\Structure
+     */
+    public function getStructure()
+    {
+        return $this->structure;
+    }
 }

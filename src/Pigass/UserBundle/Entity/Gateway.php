@@ -46,4 +46,62 @@ class Gateway extends BaseGatewayConfig
      * @var string $readable_name
      */
     private $readable_name;
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set readableName
+     *
+     * @param string $readableName
+     *
+     * @return Gateway
+     */
+    public function setReadableName($readableName)
+    {
+        $this->readable_name = $readableName;
+
+        return $this;
+    }
+
+    /**
+     * Get readableName
+     *
+     * @return string
+     */
+    public function getReadableName()
+    {
+        return $this->readable_name;
+    }
+
+    /**
+     * Set structure
+     *
+     * @param \Pigass\CoreBundle\Entity\Structure $structure
+     *
+     * @return Gateway
+     */
+    public function setStructure(\Pigass\CoreBundle\Entity\Structure $structure = null)
+    {
+        $this->structure = $structure;
+
+        return $this;
+    }
+
+    /**
+     * Get structure
+     *
+     * @return \Pigass\CoreBundle\Entity\Structure
+     */
+    public function getStructure()
+    {
+        return $this->structure;
+    }
 }

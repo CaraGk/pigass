@@ -178,4 +178,28 @@ class Parameter extends BaseParameter
     {
         return $this->more;
     }
+
+    /**
+     * Set structure
+     *
+     * @param \Pigass\CoreBundle\Entity\Structure $structure
+     *
+     * @return Parameter
+     */
+    public function setStructure(\Pigass\CoreBundle\Entity\Structure $structure = null)
+    {
+        $this->structure = $structure;
+
+        return $this;
+    }
+
+    /**
+     * Get structure
+     *
+     * @return \Pigass\CoreBundle\Entity\Structure
+     */
+    public function getStructure()
+    {
+        return $this->structure;
+    }
 }

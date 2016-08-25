@@ -129,4 +129,86 @@ class Structure
         return $text;
     }
 
+
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     *
+     * @return Structure
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Add parameter
+     *
+     * @param \Pigass\ParameterBundle\Entity\Parameter $parameter
+     *
+     * @return Structure
+     */
+    public function addParameter(\Pigass\ParameterBundle\Entity\Parameter $parameter)
+    {
+        $this->parameters[] = $parameter;
+
+        return $this;
+    }
+
+    /**
+     * Remove parameter
+     *
+     * @param \Pigass\ParameterBundle\Entity\Parameter $parameter
+     */
+    public function removeParameter(\Pigass\ParameterBundle\Entity\Parameter $parameter)
+    {
+        $this->parameters->removeElement($parameter);
+    }
+
+    /**
+     * Get parameters
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * Add gateway
+     *
+     * @param \Pigass\UserBundle\Entity\Gateway $gateway
+     *
+     * @return Structure
+     */
+    public function addGateway(\Pigass\UserBundle\Entity\Gateway $gateway)
+    {
+        $this->gateways[] = $gateway;
+
+        return $this;
+    }
+
+    /**
+     * Remove gateway
+     *
+     * @param \Pigass\UserBundle\Entity\Gateway $gateway
+     */
+    public function removeGateway(\Pigass\UserBundle\Entity\Gateway $gateway)
+    {
+        $this->gateways->removeElement($gateway);
+    }
+
+    /**
+     * Get gateways
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getGateways()
+    {
+        return $this->gateways;
+    }
 }

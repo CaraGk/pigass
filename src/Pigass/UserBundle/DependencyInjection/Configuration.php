@@ -3,7 +3,7 @@
 /**
  * This file is part of PIGASS project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
  * @copyright: Copyright 2013-2016 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('gesseh_user');
+        $rootNode = $treeBuilder->root('pigass_user');
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for

@@ -67,14 +67,14 @@ class StructureController extends Controller
         if ($structure = $formHandler->process()) {
             $now = new \DateTime('now');
             $parameters = array(
-                0 => array('Name' => 'reg_date', 'Value' => $now, 'Active' => true, 'ActivatesAt' => $now, 'Label' => 'Date anniversaire des adhésions', 'Category' => 'Module Adhesion', 'Type' => 1, 'More' => null, 'Structure' => $structure),
-                1 => array('Name' => 'reg_periodicity', 'Value' => '+ 1 year', 'Active' => true, 'ActivatesAt' => $now, 'Label' => 'Périodicité des adhésions', 'Category' => 'Module Adhesion', 'Type' => 3, 'More' => 'a:6:{s:9:"+ 1 month";s:6:"1 mois";s:10:"+ 2 months";s:6:"2 mois";s:10:"+ 6 months";s:6:"6 mois";s:8:"+ 1 year";s:4:"1 an";s:9:"+ 2 years";s:5:"2 ans";s:9:"+ 3 years";s:5:"3 ans";}', 'Structure' => $structure),
-                2 => array('Name' => 'reg_payment', 'Value' => 60, 'Active' => true, 'ActivatesAt' => $now, 'Label' => 'Montant de la cotisation (EUR)', 'Category' => 'Module Adhesion', 'Type' => 1, 'More' => null, 'Structure' => $structure),
+                0 => array('setName' => 'reg_date', 'setValue' => $now, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                1 => array('setName' => 'reg_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => 'a:6:{s:9:"+ 1 month";s:6:"1 mois";s:10:"+ 2 months";s:6:"2 mois";s:10:"+ 6 months";s:6:"6 mois";s:8:"+ 1 year";s:4:"1 an";s:9:"+ 2 years";s:5:"2 ans";s:9:"+ 3 years";s:5:"3 ans";}', 'setStructure' => $structure),
+                2 => array('setName' => 'reg_payment', 'setValue' => 60, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
             );
             foreach ($parameters as $parameter) {
                 $structure_parameter = new Parameter();
                 foreach ($parameter as $name => $value) {
-                    $structure_parameter->get$name($value);
+                    $structure_parameter->$name($value);
                 }
                 $this->em->persist($structure_parameter);
             }

@@ -5,7 +5,7 @@
     {{ parent() }}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     {% stylesheets
-        '@GessehCoreBundle/Resources/public/css/main.css'
+        '@PigassCoreBundle/Resources/public/css/main.css'
         '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css'
     %}
     <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
@@ -47,7 +47,7 @@
 {% block page_header %}
 <header id="header" class="row" style="background-color: {{ kparam('header_color') }};">
     <span class="hidden-xs col-sm-1">
-        {% block logo %}<a href="{{ path('homepage') }}"><img src="{{ asset('bundles/gessehcore/images/entete.png') }}" alt="logo" /></a>{% endblock logo %}
+        {% block logo %}<a href="{{ path('core_structure_index') }}"><img src="{{ asset('bundles/pigasscore/images/entete.png') }}" alt="logo" /></a>{% endblock logo %}
     </span>
     <h1 class="col-sm-4">{% block headline %}{% endblock headline %}</h1>
     <aside id="menu" class="col-sm-7">
@@ -83,7 +83,7 @@
     <li><a href="https://github.com/CaraGk/pigass/issues">Reporter un bug ou un souhait</a></li>
 </ul>
 <div class="miniature col-sm-6 col-xs-12">
-    <a href="https://github.com/CaraGk/pigass"><img src="{{ asset('bundles/gessehcore/images/gesseh_logo_small.png') }}" alt="pigass" /></a> powered by <a href="http://symfony.com/"><img src="{{ asset('bundles/gessehcore/images/symfony_logo.png') }}" alt="symfony 2" /></a>
+    <a href="https://github.com/CaraGk/pigass"><img src="{{ asset('bundles/pigasscore/images/pigass_logo_small.png') }}" alt="pigass" /></a> powered by <a href="http://symfony.com/"><img src="{{ asset('bundles/pigasscore/images/symfony_logo.png') }}" alt="symfony 2" /></a>
 </div>
 {% endblock footer %}
 

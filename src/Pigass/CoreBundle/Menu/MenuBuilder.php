@@ -12,7 +12,7 @@
 namespace Pigass\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Menu builder class
@@ -30,43 +30,44 @@ class MenuBuilder
     }
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function createAnonMenu(Request $request)
+    public function createAnonMenu(RequestStack $requestStack)
     {
         $menu = $this->factory->createItem('anon');
+        $menu->addChild('Register', array('route' => 'user_register_register', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure')));
 
         return $menu;
     }
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function createMemberMenu(Request $request)
+    public function createMemberMenu(RequestStack $requestStack)
     {
         $menu = $this->factory->createItem('member');
-        $menu->addChild('My memberships', array('route' => 'GRegister_UIndex', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
+        $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
 
         return $menu;
     }
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function createAdminMenu(Request $request)
+    public function createAdminMenu(RequestStack $requestStack)
     {
         $menu = $this->factory->createItem('admin');
         $menu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Catégories', 'attributes' => array('title' => 'Gérer les catégories')));
-        $menu->addChild('Persons', array('route' => 'GUser_SAIndex', 'label' => 'Étudiants', 'attributes' => array('title' => 'Gérer les étudiants')));
-        $menu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
+        $menu->addChild('Persons', array('route' => 'user_person_index', 'label' => 'Étudiants', 'attributes' => array('title' => 'Gérer les étudiants')));
+        $menu->addChild('Parameters', array('route' => 'parameter_admin_index', 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
 
         return $menu;
     }
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function createStructureMenu(Request $request)
+    public function createStructureMenu(RequestStack $requestStack)
     {
         $menu = $this->factory->createItem('structure');
         $menu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));

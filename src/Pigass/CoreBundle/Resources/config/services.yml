@@ -2,40 +2,32 @@
 services:
   pigass_core.menu_builder:
     class: Pigass\CoreBundle\Menu\MenuBuilder
-    arguments: [@knp_menu.factory]
+    arguments: ["@knp_menu.factory"]
 
   pigass_core.menu.anon:
     class: Knp\Menu\MenuItem
-    factory_service: pigass_core.menu_builder
-    factory_method: createAnonMenu
-    arguments: [@request]
-    scope: request
+    factory: ["@pigass_core.menu_builder", createAnonMenu]
+    arguments: ["@request_stack"]
     tags:
       - { name: knp_menu.menu, alias: anon }
 
   pigass_core.menu.person:
     class: Knp\Menu\MenuItem
-    factory_service: pigass_core.menu_builder
-    factory_method: createPersonMenu
-    arguments: [@request]
-    scope: request
+    factory: ["@pigass_core.menu_builder", createAnonMenu]
+    arguments: ["@request_stack"]
     tags:
       - { name: knp_menu.menu, alias: person }
 
   pigass_core.menu.admin:
     class: Knp\Menu\MenuItem
-    factory_service: pigass_core.menu_builder
-    factory_method: createAdminMenu
-    arguments: [@request]
-    scope: request
+    factory: ["@pigass_core.menu_builder", createAnonMenu]
+    arguments: ["@request_stack"]
     tags:
       - { name: knp_menu.menu, alias: admin }
 
   pigass_core.menu.structure:
     class: Knp\Menu\MenuItem
-    factory_service: pigass_core.menu_builder
-    factory_method: createStructureMenu
-    arguments: [@request]
-    scope: request
+    factory: ["@pigass_core.menu_builder", createAnonMenu]
+    arguments: ["@request_stack"]
     tags:
       - { name: knp_menu.menu, alias: structure }

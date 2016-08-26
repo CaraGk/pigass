@@ -34,11 +34,11 @@ class MembershipRepository extends EntityRepository
         return $query->getQuery()->getSingleResult();
     }
 
-    public function getCurrentForperson($person, $payed = false)
+    public function getCurrentForPerson($person_id, $payed = false)
     {
         $query = $this->createQueryBuilder('m');
         $query->where('m.person = :person')
-            ->setParameter('person', $person)
+            ->setParameter('person', $person_id)
             ->andWhere('m.expiredOn > :now')
             ->setParameter('now', new \DateTime('now'))
             ->setMaxResults(1)
@@ -50,15 +50,19 @@ class MembershipRepository extends EntityRepository
         return $query->getQuery()->getOneOrNullResult();
     }
 
-    public function getCurrentForAll($filter = null)
+    public function getCurrentByStructure($slug, $filter = null)
     {
         $query = $this->createQueryBuilder('m')
             ->join('m.person', 's')
             ->addSelect('s')
             ->join('s.user', 'u')
             ->addSelect('u')
+            ->join('m.structure', 't')
+            ->addSelect('t')
             ->where('m.expiredOn > :now')
             ->setParameter('now', new \DateTime('now'))
+            ->andWhere('t.slug = :slug')
+            ->setParameter('slug', $slug)
             ->orderBy('s.name', 'asc');
 
         if ($filter) {

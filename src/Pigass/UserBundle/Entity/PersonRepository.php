@@ -36,7 +36,7 @@ class PersonRepository extends EntityRepository
                  ->getSingleResult();
   }
 
-  public function getAll($search = null)
+  public function getAll($slug, $search = null)
   {
     $query = $this->getBaseQuery();
     $query->addOrderBy('s.surname', 'asc');

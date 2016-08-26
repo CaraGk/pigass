@@ -53,17 +53,17 @@ class RegisterController extends Controller
      *
      * @Route("/{slug}/members", name="user_register_index")
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function indexAction($slug, Request $request)
     {
         $limit = $request->query->get('limit', null);
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
-        $membership_filters = $session->get('gregister_membership_filter', array(
+        $membership_filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
-        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($membership_filters, $slug);
+        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $membership_filters);
 
         return array(
             'memberships' => $memberships,
@@ -91,7 +91,7 @@ class RegisterController extends Controller
         $this->em->persist($membership);
         $this->em->flush();
 
-        $this->get('session')->getFlashBag()->add('notice', 'Paiement validé !');
+        $this->session->getFlashBag()->add('notice', 'Paiement validé !');
 
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_registre_index'));
@@ -116,7 +116,7 @@ class RegisterController extends Controller
         $this->em->remove($membership);
         $this->em->flush();
 
-        $this->get('session')->getFlashBag()->add('notice', 'Adhésion supprimée !');
+        $this->session->getFlashBag()->add('notice', 'Adhésion supprimée !');
 
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_register_index'));
@@ -127,7 +127,7 @@ class RegisterController extends Controller
     /**
      * Export active memberships
      *
-     * @Route("/{slug}/members/export", name="user_registrer_export")
+     * @Route("/{slug}/members/export", name="user_register_export")
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */
     public function exportAction($slug)
@@ -237,8 +237,7 @@ class RegisterController extends Controller
      */
     public function addFilterAction($type, $id, $value)
     {
-        $session = $this->get('session');
-        $membership_filters = $session->get('user_register_filter', array(
+        $membership_filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
@@ -249,7 +248,7 @@ class RegisterController extends Controller
             $membership_filters[$type][$id] = $value;
         }
 
-        $session->set('user_register_filter', $membership_filters);
+        $this->session->set('user_register_filter', $membership_filters);
 
         return $this->redirect($this->generateUrl('user_register_index'));
     }
@@ -262,8 +261,7 @@ class RegisterController extends Controller
      */
     public function removeFilterAction($type, $id)
     {
-        $session = $this->get('session');
-        $membership_filters = $session->get('user_register_filter', array(
+        $membership_filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
@@ -276,7 +274,7 @@ class RegisterController extends Controller
             }
         }
 
-        $session->set('user_register_filter', $membership_filters);
+        $this->session->set('user_register_filter', $membership_filters);
 
         return $this->redirect($this->generateUrl('user_register_index'));
     }
@@ -290,7 +288,7 @@ class RegisterController extends Controller
     public function registerAction(Request $request)
     {
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $this->get('session')->getFlashBag()->add('error', 'Utilisateur déjà enregistré');
+            $this->session->getFlashBag()->add('error', 'Utilisateur déjà enregistré');
             return $this->redirect($this->generateUrl('user_register_join'));
         }
 
@@ -301,7 +299,7 @@ class RegisterController extends Controller
         $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $this->pm->findParamByName('reg_payment')->getValue(), $token, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($username = $form_handler->process()) {
-            $this->get('session')->getFlashBag()->add('notice', 'Utilisateur ' . $username . ' créé.');
+            $this->session->getFlashBag()->add('notice', 'Utilisateur ' . $username . ' créé.');
 
             return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $username)));
         }
@@ -360,7 +358,7 @@ class RegisterController extends Controller
         $person = $this->testAdminTakeOver($user, $userid);
 
         if (null !== $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person)) {
-            $this->get('session')->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
+            $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
 
             if ($userid and $user->hasRole('ROLE_ADMIN'))
                 return $this->redirect($this->generateUrl('user_register_list', array("userid" => $userid)));
@@ -372,7 +370,7 @@ class RegisterController extends Controller
         $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($membership = $form_handler->process()) {
-            $this->get('session')->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
+            $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
 
             return $this->redirect($this->generateUrl('user_payment_prepare', array('gateway' => $membership->getMethod(), 'memberid' => $membership->getId())));
         }
@@ -401,7 +399,7 @@ class RegisterController extends Controller
         $form = $this->createForm(new QuestionType($questions));
         $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
         if($form_handler->process()) {
-            $this->get('session')->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
+            $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
 
             return $this->redirect($this->generateUrl('user_register_list'));
         }
@@ -455,7 +453,7 @@ class RegisterController extends Controller
         $person = $this->testAdminTakeOver($user, $userid);
 
         if (!$membership) {
-            $this->get('session')->getFlashBag()->add('error', 'Adhésion inconnue.');
+            $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
             return $this->redirect($this->generateUrl('user_register_list'));
         }
 
@@ -484,7 +482,7 @@ class RegisterController extends Controller
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
 
         if (!$person) {
-            $this->get('session')->getFlashBag()->add('error', 'Étudiant inconnu.');
+            $this->session->getFlashBag()->add('error', 'Étudiant inconnu.');
             return $this->redirect($this->generateUrl('user_register_list'));
         } else {
             return $person;

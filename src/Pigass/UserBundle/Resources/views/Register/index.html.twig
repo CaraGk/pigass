@@ -5,12 +5,12 @@
 {% block headline %}Adhérents actuels{% endblock %}
 
 {% block action %}
-    <li class="field"><a href="{{ path('user_register_export') }}"><button type="button">Exporter (xls)</button></a></li>
-{% endblock %}
-
-{% block content %}
-    <ul class="filters">
-        <li>
+    <li class="btn btn-primary">
+        <a href="{{ path('user_register_export', {'slug': slug}) }}">
+            {{ icon('folder-open') }} Exporter (xls)
+        </a>
+    </li>
+    <li class="">
             <div class="title">Validation</div>
             {% if filters['valid'] is not null %}
                 <div class="item set"><a href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0}) }}" title="Supprimer le filtre par adhésion">{{ filters['valid'] }}</a></div>
@@ -32,6 +32,10 @@
             </li>
         {% endfor %}
     </ul>
+
+{% endblock %}
+
+{% block content %}
     <ul>
     {% for membership in memberships %}
         <li class="entity person">
@@ -44,7 +48,7 @@
                     <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': membership.person.user.id, 'view': 'index'}) }}" title="Supprimer cette adhésion">Supprimer</a>
                 </div>
             {% endif %}
-            <div class="field"><a href="{{ path('user_register_index', {'userid': membership.person.user.id}) }}" title="Afficher le détail des adhésions de l'étudiant">Détail</a></div>
+            <div class="field"><a href="{{ path('user_register_index', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher le détail des adhésions de l'étudiant">Détail</a></div>
         </li>
     {% else %}
         <li>Aucune adhésion enregistrée.</li>

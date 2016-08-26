@@ -51,26 +51,21 @@ class PersonController extends Controller
      *
      * @Route("/{slug}/persons", name="user_person_index")
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Security\Secure(roles="ROLE_ADMIN")
      */
-    public function indexAction($slug, Request $request)
+    public function indexAction(Request $request, $slug)
     {
         $username = $this->get('security.token_storage')->getToken()->getUsername();
         $user = $this->um->findUserByUsername($username);
         $search = $request->query->get('search', null);
         $paginator = $this->get('knp_paginator');
-        $persons_query = $this->em->getRepository('PigassUserBundle:Person')->getAll($search);
-        $persons_count = $this->em->getRepository('PigassUserBundle:Person')->countAll(true, $search);
+        $persons_query = $this->em->getRepository('PigassUserBundle:Person')->getAll($slug, $search);
+        $persons_count = $this->em->getRepository('PigassUserBundle:Person')->countAll(true, $slug, $search);
         $persons = $paginator->paginate($persons_query, $request->query->get('page', 1), 20);
 
         $member_list = null;
-        if ($this->pm->findParamByName('reg_active')->getValue())
-        {
-            if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_SUPERTEACHER') and $this->pm->findParamByName('reg_teacher_access')->getValue())) {
-                foreach ($members = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPersonArray() as $member) {
-                    $member_list[] = $member['id'];
-                }
-            }
+        foreach ($members = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPersonArray($slug) as $member) {
+            $member_list[] = $member['id'];
         }
 
     return array(

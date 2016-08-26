@@ -142,3 +142,6 @@ payum:
         config_storage:
             Pigass\UserBundle\Entity\Gateway: { doctrine: orm }
 
+jms_security_extra:
+    secure_all_services: true
+    enable_iddqd_attribute: false

@@ -1,13 +1,13 @@
 {% extends 'PigassCoreBundle::layout.html.twig' %}
 
 {% block title %}
-    {{ parent() }} - Structure - Modification
+    {{ parent() }} - {% if structure is not null %}{{ structure.name }} - Modification {% else %} Structure - Ajout {% endif %}
 {% endblock %}
 
 {% block headline %}
-    Structure - Modification
+    {% if structure is not null %}{{ structure.name }} - Modification {% else %} Structure - Ajout {% endif %}
 {% endblock %}
 
 {% block content %}
-    {{ form }}
-{% endblock }
+    {{ form(form) }}
+{% endblock %}

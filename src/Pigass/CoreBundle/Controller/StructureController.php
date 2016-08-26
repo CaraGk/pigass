@@ -14,12 +14,14 @@ namespace Pigass\CoreBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Pigass\CoreBundle\Entity\Structure,
     Pigass\CoreBundle\Form\StructureType,
     Pigass\CoreBundle\Form\StructureHandler;
-use Pigass\ParameterBundle\Entity\Parameter;
+use Pigass\ParameterBundle\Entity\Parameter,
+    Pigass\UserBundle\Entity\Gateway;
 
 /**
  * Structure controller.
@@ -54,20 +56,20 @@ class StructureController extends Controller
      *
      * @Route("/structure/new", name="core_structure_new")
      * @Template("PigassCoreBundle:Structure:edit.html.twig")
-     * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
+     * @Security\Secure(roles="ROLE_ADMIN")
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
         $structures = $this->em->getRepository('PigassCoreBundle:Structure')->findAll();
 
         $structure = new Structure();
-        $form = $this->createForm(new StructureType(), $structure);
-        $formHandler = new StructureHandler($form, $this->$request, $this->em);
+        $form = $this->createForm(StructureType::class, $structure);
+        $formHandler = new StructureHandler($form, $request, $this->em);
 
-        if ($structure = $formHandler->process()) {
+        if ($formHandler->process()) {
             $now = new \DateTime('now');
             $parameters = array(
-                0 => array('setName' => 'reg_date', 'setValue' => $now, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                0 => array('setName' => 'reg_date', 'setValue' => $now->format('Y-m-d H:i:s'), 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
                 1 => array('setName' => 'reg_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => 'a:6:{s:9:"+ 1 month";s:6:"1 mois";s:10:"+ 2 months";s:6:"2 mois";s:10:"+ 6 months";s:6:"6 mois";s:8:"+ 1 year";s:4:"1 an";s:9:"+ 2 years";s:5:"2 ans";s:9:"+ 3 years";s:5:"3 ans";}', 'setStructure' => $structure),
                 2 => array('setName' => 'reg_payment', 'setValue' => 60, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
             );
@@ -107,7 +109,7 @@ class StructureController extends Controller
      */
     public function editAction(Structure $structure, Request $request)
     {
-        $form = $this->createForm(new StructureType(), $structure);
+        $form = $this->createForm(StructureType::class, $structure);
         $formHandler = new StructureHandler($form, $request, $this->em);
 
         if ($formHandler->process()) {

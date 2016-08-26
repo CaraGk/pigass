@@ -40,12 +40,10 @@ class Gateway extends BaseGatewayConfig
      */
     private $structure;
 
-    /**
-     * @ORM\Column(name="readable_name", type="string", length=100)
-     *
-     * @var string $readable_name
-     */
-    private $readable_name;
+    public function __toString()
+    {
+        return $this->gatewayName;
+    }
 
     /**
      * Get id
@@ -55,30 +53,6 @@ class Gateway extends BaseGatewayConfig
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set readableName
-     *
-     * @param string $readableName
-     *
-     * @return Gateway
-     */
-    public function setReadableName($readableName)
-    {
-        $this->readable_name = $readableName;
-
-        return $this;
-    }
-
-    /**
-     * Get readableName
-     *
-     * @return string
-     */
-    public function getReadableName()
-    {
-        return $this->readable_name;
     }
 
     /**
@@ -103,5 +77,20 @@ class Gateway extends BaseGatewayConfig
     public function getStructure()
     {
         return $this->structure;
+    }
+
+    /**
+     * Get Description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        if ($this->factoryName == "offline")
+            return "Chèques ou espèces";
+        elseif ($this->factoryName == "paypal_express_checkout")
+            return "Paypal";
+        else
+            return false;
     }
 }

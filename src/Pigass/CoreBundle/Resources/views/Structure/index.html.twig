@@ -31,7 +31,12 @@
                         <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                         <ul class="dropdown-menu">
                             <li class="action">
-                                <a href="{{ path('user_payment_index', {'slug': structure.slug}) }}" title="Afficher les moyens de paiement pour la structure '{{ structure.name }}'" class="edit">
+                                <a href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de la structure '{{ structure.name }}'" class="index">
+                                    {{ icon('user') }} Adhérents
+                                </a>
+                            </li>
+                            <li class="action">
+                                <a href="{{ path('user_payment_index', {'slug': structure.slug}) }}" title="Afficher les moyens de paiement pour la structure '{{ structure.name }}'" class="index">
                                     {{ icon('piggy-bank') }} Moyens de paiement
                                 </a>
                             </li>

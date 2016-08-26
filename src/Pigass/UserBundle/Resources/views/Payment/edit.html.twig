@@ -1,11 +1,11 @@
 {% extends 'PigassCoreBundle::layout.html.twig' %}
 
 {% block title %}
-    {{ parent() }} - {% if gateway is not null %}{{ gateway.name }} - Modification {% else %} Moyen de paiement - Ajout {% endif %}
+    {{ parent() }} - {% if gateway is not null %}{{ gateway.gatewayName }} - Modification {% else %} Moyen de paiement - Ajout {% endif %}
 {% endblock %}
 
 {% block headline %}
-    {% if gateway is not null %}{{ gateway.name }} - Modification {% else %} Moyen de paiement - Ajout {% endif %}
+    {% if gateway is not null %}{{ gateway.gatewayName }} - Modification {% else %} Moyen de paiement - Ajout {% endif %}
 {% endblock %}
 
 {% block content %}

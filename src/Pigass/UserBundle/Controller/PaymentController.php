@@ -18,6 +18,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Payum\Core\Request\GetHumanStatus;
+use Pigass\UserBundle\Entity\Gateway,
+    Pigass\UserBundle\Form\GatewayType,
+    Pigass\UserBundle\Form\GatewayHandler;
 
 class PaymentController extends Controller
 {
@@ -131,7 +134,7 @@ class PaymentController extends Controller
      * @Template("PigassUserBundle:Payment:edit.html.twig")
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, $slug)
     {
         $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
         if (!$structure)
@@ -139,7 +142,7 @@ class PaymentController extends Controller
 
         $gateway = new Gateway();
         $form = $this->createForm(GatewayType::class, $gateway);
-        $formHandler = new GatewayHandler($form, $request, $this->em);
+        $formHandler = new GatewayHandler($form, $request, $this->em, $structure);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Moyen de paiement "' . $gateway . '" enregistré.');
@@ -160,14 +163,14 @@ class PaymentController extends Controller
      * @Template("PigassUserBundle:Payment:edit.html.twig")
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function editAction(Gateway $gateway, Request $request)
+    public function editAction(Gateway $gateway, Request $request, $slug)
     {
         $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver la structure correspondante à "' . $slug . '".');
 
         $form = $this->createForm(GatewayType::class, $gateway);
-        $formHandler = new GatewayHandler($form, $request, $this->em);
+        $formHandler = new GatewayHandler($form, $request, $this->em, $structure);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Moyen de paiement "' . $gateway . '" modifié.');
@@ -187,7 +190,7 @@ class PaymentController extends Controller
      * @Route("/{slug}/gateway/{id}/delete", name="user_payment_delete", requirements={"id" = "\d+"})
      * @Security\Secure(roles="ROLE_ADMIN")
      */
-    public function deleteAction(Gateway $gateway)
+    public function deleteAction(Gateway $gateway, $slug)
     {
         $this->em->remove($gateway);
         $this->em->flush();

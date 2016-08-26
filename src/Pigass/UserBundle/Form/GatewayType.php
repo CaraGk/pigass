@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * This file is part of PIGASS project
+ *
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013 Pierre-François Angrand
+ * @license: GPLv3
+ * See LICENSE file or http://www.gnu.org/licenses/gpl.html
+ */
+
+namespace Pigass\UserBundle\Form;
+
+use Symfony\Component\Form\AbstractType,
+    Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
+/**
+ * GatewayType
+ */
+class GatewayType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('factoryName', ChoiceType::class, array(
+                'label'   => 'Type',
+                'choices' => array(
+                    'Chèques ou espèces' => 'offline',
+                    'Paypal'             => 'paypal_express_checkout',
+                ),
+                'multiple' => false,
+                'expanded' => false,
+            ))
+            ->add('config', GatewayConfigType::class, array(
+                'label'   => 'Configuration',
+                'required' => false,
+            ))
+            ->add('Enregistrer', SubmitType::class)
+        ;
+    }
+
+    public function getName()
+    {
+        return 'pigass_userbundle_gatewaytype';
+    }
+}

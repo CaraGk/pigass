@@ -1,0 +1,65 @@
+{% extends 'PigassCoreBundle::layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - Moyens de paiement
+{% endblock %}
+
+{% block headline %}
+    Moyens de paiement
+{% endblock %}
+
+{% block action %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <li class="btn btn-primary">
+            <a href="{{ path('user_payment_new', {'slug': slug}) }}" title="Ajouter une nouvelle gateway">
+                {{ icon('plus') }} Ajouter
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        <div>Pour adhérer, veuillez cliquer sur la gateway de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
+    {% endif %}
+
+    <ul class="entities gateways list-group">
+        {% for gateway in gateways %}
+            <li class="entity gateway list-group-item">
+                <span class="btn-group pull-right">
+                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li class="action">
+                            <a href="{{ path('user_payment_edit', {'id': gateway.id, 'slug': slug}) }}" title="Modifier le moyen de paiement '{{ gateway.gatewayName }}'" class="edit">
+                                {{ icon('pencil') }} Modifier
+                            </a>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="action">
+                                <a href="{{ path('user_payment_delete', {'id': gateway.id, 'slug': slug}) }}" title="Supprimer le moyen de paiement '{{ gateway.gatewayName }}'" class="confirm delete" confirm="Attention, vous allez supprimer la gateway et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
+                                    {{ icon('trash') }} Supprimer
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </span>
+
+                {{ gateway.gatewayName }} ({{ gateway.factoryName }}) : {{ gateway.readableName }}
+            </li>
+        {% else %}
+            <li class="noentity gateway">
+                Aucun moyen de paiement enregistré enregistrée.
+                {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('user_payment_new', {'slug': slug}) }}" title="Ajouter un moyen de paiement">Ajouter un moyen de paiement</a>.
+                {% else %}
+                    Contactez un administrateur.
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/pigasscore/js/confirm.js') }}" type="text/javascript"></script>
+{% endblock %}

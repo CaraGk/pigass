@@ -19,7 +19,7 @@ use Payum\Core\Model\GatewayConfig as BaseGatewayConfig;
  * Gateway
  *
  * @ORM\Table(name="payum_gateway")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Pigass\UserBundle\Entity\GatewayRepository")
  */
 class Gateway extends BaseGatewayConfig
 {

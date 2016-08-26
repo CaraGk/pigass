@@ -13,7 +13,8 @@ namespace Pigass\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller,
     Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Payum\Core\Request\GetHumanStatus;
@@ -101,5 +102,97 @@ class PaymentController extends Controller
              $this->addFlash('error', 'Le paiement a échoué.');
         }
         return $this->redirect($this->generateUrl('user_register_list'));
+    }
+
+    /**
+     * Show gateways for structure
+     *
+     * @Route("/{slug}/gateway/index", name="user_payment_index")
+     * @Template()
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     */
+    public function indexAction($slug)
+    {
+        $gateways = $this->em->getRepository('PigassUserBundle:Gateway')->getBySlug($slug);
+
+        if (!$gateways)
+            throw $this->createNotFoundException('Impossible de trouver une Gateway associée à ' . $slug);
+
+        return array(
+            'gateways' => $gateways,
+            'slug'     => $slug,
+        );
+    }
+
+    /**
+     * Add a new gateway for structure
+     *
+     * @Route("/{slug}/gateway/new", name="user_payment_new")
+     * @Template("PigassUserBundle:Payment:edit.html.twig")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     */
+    public function newAction(Request $request)
+    {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver la structure correspondante à "' . $slug . '".');
+
+        $gateway = new Gateway();
+        $form = $this->createForm(GatewayType::class, $gateway);
+        $formHandler = new GatewayHandler($form, $request, $this->em);
+
+        if ($formHandler->process()) {
+            $this->get('session')->getFlashBag()->add('notice', 'Moyen de paiement "' . $gateway . '" enregistré.');
+            return $this->redirect($this->generateUrl('user_payment_index', array('slug' => $slug)));
+        }
+
+        return array(
+            'form'    => $form->createview(),
+            'gateway' => null,
+            'slug'    => $slug,
+        );
+    }
+
+    /**
+     * Edit a gateway
+     *
+     * @Route("/{slug}/gateway/{id}/edit", name="user_payment_edit", requirements={"id" = "\d+"})
+     * @Template("PigassUserBundle:Payment:edit.html.twig")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     */
+    public function editAction(Gateway $gateway, Request $request)
+    {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver la structure correspondante à "' . $slug . '".');
+
+        $form = $this->createForm(GatewayType::class, $gateway);
+        $formHandler = new GatewayHandler($form, $request, $this->em);
+
+        if ($formHandler->process()) {
+            $this->get('session')->getFlashBag()->add('notice', 'Moyen de paiement "' . $gateway . '" modifié.');
+            return $this->redirect($this->generateUrl('user_payment_index', array('slug' => $slug)));
+        }
+
+        return array(
+            'form'    => $form->createview(),
+            'gateway' => $gateway,
+            'slug'    => $slug,
+        );
+    }
+
+    /**
+     * Delete a gateway
+     *
+     * @Route("/{slug}/gateway/{id}/delete", name="user_payment_delete", requirements={"id" = "\d+"})
+     * @Security\Secure(roles="ROLE_ADMIN")
+     */
+    public function deleteAction(Gateway $gateway)
+    {
+        $this->em->remove($gateway);
+        $this->em->flush();
+
+        $this->get('session')->getFlashBag()->add('notice', 'Moyen de paiement "' . $gateway . '" supprimé.');
+        return $this->redirect($this->generateUrl('user_payment_index', array('slug' => $slug)));
     }
 }

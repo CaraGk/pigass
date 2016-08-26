@@ -105,7 +105,7 @@ class StructureController extends Controller
      *
      * @Route("/structure/{id}/edit", name="core_structure_edit", requirements={"id" = "\d+"})
      * @Template("PigassCoreBundle:Structure:edit.html.twig")
-     * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
+     * @Security\Secure(roles="ROLE_ADMIN")
      */
     public function editAction(Structure $structure, Request $request)
     {

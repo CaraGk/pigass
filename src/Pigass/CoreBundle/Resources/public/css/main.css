@@ -42,10 +42,11 @@ div.flasherror, div.flashnotice { padding: 2px 10px 2px 10px; width: auto; font-
 #menu ul { margin: 0; padding: 14px 0; border: 0; }
 #menu li { list-style: none; padding: 0; }
 #menu li:hover { }
-#menu li:hover a { color: #FDEF55; }
+#menu li:hover a, #menu li:focus a { color: #FDEF55; }
 #menu li a, #menu li span { color: #BBBBBB; padding: 5px; display: inline-block; }
 #menu li a:hover { color: #FDEF55; text-decoration: none; background-color: #252525; }
 #menu .active { background-color: #252525; }
+#menu ul.dropdown-menu { background-color: #252525; }
 
 #search{ width: auto; height: 25px; margin: 0; padding: 0px; font-size: 110%; }
 #search select{ border: 1px; width: 50%; }

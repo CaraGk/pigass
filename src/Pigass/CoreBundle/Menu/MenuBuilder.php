@@ -50,15 +50,15 @@ class MenuBuilder
                 $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer le site', 'dropdown' => true, 'caret' => true,));
                 if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
                     $slug = $session->get('slug');
-                    $adminMenu->addChild('Persons', array('route' => 'user_person_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents')));
-                    $adminMenu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'route_parameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
+                    $adminMenu->addChild('Persons', array('route' => 'user_person_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'home'));
+                    $adminMenu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'route_parameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
                 }
                 if ($security->isGranted('ROLE_ADMIN')) {
-                    $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures')));
-                    $adminMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => null), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
+                    $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'home'));
+                    $adminMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => null), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
                 }
             }
-            $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site')));
+            $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site'), 'icon' => 'log-out'));
         }
 
         return $menu;

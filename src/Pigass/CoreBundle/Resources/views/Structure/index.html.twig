@@ -8,15 +8,54 @@
     Structures
 {% endblock %}
 
+{% block action %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <li class="btn btn-primary">
+            <a href="{{ path('core_structure_new') }}" title="Ajouter une nouvelle structure">
+                {{ icon('plus') }} Ajouter
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
-    <ul class="entities structures">
+    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        <div>Pour adhérer, veuillez cliquer sur la structure de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
+    {% endif %}
+
+    <ul class="entities structures list-group">
         {% for structure in structures %}
-            <li class="entity structure row">
-                {{ structure.name }} ({{ structure.slug }})
+            <li class="entity structure list-group-item">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <span class="btn-group pull-right">
+                        <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li class="action">
+                                <a href="{{ path('core_structure_edit', {'id': structure.id}) }}" title="Modifier la structure '{{ structure.name }}'" class="edit">
+                                    {{ icon('pencil') }} Modifier
+                                </a>
+                            </li>
+                            <li class="action">
+                                <a href="{{ path('core_structure_delete', {'id': structure.id}) }}" title="Supprimer la structure '{{ structure.name }}'" class="confirm delete" confirm="Attention, vous allez supprimer la structure et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
+                                    {{ icon('trash') }} Supprimer
+                                </a>
+                            </li>
+                        </ul>
+                    </span>
+
+                    {{ structure.name }} ({{ structure.slug }})
+                {% elseif not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                    <a href="{{ path('user_register_register', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">{{ structure.name }}</a>
+                {% endif %}
             </li>
         {% else %}
             <li class="noentity structure">
-                Aucune structure enregistrée. Contactez un administrateur.
+                Aucune structure enregistrée.
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('core_structure_new') }}" title="Ajouter une structure">Ajouter une structure</a>.
+                {% else %}
+                    Contactez un administrateur.
+                {% endif %}
             </li>
         {% endfor %}
     </ul>

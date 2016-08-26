@@ -13,7 +13,10 @@ namespace Pigass\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
-    Symfony\Component\Form\Extension\Core\Type\SubmitType;
+    Symfony\Component\Form\Extension\Core\Type\SubmitType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Pigass\UserBundle\Form\UserAdminType,
     Pigass\UserBundle\Form\AddressType;
 
@@ -25,7 +28,7 @@ class RegisterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('title', 'choice', array(
+            ->add('title', ChoiceType::class, array(
                 'label' => 'Titre',
                 'choices' => array(
                     'M.'   => 'M.',
@@ -33,33 +36,28 @@ class RegisterType extends AbstractType
                     'Mlle' => 'Mlle',
                 ),
             ))
-            ->add('surname', 'text', array(
+            ->add('surname', TextType::class, array(
                 'label' => 'Nom',
             ))
-            ->add('name', 'text', array(
+            ->add('name', TextType::class, array(
                 'label' => 'Prénom',
             ))
-            ->add('birthday', 'birthday', array(
+            ->add('birthday', BirthdayType::class, array(
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
             ))
-            ->add('birthplace', 'text', array(
+            ->add('birthplace', TextType::class, array(
                 'label' => 'Lieu de naissance',
             ))
-            ->add('user', new UserAdminType('Pigass\UserBundle\Entity\User'), array(
+            ->add('user', UserAdminType::class, array(
                 'label' => ' ',
             ))
-            ->add('phone', 'text', array(
+            ->add('phone', TextType::class, array(
                 'label' => 'Téléphone',
             ))
-            ->add('address', new AddressType(), array(
+            ->add('address', AddressType::class, array(
                 'label' => 'Adresse :'
-            ))
-            ->add('grade', 'entity', array(
-                'class' => 'PigassUserBundle:Grade',
-                'query_builder' => function (\Pigass\UserBundle\Entity\GradeRepository $er) { return $er->getActiveQuery(); },
-                'label' => 'Promotion',
             ))
             ->add('Enregistrer', SubmitType::class)
         ;
@@ -76,9 +74,6 @@ class RegisterType extends AbstractType
     $resolver->setDefaults(array(
         'data_class' => 'Pigass\UserBundle\Entity\Person',
         'cascade_validation' => true,
-    ));
-
-    $resolver->setAllowedValues(array(
     ));
   }
 }

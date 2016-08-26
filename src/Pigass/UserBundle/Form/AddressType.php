@@ -12,7 +12,11 @@
 namespace Pigass\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType,
-    Symfony\Component\Form\FormBuilderInterface;
+    Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Component\Form\Extension\Core\Type\IntegerType,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\CountryType;
 
 /**
  * AddressType
@@ -22,10 +26,10 @@ class AddressType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('number', 'integer', array(
+            ->add('number', IntegerType::class, array(
                 'label' => 'Nº dans la voie',
             ))
-            ->add('type', 'choice', array(
+            ->add('type', ChoiceType::class, array(
                 'label' => 'Type de voie',
                 'choices' => array(
                     'allée'     => 'allée',
@@ -63,21 +67,22 @@ class AddressType extends AbstractType
                 'multiple' => false,
                 'expanded' => false,
             ))
-            ->add('street', 'text', array(
+            ->add('street', textType::class, array(
                 'label' => 'Nom de voie',
             ))
-            ->add('complement', 'text', array(
+            ->add('complement', TextType::class, array(
                 'label' => 'Complément d\'adresse',
                 'required' => false,
             ))
-            ->add('code', 'integer', array(
+            ->add('code', IntegerType::class, array(
                 'label' => 'Code postal',
             ))
-            ->add('city', 'text', array(
+            ->add('city', TextType::class, array(
                 'label' => 'Ville',
             ))
-            ->add('country', 'country', array(
+            ->add('country', CountryType::class, array(
                 'label' => 'Pays',
+                'preferred_choices' => array('France')
             ))
         ;
     }

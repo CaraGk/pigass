@@ -19,9 +19,9 @@ use Pigass\UserBundle\Entity\Membership,
     Pigass\UserBundle\Entity\Person;
 
 /**
- * UserType Handler
+ * RegisterType Handler
  */
-class UserHandler
+class RegisterHandler
 {
     private $form, $request, $em, $um, $payment, $token;
 

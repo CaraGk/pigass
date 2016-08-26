@@ -297,7 +297,7 @@ class RegisterController extends Controller
         $tokenGenerator = $this->container->get('fos_user.util.token_generator');
         $token = $tokenGenerator->generateToken();
 
-        $form = $this->createForm(new RegisterType($this->pm->findParamByName('simul_active')->getValue()));
+        $form = $this->createForm(RegisterType::class);
         $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $this->pm->findParamByName('reg_payment')->getValue(), $token, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($username = $form_handler->process()) {
@@ -368,7 +368,7 @@ class RegisterController extends Controller
                 return $this->redirect($this->generateUrl('user_register_list'));
         }
 
-        $form = $this->createForm(new JoinType());
+        $form = $this->createForm(JoinType::class);
         $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($membership = $form_handler->process()) {

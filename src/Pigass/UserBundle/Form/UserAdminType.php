@@ -11,7 +11,10 @@
 
 namespace Pigass\UserBundle\Form;
 
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Component\Form\Extension\Core\Type\EmailType,
+    Symfony\Component\Form\Extension\Core\Type\PasswordType,
+    Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use FOS\UserBundle\Form\Type\RegistrationFormType as BaseType;
 
 /**
@@ -21,11 +24,11 @@ class UserAdminType extends BaseType
 {
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
-    $builder->add('email', 'email')
-            ->add('plainPassword', 'repeated', array(
+    $builder->add('email', EmailType::class)
+            ->add('plainPassword', RepeatedType::class, array(
               'first_name' => 'password',
               'second_name' => 'confirm',
-              'type' => 'password',
+              'type' => PasswordType::class,
             ));
   }
 
@@ -38,9 +41,6 @@ class UserAdminType extends BaseType
   {
     $resolver->setDefaults(array(
         'data_class' => 'Pigass\UserBundle\Entity\User',
-    ));
-
-    $resolver->setAllowedValues(array(
     ));
   }
 }

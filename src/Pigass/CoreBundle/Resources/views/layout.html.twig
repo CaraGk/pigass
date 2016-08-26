@@ -3,19 +3,15 @@
 {% block title %}{{ parent() }}{% endblock %}
 
 {% block nav %}
-    <div class="header">Général</div>
-    {{ mopa_bootstrap_menu('anon') }}
+    {{ mopa_bootstrap_menu('anon', {'automenu': 'navbar'}) }}
     {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
         {% if is_granted('ROLE_MEMBER') %}
-            <div class="header">Membre</div>
-            {{ mopa_bootstrap_menu('person') }}
+            {{ mopa_bootstrap_menu('person', {'automenu': 'navbar'}) }}
         {% elseif is_granted('ROLE_STRUCTURE') %}
-            <div class="header">Structure</div>
-            {{ mopa_bootstrap_menu('structure') }}
+            {{ mopa_bootstrap_menu('structure', {'automenu': 'navbar'}) }}
         {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
-            <div class="header">Administation</div>
-            {{ mopa_bootstrap_menu('admin') }}
+            {{ mopa_bootstrap_menu('admin', {'automenu': 'navbar'}) }}
         {% endif %}
     {% endif %}
 {% endblock %}

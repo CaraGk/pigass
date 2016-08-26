@@ -21,9 +21,7 @@
     {% endjavascripts %}
 {% endblock head_script %}
 
-{% block title %}
-    {{ kparam('title') }}
-{% endblock title %}
+{% block title %}Adhésions{% endblock title %}
 
 {% block favicon %}
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
@@ -45,7 +43,7 @@
 {% endblock navbar %}
 
 {% block page_header %}
-<header id="header" class="row" style="background-color: {{ kparam('header_color') }};">
+<header id="header" class="row">
     <span class="hidden-xs col-sm-1">
         {% block logo %}<a href="{{ path('core_structure_index') }}"><img src="{{ asset('bundles/pigasscore/images/entete.png') }}" alt="logo" /></a>{% endblock logo %}
     </span>

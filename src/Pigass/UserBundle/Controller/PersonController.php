@@ -40,7 +40,7 @@ class PersonController extends Controller
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
-    /** @DI\Inject("for_user.user_manager") */
+    /** @DI\Inject("fos_user.user_manager") */
     private $um;
 
     /** @DI\Inject("kdb_parameters.manager") */

@@ -12,7 +12,8 @@
 namespace Pigass\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack,
+    Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 /**
  * Menu builder class
@@ -31,47 +32,34 @@ class MenuBuilder
 
     /**
      * @param RequestStack $requestStack
+     * @param AuthorizationChecker $security
      */
-    public function createAnonMenu(RequestStack $requestStack)
+    public function createMainMenu(RequestStack $requestStack, AuthorizationChecker $security)
     {
-        $menu = $this->factory->createItem('anon');
-        $menu->addChild('Register', array('route' => 'user_register_register', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure')));
-        $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site')));
+        $menu = $this->factory->createItem('anon', array('navbar' => true));
+        $session = $requestStack->getCurrentRequest()->getSession();
 
-        return $menu;
-    }
-
-    /**
-     * @param RequestStack $requestStack
-     */
-    public function createMemberMenu(RequestStack $requestStack)
-    {
-        $menu = $this->factory->createItem('member');
-        $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
-
-        return $menu;
-    }
-
-    /**
-     * @param RequestStack $requestStack
-     */
-    public function createAdminMenu(RequestStack $requestStack)
-    {
-        $menu = $this->factory->createItem('admin');
-        $menu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Catégories', 'attributes' => array('title' => 'Gérer les catégories')));
-        $menu->addChild('Persons', array('route' => 'user_person_index', 'label' => 'Étudiants', 'attributes' => array('title' => 'Gérer les étudiants')));
-        $menu->addChild('Parameters', array('route' => 'parameter_admin_index', 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
-
-        return $menu;
-    }
-
-    /**
-     * @param RequestStack $requestStack
-     */
-    public function createStructureMenu(RequestStack $requestStack)
-    {
-        $menu = $this->factory->createItem('structure');
-        $menu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
+        if (!$security->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site')));
+        } else {
+            if ($security->isGranted('ROLE_MEMBER')) {
+                $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
+            }
+            if ($security->isGranted('ROLE_STRUCTURE') or $security->isGranted('ROLE_ADMIN')) {
+                $menu = $this->factory->createItem('admin', array('navbar' => true));
+                $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer le site', 'dropdown' => true, 'caret' => true,));
+                if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
+                    $slug = $session->get('slug');
+                    $adminMenu->addChild('Persons', array('route' => 'user_person_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents')));
+                    $adminMenu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'route_parameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
+                }
+                if ($security->isGranted('ROLE_ADMIN')) {
+                    $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures')));
+                    $adminMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => null), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site')));
+                }
+            }
+            $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site')));
+        }
 
         return $menu;
     }

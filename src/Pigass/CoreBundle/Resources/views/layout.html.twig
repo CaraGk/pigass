@@ -3,17 +3,7 @@
 {% block title %}{{ parent() }}{% endblock %}
 
 {% block nav %}
-    {{ mopa_bootstrap_menu('anon', {'automenu': 'navbar'}) }}
-    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-        {% if is_granted('ROLE_MEMBER') %}
-            {{ mopa_bootstrap_menu('person', {'automenu': 'navbar'}) }}
-        {% elseif is_granted('ROLE_STRUCTURE') %}
-            {{ mopa_bootstrap_menu('structure', {'automenu': 'navbar'}) }}
-        {% endif %}
-        {% if is_granted('ROLE_ADMIN') %}
-            {{ mopa_bootstrap_menu('admin', {'automenu': 'navbar'}) }}
-        {% endif %}
-    {% endif %}
+            {{ mopa_bootstrap_menu('main', {'automenu': 'navbar'}) }}
 {% endblock %}
 
 {% block logo %}

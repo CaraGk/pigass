@@ -4,30 +4,9 @@ services:
     class: Pigass\CoreBundle\Menu\MenuBuilder
     arguments: ["@knp_menu.factory"]
 
-  pigass_core.menu.anon:
+  pigass_core.menu.main:
     class: Knp\Menu\MenuItem
-    factory: ["@pigass_core.menu_builder", createAnonMenu]
-    arguments: ["@request_stack"]
+    factory: ["@pigass_core.menu_builder", createMainMenu]
+    arguments: ["@request_stack","@security.authorization_checker"]
     tags:
-      - { name: knp_menu.menu, alias: anon }
-
-  pigass_core.menu.person:
-    class: Knp\Menu\MenuItem
-    factory: ["@pigass_core.menu_builder", createAnonMenu]
-    arguments: ["@request_stack"]
-    tags:
-      - { name: knp_menu.menu, alias: person }
-
-  pigass_core.menu.admin:
-    class: Knp\Menu\MenuItem
-    factory: ["@pigass_core.menu_builder", createAnonMenu]
-    arguments: ["@request_stack"]
-    tags:
-      - { name: knp_menu.menu, alias: admin }
-
-  pigass_core.menu.structure:
-    class: Knp\Menu\MenuItem
-    factory: ["@pigass_core.menu_builder", createAnonMenu]
-    arguments: ["@request_stack"]
-    tags:
-      - { name: knp_menu.menu, alias: structure }
+      - { name: knp_menu.menu, alias: main }

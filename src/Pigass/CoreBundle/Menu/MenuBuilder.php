@@ -36,6 +36,7 @@ class MenuBuilder
     {
         $menu = $this->factory->createItem('anon');
         $menu->addChild('Register', array('route' => 'user_register_register', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure')));
+        $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site')));
 
         return $menu;
     }

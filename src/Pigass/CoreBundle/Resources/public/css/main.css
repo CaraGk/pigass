@@ -28,24 +28,23 @@ input:invalid, textarea:invalid, select:invalid  { background-color: #faa; outli
 .flashnotice { background-color: #99ff99; color: black; }
 div.flasherror, div.flashnotice { padding: 2px 10px 2px 10px; width: auto; font-style: italic; }
 
-#header { margin: 0; padding: 0; border: 0; }
-#header img, h1 { vertical-align: middle; margin: 0; }
-#header h1 { padding: 10px 10px 10px 30px; font-size: 2.8em; color: #EEEEEE; display: inline-block; }
+#header { margin: 0; padding: 0; border: 0; background-color: #252525; }
+#header img, h1, span { vertical-align: middle; margin: 0; padding: 0; }
+#header h1 { padding: 12px 10px; font-size: 2.4em; color: #EEEEEE; display: inline-block; }
 #header a { text-decoration: none; color: #252525; }
-#header img { padding: 10px; }
+#header img { padding: 10px 0px; }
 #header ul { text-align: right; font-weight: bold; font-size: 90%; padding: 5px; }
 #header li { list-style: none; }
 #header li a { color: #252525; }
 #header li a:hover { color: #EEEEEE; }
 
 #menu { font-size: 110%; font-weight: bold; background-color: #252525; padding: 0; margin: 0; }
-#menu div.header { font-size: 120%; color: #BBBBBB; padding: 20px 3px 0 3px; border-bottom: 1px dotted #FDEF55; }
-#menu ul { margin: 0; padding: 0; border: 0; }
-#menu li { list-style: none; padding: 0; border-left: 5px solid #252525; }
-#menu li:hover { border-left-color: #FDEF55; background-color: #303030; }
+#menu ul { margin: 0; padding: 14px 0; border: 0; }
+#menu li { list-style: none; padding: 0; }
+#menu li:hover { }
 #menu li:hover a { color: #FDEF55; }
 #menu li a, #menu li span { color: #BBBBBB; padding: 5px; display: inline-block; }
-#menu li a:hover { color: #FDEF55; text-decoration: none; }
+#menu li a:hover { color: #FDEF55; text-decoration: none; background-color: #252525; }
 #menu .active { background-color: #252525; }
 
 #search{ width: auto; height: 25px; margin: 0; padding: 0px; font-size: 110%; }

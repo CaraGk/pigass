@@ -16,6 +16,12 @@
     {% endif %}
 {% endblock %}
 
+{% block logo %}
+    {% image '@PigassCoreBundle/Resources/public/images/pigass_medium.png' %}
+        <a href="{{ path('core_structure_index') }}"><img src="{{ asset_url }}" alt="logo" /></a>
+    {% endimage %}
+{% endblock logo %}
+
 {% block headline %}{% endblock %}
 
 {% block action %}{% endblock %}

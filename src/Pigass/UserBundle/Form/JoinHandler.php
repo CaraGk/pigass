@@ -38,7 +38,7 @@ class JoinHandler
     public function process()
     {
         if($this->request->getMethod() == 'POST') {
-            $this->form->bind($this->request);
+            $this->form->handleRequest($this->request);
 
             if($this->form->isValid()) {
                 $this->onSuccess($this->form->getData());

@@ -37,7 +37,6 @@ class PaymentController extends Controller
      * Prepare action
      *
      * @Route("/member/{memberid}/payment/{gateway}", name="user_payment_prepare", requirements={"memberid" = "\d+", "gateway" = "\w+"})
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER')")
      */
     public function prepareAction($gateway, $memberid)
     {
@@ -46,11 +45,6 @@ class PaymentController extends Controller
 
         if (!$membership or $membership->getPerson()->getUser() !== $user)
             throw $this->createNotFoundException('Impossible d\'effectuer la transaction. Contactez un administrateur.');
-
-        if ($gateway == 1)
-            $gateway = 'offline';
-        elseif ($gateway == 2)
-            $gateway = 'paypal';
 
         $storage = $this->get('payum')->getStorage('Pigass\UserBundle\Entity\Payment');
 

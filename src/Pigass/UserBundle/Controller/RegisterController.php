@@ -282,14 +282,18 @@ class RegisterController extends Controller
     /**
      * Register Person and create Membership
      *
-     * @Route("/register/", name="user_register_register")
+     * @Route("/{slug}/register/", name="user_register_register")
      * @Template()
      */
-    public function registerAction(Request $request)
+    public function registerAction(Request $request, $slug)
     {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $this->session->getFlashBag()->add('error', 'Utilisateur déjà enregistré');
-            return $this->redirect($this->generateUrl('user_register_join'));
+            return $this->redirect($this->generateUrl('user_register_join', array('slug' => $slug)));
         }
 
         $tokenGenerator = $this->container->get('fos_user.util.token_generator');
@@ -299,9 +303,10 @@ class RegisterController extends Controller
         $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $this->pm->findParamByName('reg_payment')->getValue(), $token, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($username = $form_handler->process()) {
+            $this->session->set('user_register_tmp', 1);
             $this->session->getFlashBag()->add('notice', 'Utilisateur ' . $username . ' créé.');
 
-            return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $username)));
+            return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $username, 'slug' => $slug)));
         }
 
         return array(
@@ -312,11 +317,15 @@ class RegisterController extends Controller
     /**
      * Send confirmation email
      *
-     * @Route("/register/send/{email}", name="user_register_confirmation_send", requirements={"email" = ".+\@.+\.\w+" })
+     * @Route("/{slug}/register/send/{email}", name="user_register_confirmation_send", requirements={"email" = ".+\@.+\.\w+" })
      * @Template()
      */
-    public function sendConfirmationAction($email, Request $request)
+    public function sendConfirmationAction($email, Request $request, $slug)
     {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+
         $username = $request->query->get('username');
         $user = $this->um->findUserByUsername($email);
 
@@ -325,6 +334,9 @@ class RegisterController extends Controller
 
         if(!$user->getConfirmationToken())
             throw $this->createNotFoundException('Cet utilisateur n\'a pas de jeton de confirmation défini. Est-il déjà validé ? Contactez un administrateur.');
+
+        if ($this->session->get('user_register_tmp'))
+            $this->session->set('user_register_tmp', $email);
 
         $url = $this->generateUrl('fos_user_registration_confirm', array('token' => $user->getConfirmationToken()), true);
         $sendmail = \Swift_Message::newInstance()
@@ -338,22 +350,30 @@ class RegisterController extends Controller
 
         return array(
             'email' => $user->getEmailCanonical(),
+            'slug'  => $slug,
         );
     }
 
     /**
      * Join action
      *
-     * @Route("/member/join", name="user_register_join")
+     * @Route("/{slug}/member/join", name="user_register_join")
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or hasRole('ROLE_STRUCTURE')")
      */
-    public function joinAction(Request $request)
+    public function joinAction(Request $request, $slug)
     {
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED'))
-            return $this->redirect($this->generateUrl('user_register_register'));
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') and !$this->session->get('user_register_tmp'))
+            return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
+
+        if ($username = $this->session->get('user_register_tmp'))
+            $user = $this->um->findUserByUsername($username);
+        else
+            $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 
@@ -372,7 +392,7 @@ class RegisterController extends Controller
         if($membership = $form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
 
-            return $this->redirect($this->generateUrl('user_payment_prepare', array('gateway' => $membership->getMethod(), 'memberid' => $membership->getId())));
+            return $this->redirect($this->generateUrl('user_payment_prepare', array('gateway' => $membership->getMethod()->getGatewayName(), 'memberid' => $membership->getId())));
         }
 
         return array(
@@ -386,7 +406,7 @@ class RegisterController extends Controller
      *
      * @Route("/member/questions", name="user_register_question")
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER')")
+     * @Security\Secure(roles="ROLE_MEMBER")
      */
     public function questionAction(Request $request)
     {
@@ -414,7 +434,7 @@ class RegisterController extends Controller
      *
      * @Route("/member/list", name="user_register_list")
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or hasRole('ROLE_STRUCTURE')")
+     * @Security\Secure(roles="ROLE_MEMBER, ROLE_STRUCTURE")
      */
     public function listAction(Request $request)
     {
@@ -444,7 +464,7 @@ class RegisterController extends Controller
      *
      * @Route("/user/{id}/infos/", name="user_register_infos", requirements={"id" = "\d+"})
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or hasRole('ROLE_STRUCTURE')")
+     * @Security\Secure(roles="ROLE_MEMBER, ROLE_STRUCTURE")
      */
     public function showInfosAction(Membership $membership, Request $request)
     {

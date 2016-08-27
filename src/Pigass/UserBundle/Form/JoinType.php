@@ -12,7 +12,9 @@
 namespace Pigass\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType,
-    Symfony\Component\Form\FormBuilderInterface;
+    Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Bridge\Doctrine\Form\Type\EntityType,
+    Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * JoinType
@@ -21,17 +23,15 @@ class JoinType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('method', 'choice', array(
-                'choices' => array(
-                    'offline' => 'Chèque',
-                    'paypal'  => 'Paypal',
-                ),
-                'required' => true,
-                'multiple' => false,
-                'expanded' => true,
-                'label'    => 'Moyen de paiement'
+            ->add('method', EntityType::class, array(
+                'class'        => 'PigassUserBundle:Gateway',
+                'choice_label' => 'description',
+                'required'     => true,
+                'multiple'     => false,
+                'expanded'     => true,
+                'label'        => 'Moyen de paiement'
             ))
-            ->add('Payer', 'submit')
+            ->add('Payer', SubmitType::class)
         ;
     }
 
@@ -44,9 +44,6 @@ class JoinType extends AbstractType {
     {
         $resolver->setDefaults(array(
             'data_class' => 'Pigass\UserBundle\Entity\Membership',
-        ));
-
-        $resolver->setAllowedValues(array(
         ));
     }
 }

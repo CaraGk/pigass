@@ -166,21 +166,6 @@ class Membership
     }
 
     /**
-     * Get readable method
-     *
-     * @return string
-     */
-    public function getReadableMethod()
-    {
-        if ($this->method == 1 or $this->method == 'offline')
-            return 'Chèque';
-        elseif ($this->method == 2 or $this->method == 'paypal')
-            return 'Paypal';
-        elseif ($this->method == 3 or $this->method == 'sips')
-            return 'Carte bancaire';
-    }
-
-    /**
      * Set payedOn
      *
      * @param \DateTime $payedOn

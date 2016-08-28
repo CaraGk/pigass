@@ -16,25 +16,22 @@ use Symfony\Component\Form\Form,
     Doctrine\ORM\EntityManager,
     FOS\UserBundle\Doctrine\UserManager;
 use Pigass\UserBundle\Entity\Membership,
-    Pigass\UserBundle\Entity\Person;
+    Pigass\UserBundle\Entity\Person,
+    Pigass\CoreBundle\Entity\Structure;
 
 /**
  * RegisterType Handler
  */
 class RegisterHandler
 {
-    private $form, $request, $em, $um, $payment, $token;
+    private $form, $request, $em, $um;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um, $payment, $token, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year")
+    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um)
     {
       $this->form    = $form;
       $this->request = $request;
       $this->em      = $em;
       $this->um      = $um;
-      $this->payment = $payment;
-      $this->token   = $token;
-      $this->date    = $reg_date;
-      $this->periodicity = $reg_periodicity;
     }
 
     public function process()

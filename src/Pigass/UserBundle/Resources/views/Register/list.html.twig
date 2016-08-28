@@ -9,12 +9,24 @@
 {% endblock %}
 
 {% block action %}
-    <li class="btn btn-primary">
-        <a href="{{ path('user_register_join')}}?{{ app.request.queryString }}">
-            <span class="glyphicon glyphicon-euro"></span>
-            Adhérer
-        </a>
-    </li>
+    {% if slug is not null %}
+        <li class="btn btn-primary">
+            <a href="{{ path('user_register_join', {'slug': slug}) }}?{{ app.request.queryString }}">
+                {{ icon('euro') }} Ré-adhérer
+            </a>
+        </li>
+        <li class="btn btn-primary">
+            <a href="{{ path('core_structure_index') }}">
+                {{ icon('euro') }} Autre structure
+            </a>
+        </li>
+    {% else %}
+        <li class="btn btn-primary">
+            <a href="{{ path('core_structure_index') }}">
+                {{ icon('euro') }} Adhérer
+            </a>
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -25,7 +37,7 @@
                     <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="{{ path('user_register_infos', {'memberid': membership.id, 'userid': userid}) }}" title="Afficher les réponses aux questions complémentaires">
+                            <a href="{{ path('user_register_infos', {'id': membership.id, 'userid': userid}) }}" title="Afficher les réponses aux questions complémentaires">
                                 <span class="glyphicon glyphicon-question-sign"></span>
                                 Questions complémentaires
                             </a>
@@ -47,7 +59,7 @@
                     </ul>
                 </span>
                 <div>
-                    Adhésion jusqu'au {{ membership.expiredOn|date('d/m/Y') }} payée ({{ membership.amount }} €) par {{ membership.readableMethod|lower }}
+                    Adhésion jusqu'au {{ membership.expiredOn|date('d/m/Y') }} payée ({{ membership.amount }} €) par {{ membership.method.description|lower }}
                     {% if membership.payedOn is not null %}
                         le {{ membership.payedOn|date('d/m/Y') }}.
                     {% else %}

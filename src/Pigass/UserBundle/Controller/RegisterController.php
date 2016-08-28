@@ -300,7 +300,7 @@ class RegisterController extends Controller
         $token = $tokenGenerator->generateToken();
 
         $form = $this->createForm(RegisterType::class);
-        $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $this->pm->findParamByName('reg_payment')->getValue(), $token, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
+        $form_handler = new RegisterHandler($form, $request, $this->em, $this->um);
 
         if($username = $form_handler->process()) {
             $this->session->set('user_register_tmp', 1);
@@ -387,7 +387,7 @@ class RegisterController extends Controller
         }
 
         $form = $this->createForm(JoinType::class);
-        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
+        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
 
         if($membership = $form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
@@ -448,6 +448,7 @@ class RegisterController extends Controller
             if ($count_infos < $count_questions) {
                 return $this->redirect($this->generateUrl('user_register_question'));
             }
+            $slug = $current_membership->getStructure()->getSlug();
         }
 
         $memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person));
@@ -456,6 +457,7 @@ class RegisterController extends Controller
             'memberships' => $memberships,
             'userid'      => $userid,
             'person'      => $person,
+            'slug'        => $slug,
         );
     }
 

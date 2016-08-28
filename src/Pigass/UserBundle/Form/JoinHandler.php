@@ -15,16 +15,17 @@ use Symfony\Component\Form\Form,
     Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use Pigass\UserBundle\Entity\Membership,
-    Pigass\UserBundle\Entity\Person;
+    Pigass\UserBundle\Entity\Person,
+    Pigass\CoreBundle\Entity\Structure;
 
 /**
  * JoinType Handler
  */
 class JoinHandler
 {
-    private $form, $request, $em, $um, $payment, $token;
+    private $form, $request, $em, $um, $payment, $person, $structure;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, $payment, Person $person, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year")
+    public function __construct(Form $form, Request $request, EntityManager $em, $payment, Person $person, Structure $structure, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year")
     {
       $this->form    = $form;
       $this->request = $request;
@@ -33,6 +34,7 @@ class JoinHandler
       $this->person  = $person;
       $this->date    = $reg_date;
       $this->periodicity = $reg_periodicity;
+      $this->structure = $structure;
     }
 
     public function process()
@@ -61,6 +63,7 @@ class JoinHandler
         $membership->setAmount($this->payment);
         $membership->setExpiredOn($expire);
         $membership->setPerson($this->person);
+        $membership->setStructure($structure);
 
         $this->em->persist($membership);
         $this->em->flush();

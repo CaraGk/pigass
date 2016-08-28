@@ -1,12 +1,15 @@
 {% extends "PigassCoreBundle::layout.html.twig" %}
 
-{% block headline %}Modifier mes informations personnelles{% endblock %}
+{% block title %}{{ parent() }} - Informations personnelles{% endblock %}
+
+{% block headline %}Informations personnelles{% endblock %}
 
 {% block action %}
-  <ul>
-    <li><a href="{{ path('homepage') }}" title="Retour à l'accueil">Retour</a></li>
-    <li><a href="{{ path('fos_user_change_password') }}" title="Modifier le mot de passe">Mot de passe</a></li>
-  </ul>
+    <li class="btn btn-primary">
+        <a href="{{ path('fos_user_change_password') }}" title="Modifier le mot de passe">
+            {{ icon('lock') }} Mot de passe
+        </a>
+    </li>
 {% endblock %}
 
 {% block content %}

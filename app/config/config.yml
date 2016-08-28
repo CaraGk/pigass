@@ -145,3 +145,4 @@ payum:
 jms_security_extra:
     secure_all_services: true
     enable_iddqd_attribute: false
+    expressions: true

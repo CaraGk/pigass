@@ -85,10 +85,8 @@ class PersonController extends Controller
      */
     public function newAction(Request $request)
     {
-        $mod_simul = $this->pm->findParamByName('simul_active');
-
         $person = new person();
-        $form = $this->createForm(new PersonType($mod_simul->getValue()), $person);
+        $form = $this->createForm(PersonType::class,$person);
         $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
@@ -112,9 +110,7 @@ class PersonController extends Controller
      */
     public function editAction(Person $person, Request $request)
     {
-        $mod_simul = $this->pm->findParamByName('simul_active');
-
-        $form = $this->createForm(new PersonType($mod_simul->getValue()), $person);
+        $form = $this->createForm(PersonType::class, $person);
         $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
@@ -213,7 +209,7 @@ class PersonController extends Controller
      *
      * @Route("/user/edit", name="user_person_edit_me")
      * @Template()
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER')")
+     * @Security\Secure(roles="ROLE_MEMBER")
      */
     public function editMeAction(Request $request)
     {
@@ -223,12 +219,12 @@ class PersonController extends Controller
         if (!$person)
             throw $this->createNotFoundException('Unable to find person entity.');
 
-        $form = $this->createForm(new PersonUserType(), $person);
+        $form = $this->createForm(PersonUserType::class, $person);
         $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Votre compte a bien été modifié.');
-            return $this->redirect($this->generateUrl('user_person_SEdit'));
+            return $this->redirect($this->generateUrl('user_person_edit_me'));
         }
 
         return array(
@@ -249,7 +245,7 @@ class PersonController extends Controller
         }
 
         $user = $this->um->createUser();
-        $form = $this->createForm(new UserAdminType($user));
+        $form = $this->createForm(UserAdminType::class, $user);
         $formHandler = new UserHandler($form, $request, $this->um);
 
         if ( $formHandler->process() ) {

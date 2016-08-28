@@ -11,21 +11,30 @@
 
 namespace Pigass\UserBundle\Form;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use FOS\UserBundle\Form\Type\RegistrationFormType as BaseType;
+use Symfony\Component\Form\AbstractType,
+    Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Component\Form\Extension\Core\Type\EmailType;
 
 /**
  * UserType
  */
-class UserType extends BaseType
+class UserType extends AbstractType
 {
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
-    $builder->add('email', 'email');
+    $builder->add('email', EmailType::class);
   }
 
   public function getName()
   {
     return 'pigass_user';
+  }
+
+  public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
+  {
+    $resolver->setDefaults(array(
+        'data_class' => 'Pigass\UserBundle\Entity\User',
+        'cascade_validation' => true,
+    ));
   }
 }

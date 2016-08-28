@@ -40,6 +40,7 @@ class MenuBuilder
         $session = $requestStack->getCurrentRequest()->getSession();
 
         if (!$security->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $menu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure')));
             $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site')));
         } else {
             if ($security->isGranted('ROLE_MEMBER')) {

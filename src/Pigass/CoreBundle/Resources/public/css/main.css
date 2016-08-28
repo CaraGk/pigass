@@ -62,8 +62,6 @@ div.flasherror, div.flashnotice { padding: 2px 10px 2px 10px; width: auto; font-
 #content h2 { font-size: 1.8em; font-weight: bold; padding: 0; }
 #content ol.infos { display: inline-block; }
 #content ol.infos li{ display: inline; list-style: decimal; margin-right: 5px; }
-#content ul { }
-#content ul li { list-style: none; display: block; }
 #content div.comments { margin: 10px; border: 1px solid black; padding: 5px; }
 #content div.eval{ margin: 10px }
 #content div.description { border: 1px dotted black; margin: 10px; }
@@ -136,11 +134,6 @@ div.flasherror, div.flashnotice { padding: 2px 10px 2px 10px; width: auto; font-
 #footer .miniature { font-family: arial,sans-serif; font-size: 80%; text-align: right; padding: 10px; color: #666; }
 #footer .miniature img{ vertical-align: middle; }
 #footer form{ margin: 10px 0; color: #5f6364; }
-
-/*.FEED{
-  padding-left: 20px;
-  background: transparent url(../images/feed.png) no-repeat 0 0;
-}*/
 
 .error_list{ color: red; }
 .flash_notice{ margin: 3px 0; padding: 7px; background-color: #cfc; }

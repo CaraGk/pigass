@@ -12,7 +12,13 @@
 namespace Pigass\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\BirthdayType,
+    Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Pigass\UserBundle\Form\AddressType,
+    Pigass\UserBundle\Form\UserType;
 
 /**
  * PersonUserType
@@ -22,7 +28,7 @@ class PersonUserType extends AbstractType
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
       $builder
-            ->add('title', 'choice', array(
+            ->add('title', ChoiceType::class, array(
                 'label' => 'Titre',
                 'choices' => array(
                     'M.'   => 'M.',
@@ -30,31 +36,31 @@ class PersonUserType extends AbstractType
                     'Mlle' => 'Mlle',
                 ),
             ))
-            ->add('surname', 'text', array(
+            ->add('surname', TextType::class, array(
                 'label' => 'Nom',
             ))
-            ->add('name', 'text', array(
+            ->add('name', TextType::class, array(
                 'label' => 'Prénom',
             ))
-            ->add('birthday', 'birthday', array(
+            ->add('birthday', BirthdayType::class, array(
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
             ))
-            ->add('birthplace', 'text', array(
+            ->add('birthplace', TextType::class, array(
                 'label' => 'Lieu de naissance',
             ))
             ->add('anonymous')
-            ->add('user', new UserType('Pigass\UserBundle\Entity\User'), array(
+            ->add('user', UserType::class, array(
                 'label' => ' ',
             ))
-            ->add('phone', 'text', array(
+            ->add('phone', TextType::class, array(
                 'label' => 'Téléphone',
             ))
-            ->add('address', new AddressType(), array(
+            ->add('address', AddressType::class, array(
                 'label' => 'Adresse :'
             ))
-            ->add('Enregistrer', 'submit')
+            ->add('Enregistrer', SubmitType::class)
     ;
   }
 
@@ -68,9 +74,6 @@ class PersonUserType extends AbstractType
     $resolver->setDefaults(array(
         'data_class' => 'Pigass\UserBundle\Entity\Person',
         'cascade_validation' => true,
-    ));
-
-    $resolver->setAllowedValues(array(
     ));
   }
 }

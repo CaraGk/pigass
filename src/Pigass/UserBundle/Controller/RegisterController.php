@@ -77,7 +77,7 @@ class RegisterController extends Controller
      * Validate offline payment
      *
      * @Route("/member/{id}/validate", name="user_register_validate", requirements={"id" = "\d+"})
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Security\Secure(roles="ROLE_STRUCTURE")
      */
     public function validateAction(Membership $membership, Request $request)
     {
@@ -103,7 +103,7 @@ class RegisterController extends Controller
      * Delete membership
      *
      * @Route("/member/{id}/delete", name="user_register_delete", requirements={"id" = "\d+"})
-     * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
+     * @Security\Secure(roles="ROLE_ADMIN")
      */
     public function deleteAction(Membership $membership, Request $request)
     {
@@ -128,7 +128,7 @@ class RegisterController extends Controller
      * Export active memberships
      *
      * @Route("/{slug}/members/export", name="user_register_export")
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Security\Secure(roles="ROLE_STRUCTURE")
      */
     public function exportAction($slug)
     {
@@ -457,7 +457,7 @@ class RegisterController extends Controller
             'memberships' => $memberships,
             'userid'      => $userid,
             'person'      => $person,
-            'slug'        => $slug,
+            'slug'        => isset($slug)?$slug:null,
         );
     }
 

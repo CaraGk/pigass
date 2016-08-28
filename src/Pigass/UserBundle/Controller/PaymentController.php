@@ -52,7 +52,7 @@ class PaymentController extends Controller
 
         $payment->setNumber(uniqid());
         $payment->setCurrencyCode('EUR');
-        $payment->setTotalAmount($pm->findParamByName('reg_payment')->getValue() * 100);
+        $payment->setTotalAmount($this->pm->findParamByName('reg_payment')->getValue() * 100);
         $payment->setDescription('Adhésion de ' . $user->getEmail() . ' via ' . $gateway);
         $payment->setClientId($memberid);
         $payment->setClientEmail($user->getEmail());
@@ -71,8 +71,7 @@ class PaymentController extends Controller
     /**
      * Done transaction action
      *
-     * @Route("/member/payment/valid", name="GRegister_PDone")
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER')")
+     * @Route("/member/payment/valid", name="user_payment_done")
      */
     public function doneAction(Request $request)
     {
@@ -86,9 +85,10 @@ class PaymentController extends Controller
                  $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée un fois le chèque reçu.');
             } else {
                 $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
+                $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
                 $membership->setPayedOn(new \DateTime('now'));
                 $membership->setPayment($payment);
-                $membership->setMethod($gateway);
+                $membership->setMethod($method);
 
                 $this->em->persist($membership);
                 $this->em->flush();

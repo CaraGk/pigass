@@ -4,14 +4,21 @@
 
 {% block headline %}
     Questions complémentaires
-    {% if userid is not null %}({{ person }}){% endif %}
 {% endblock %}
 
 {% block action %}
+    {% if userid is not null %}
+        <li class="btn btn-info">
+            {% if infos is not empty %}
+                <a href="{{ path('user_register_index', {'slug': infos|first.membership.structure.slug}) }}" title="Revenir à la liste des adhérents">
+                    {{ person }}
+                </a>
+            {% endif %}
+        </li>
+    {% endif %}
     <li class="btn btn-primary">
-        <a href="{{ path('user_register_index') }}?{{ app.request.queryString }}" title="Retour à la liste des adhésions">
-            <span class="glyphicon glyphicon-th-list"></span>
-            Adhésions
+        <a href="{{ path('user_register_list') }}?{{ app.request.queryString }}" title="Retour à la liste des adhésions">
+            {{ icon('th-list') }} Adhésions
         </a>
     </li>
 {% endblock %}

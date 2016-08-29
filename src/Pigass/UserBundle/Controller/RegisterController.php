@@ -232,11 +232,15 @@ class RegisterController extends Controller
     /**
      * Add Filter action
      *
-     * @Route("/filter/add/{type}/{id}/{value}", name="user_register_filter_add")
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Route("/{slug}/filter/add/{type}/{id}/{value}", name="user_register_filter_add")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function addFilterAction($type, $id, $value)
+    public function addFilterAction($type, $id, $value, $slug)
     {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+
         $membership_filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
@@ -250,17 +254,21 @@ class RegisterController extends Controller
 
         $this->session->set('user_register_filter', $membership_filters);
 
-        return $this->redirect($this->generateUrl('user_register_index'));
+        return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
     }
 
     /**
      * Remove Filter action
      *
-     * @Route("/filter/remove/{type}/{id}", name="user_register_filter_remove")
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Route("/{slug}/filter/remove/{type}/{id}", name="user_register_filter_remove")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function removeFilterAction($type, $id)
+    public function removeFilterAction($type, $id, $slug)
     {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+
         $membership_filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
@@ -276,7 +284,7 @@ class RegisterController extends Controller
 
         $this->session->set('user_register_filter', $membership_filters);
 
-        return $this->redirect($this->generateUrl('user_register_index'));
+        return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
     }
 
     /**
@@ -464,7 +472,7 @@ class RegisterController extends Controller
     /**
      * Show MemberInfo action
      *
-     * @Route("/user/{id}/infos/", name="user_register_infos", requirements={"id" = "\d+"})
+     * @Route("/member/{id}/infos/", name="user_register_infos", requirements={"id" = "\d+"})
      * @Template()
      * @Security\Secure(roles="ROLE_MEMBER, ROLE_STRUCTURE")
      */

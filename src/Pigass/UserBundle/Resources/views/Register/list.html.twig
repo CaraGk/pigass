@@ -2,13 +2,20 @@
 
 {% block headline %}
     {% if userid is not null %}
-        Adhésions ({{ person }})
+        Adhésions
     {% else %}
         Mes adhésions
     {% endif %}
 {% endblock %}
 
 {% block action %}
+    {% if userid is not null %}
+        <li class="btn btn-info">
+            <a href="{{ path('user_register_index', {'slug': slug}) }}" title="Revenir à la liste des adhérents">
+                {{ person }}
+            </a>
+        </li>
+    {% endif %}
     {% if slug is not null %}
         <li class="btn btn-primary">
             <a href="{{ path('user_register_join', {'slug': slug}) }}?{{ app.request.queryString }}">

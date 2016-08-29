@@ -10,48 +10,80 @@
             {{ icon('folder-open') }} Exporter (xls)
         </a>
     </li>
-    <li class="">
-            <div class="title">Validation</div>
-            {% if filters['valid'] is not null %}
-                <div class="item set"><a href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0}) }}" title="Supprimer le filtre par adhésion">{{ filters['valid'] }}</a></div>
+    {% if filters['valid'] is null %}
+        <li class="btn btn-default">
+            <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion validée">
+                Validation ?
+            </a>
+        </li>
+    {% elseif filters['valid'] == true %}
+        <li class="btn btn-success">
+            <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
+                Validation : Oui
+            </a>
+        </li>
+    {% elseif filters['valid'] == false %}
+        <li class="btn btn-danger">
+            <a href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
+                Validation : Non
+            </a>
+        </li>
+    {% endif %}
+    {% for question in questions %}
+        <li>
+            <div class="title">{{ question.name }}</div>
+            {% if filters['questions'][question.id] is defined %}
+                <div class="item"><a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">{{ filters['questions'][question.id] }}</a></div>
             {% else %}
-                <div class="item"><a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1}) }}" title="Filtrer par adhésion validée">Oui</a></div>
-                <div class="item"><a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0}) }}" title="Filtrer par adhésion non validée">Non</a></div>
+                {% for answer in question.more %}
+                    <div class="item"><a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'value': answer, 'slug': slug}) }}" title="Filtrer par {{ question.name }} : {{ answer }}">{{ answer }}</a></div>
+                {% endfor %}
             {% endif %}
         </li>
-        {% for question in questions %}
-            <li>
-                <div class="title">{{ question.name }}</div>
-                {% if filters['questions'][question.id] is defined %}
-                    <div class="item"><a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">{{ filters['questions'][question.id] }}</a></div>
-                {% else %}
-                    {% for answer in question.more %}
-                        <div class="item"><a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'value': answer}) }}" title="Filtrer par {{ question.name }} : {{ answer }}">{{ answer }}</a></div>
-                    {% endfor %}
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+    {% endfor %}
 
 {% endblock %}
 
 {% block content %}
-    <ul>
+    <ul class="entities list-group">
     {% for membership in memberships %}
-        <li class="entity person">
-            <div class="field">{{ membership.person }}</div>
+        <li class="entity person list-group-item">
+            <span class="btn-group pull-right">
+                <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    {% if membership.payedOn is null %}
+                        <li>
+                            <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception du paiement pour cette adhésion">
+                                {{ icon('ok') }} Valider
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': membership.person.user.id, 'view': 'index'}) }}" title="Supprimer cette adhésion">
+                                {{ icon('trash') }} Supprimer
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ path('user_register_list', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher le détail des adhésions de l'étudiant">
+                            {{ icon('euro') }} Adhésions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('user_register_index', {'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">
+                            {{ icon('user') }} Informations
+                        </a>
+                    </li>
+                </ul>
+            </span>
+
+            <div class="field title">{{ membership.person }}</div>
+            <div class="field">({{ membership.person.birthday|date('d/m/y') }})</div>
             {% if membership.payedOn is not null %}
-                <div class="field">Paiement par {{ membership.readableMethod|lower }} effectué ({{ membership.payedOn|date('d/m/Y') }})</div>
-            {% else %}
-                <div class="field">
-                    <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception du paiement pour cette adhésion">Valider</a>
-                    <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': membership.person.user.id, 'view': 'index'}) }}" title="Supprimer cette adhésion">Supprimer</a>
-                </div>
+                <div class="">Adhésion par {{ membership.method.description|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>
             {% endif %}
-            <div class="field"><a href="{{ path('user_register_index', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher le détail des adhésions de l'étudiant">Détail</a></div>
         </li>
     {% else %}
-        <li>Aucune adhésion enregistrée.</li>
+        <li class="list-group-item">Aucune adhésion enregistrée.</li>
     {% endfor %}
     </ul>
 {% endblock %}

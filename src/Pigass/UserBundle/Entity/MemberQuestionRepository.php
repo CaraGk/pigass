@@ -18,11 +18,31 @@ use Doctrine\ORM\EntityRepository;
  */
 class MemberQuestionRepository extends EntityRepository
 {
-    public function countAll()
+    public function getBaseQuery()
+    {
+        return $this->createQueryBuilder('q');
+    }
+
+    public function countAll($structure_filter = null)
     {
         $query = $this->createQueryBuilder('q')
             ->select('COUNT(q)');
 
         return $query->getQuery()->getSingleScalarResult();
+    }
+
+    public function getAll($structure_filter = null)
+    {
+        $query = $this->getBaseQuery();
+
+        if ($structure_filter) {
+            $query->where('q.structure = :structure_filter')
+                ->setParameter('structure_filter', $structure_filter)
+            ;
+        }
+
+        return $query->getQuery()
+            ->getResult()
+        ;
     }
 }

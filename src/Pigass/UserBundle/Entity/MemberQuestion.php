@@ -65,6 +65,14 @@ class MemberQuestion
     private $infos;
 
     /**
+     * @var Structure
+     *
+     * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure")
+     * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
+     */
+    private $structure;
+
+    /**
      * Get id
      *
      * @return integer

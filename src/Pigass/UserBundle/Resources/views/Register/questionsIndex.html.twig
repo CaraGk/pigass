@@ -1,0 +1,45 @@
+{% extends 'PigassCoreBundle::layout.html.twig' %}
+
+{% block title %}{{ parent() }} - Questions{% endblock %}
+
+{% block headline %}Questions{% endblock %}
+
+{% block action %}
+    <li class="btn btn-primary">
+        <a href="{{ path('user_register_questions_index') }}" title="Ajouter une question">
+            {{ icon('plus-sign') }} Ajouter
+        </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <ul class="entities list-group">
+        {% for question in questions %}
+            <li class="entity list-group-item">
+                <span class="btn-group pull-right">
+                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="{{ path('user_register_questions_index') }}" title="Modifier la question complémentaire" class="edit">
+                                {{ icon('pencil') }} Modifier
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ path('user_register_questions_index') }}" title="Supprimer la question complémentaire" class="delete confirm">
+                                {{ icon('trash') }} Supprimer
+                            </a>
+                        </li>
+                    </ul>
+                </span>
+
+                <div class="col-sm-6">{{ question.name }}</div>
+                <div class="col-sm-2">{{ question.readableType }}</div>
+                <div class="col-sm-4">{{ question.more }}</div>
+            </li>
+        {% else %}
+            <li class="noentity list-group-item">
+                Il n'y a aucune question à afficher
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

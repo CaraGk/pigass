@@ -410,7 +410,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Complementary questions
+     * Complementary questions to member
      *
      * @Route("/member/questions", name="user_register_question")
      * @Template()
@@ -424,7 +424,7 @@ class RegisterController extends Controller
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
         $membership = $this->em->getRepository('Pigass\UserBundle\Entity\Membership')->getCurrentForPerson($person);
 
-        $form = $this->createForm(new QuestionType($questions));
+        $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
         $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
         if($form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
@@ -434,6 +434,24 @@ class RegisterController extends Controller
 
         return array(
             'form' => $form->createView(),
+        );
+    }
+
+    /**
+     * List complementary questions
+     *
+     * @Route("/questions", name="user_register_questions_index")
+     * @Template()
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     */
+    public function questionsIndexAction()
+    {
+        $structure_filter = $this->session->get('admin_structure_filter');
+
+        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure_filter);
+
+        return array(
+            'questions' => $questions,
         );
     }
 

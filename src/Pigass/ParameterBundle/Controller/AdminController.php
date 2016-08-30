@@ -48,8 +48,8 @@ class AdminController extends Controller
      */
     public function indexAction(Request $request, $slug)
     {
-        if ($structure_filter = $this->session->get('admin_structure_filter') and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->find($structure_filter);
+        if ($structure_filter = $this->session->get('slug') and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $structure_filter));
         } else {
             $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
         }

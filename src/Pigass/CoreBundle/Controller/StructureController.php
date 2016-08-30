@@ -30,16 +30,52 @@ use Pigass\ParameterBundle\Entity\Parameter,
  */
 class StructureController extends Controller
 {
+    /** @DI\Inject */
+    private $session;
+
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
     /** @DI\Inject("kdb_parameters.manager") */
     private $pm;
 
+    /** @DI\Inject("fos_user.user_manager") */
+    private $um;
+
+    /**
+     * Redirect to the right action
+     *
+     * @Route("/", name="core_structure_redirect")
+     */
+    public function redirectAction()
+    {
+        $username = $this->get('security.token_storage')->getToken()->getUsername();
+        if ($username != "anon.") {
+            $user = $this->um->findUserByUsername($username);
+            if ($user->hasRole('ROLE_ADMIN')) {
+                return $this->redirect($this->generateUrl('core_structure_index'));
+            } elseif($slug = $this->session->get('slug', false)) {
+                return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+            } elseif ($user->hasRole('ROLE_STRUCTURE')) {
+                $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($username);
+                $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+                $slug = $membership->getStructure()->getSlug();
+                $this->session->set('slug', $slug);
+                return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+            } elseif ($user->hasRole('ROLE_MEMBER')) {
+                return $this->redirect($this->generateUrl('user_register_list'));
+            } else {
+                return $this->redirect($this->generateUrl('core_structure_index'));
+            }
+        } else {
+            return $this->redirect($this->generateUrl('core_structure_index'));
+        }
+    }
+
     /**
      * List the structures
      *
-     * @Route("/", name="core_structure_index")
+     * @Route("/structure", name="core_structure_index")
      * @Template()
      */
     public function indexAction()

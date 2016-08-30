@@ -153,37 +153,36 @@ class PersonController extends Controller
     /**
      * Promote a person to higher rights
      *
-     * @Route("/person/{id}/promote", name="user_person_promote", requirements={"id" = "\d+"})
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Route("/{slug}/person/{id}/promote", name="user_person_promote", requirements={"id" = "\d+"})
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function promoteAction(Person $person, Request $request)
+    public function promoteAction(Person $person, Request $request, $slug)
     {
-        $search = $request->query->get('search', null);
         $user = $person->getUser();
         $user->addRole('ROLE_STRUCTURE');
 
         $this->um->updateUser($user);
 
         $this->get('session')->getFlashBag()->add('notice', 'Droits d\'administration donnés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('user_person_index', array('search' => $search)));
+        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $slug)));
     }
 
     /**
      * Demote a person to lower rights
      *
-     * @Route("/person/{id}/demote", name="user_person_demote", requirements={"id" = "\d+"})
-     * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
+     * @Route("/{slug}/person/{id}/demote", name="user_person_demote", requirements={"id" = "\d+"})
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function demoteAction(Person $person, Request $request)
+    public function demoteAction(Person $person, Request $request, $slug)
     {
-        $search = $request->query->get('search', null);
         $user = $person->getUser();
-        if( $user->hasRole('ROLE_ADMIN') )
-            $user->removeRole('ROLE_ADMIN');
+        if ($user->hasRole('ROLE_STRUCTURE'))
+            $user->removeRole('ROLE_STRUCTURE');
+
         $this->um->updateUser($user);
 
         $this->get('session')->getFlashBag()->add('notice', 'Droits d\'administration retirés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('user_person_index', array('search' => $search)));
+        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $slug)));
     }
 
     /**

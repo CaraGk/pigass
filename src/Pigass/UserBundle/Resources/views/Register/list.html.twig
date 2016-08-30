@@ -22,11 +22,26 @@
                 {{ icon('euro') }} Ré-adhérer
             </a>
         </li>
-        <li class="btn btn-primary">
-            <a href="{{ path('core_structure_index') }}">
-                {{ icon('euro') }} Autre structure
-            </a>
-        </li>
+        {% if 'ROLE_STRUCTURE' not in person.user.roles %}
+            <li class="btn btn-primary">
+                <a href="{{ path('core_structure_index') }}" title="Adhérer à une autre structure">
+                    {{ icon('euro') }} Autre structure
+                </a>
+            </li>
+        {% endif %}
+        {% if is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN') %}
+            <li class="btn btn-primary">
+                {% if 'ROLE_STRUCTURE' in person.user.roles %}
+                    <a href="{{ path('user_person_demote', {'id': person.id, 'slug': slug}) }}" title="Retirer les droits d'administration de la structure {{ slug }} à l'utilisateur">
+                        {{ icon('star') }} Démettre
+                    </a>
+                {% else %}
+                    <a href="{{ path('user_person_promote', {'id': person.id, 'slug': slug}) }}" title="Ajouter des droits d'administration de la structure {{ slug }} à l'utilisateur">
+                        {{ icon('star-empty') }} Promouvoir
+                    </a>
+                {% endif %}
+            </li>
+        {% endif %}
     {% else %}
         <li class="btn btn-primary">
             <a href="{{ path('core_structure_index') }}">
@@ -37,6 +52,19 @@
 {% endblock %}
 
 {% block content %}
+    <ul class="entities list-group">
+        <li class="list-group-item">
+            <div class="title">État civil</div>
+            <div class="">{{ person.title }} {{ person.surname }} {{ person.name }}</div>
+            <div class="">Naissance : {{ person.birthday|date('d/m/Y') }} à {{ person.birthplace }}</div>
+        </li>
+        <li class="list-group-item">
+            <div class="title">Contact</div>
+            <div class="">Téléphone : {{ person.phone }}</div>
+            <div class="">Adresse : {% for item in person.address %} {{ item }} {% endfor %}</div>
+            <div class="">E-mail : {{ person.user.email }}</div>
+        </li>
+    </ul>
     <ul class="entities list-group">
         {% for membership in memberships %}
             <li class="list-group-item">

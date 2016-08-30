@@ -130,7 +130,7 @@ class RegisterController extends Controller
      * Export active memberships
      *
      * @Route("/{slug}/members/export", name="user_register_export")
-     * @Security\Secure(roles="ROLE_STRUCTURE")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function exportAction($slug)
     {
@@ -448,7 +448,7 @@ class RegisterController extends Controller
      */
     public function questionIndexAction()
     {
-        $structure_filter = $this->session->get('admin_structure_filter');
+        $structure_filter = $this->session->get('slug');
 
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure_filter);
 
@@ -466,9 +466,9 @@ class RegisterController extends Controller
      */
     public function questionNewAction(Request $request)
     {
-        $structure_filter = $this->session->get('admin_structure_filter');
+        $structure_filter = $this->session->get('slug');
         if ($structure_filter and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->find($structure_filter);
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $structure_filter));
             if (!$structure)
                 throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
         } else {
@@ -499,9 +499,9 @@ class RegisterController extends Controller
      */
     public function questionEditAction(MemberQuestion $question, Request $request)
     {
-        $structure_filter = $this->session->get('admin_structure_filter');
+        $structure_filter = $this->session->get('slug');
         if ($structure_filter and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->find($structure_filter);
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $structure_filter));
             if (!$structure)
                 throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
         } else {
@@ -542,6 +542,8 @@ class RegisterController extends Controller
                 return $this->redirect($this->generateUrl('user_register_question'));
             }
             $slug = $current_membership->getStructure()->getSlug();
+        } else {
+            $slug = $request->get('slug');
         }
 
         $memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person));

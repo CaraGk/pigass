@@ -36,9 +36,9 @@ class QuestionHandler
     public function process()
     {
         if($this->request->getMethod() == 'POST') {
-            $this->form->bind($this->request);
+            $this->form->handleRequest($this->request);
 
-            if($this->form->isValid()) {
+            if ($this->form->isSubmitted() and $this->form->isValid()) {
                 $this->onSuccess($this->form->getData());
 
                 return true;

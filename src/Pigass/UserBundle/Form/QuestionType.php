@@ -50,6 +50,7 @@ class QuestionType extends AbstractType
             } elseif ($question->getType() == 3) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices' => $question->getMore(),
+                    'choice_label' => function ($value, $key, $index) { return $value; },
                     'required' => true,
                     'multiple' => true,
                     'expanded' => true,
@@ -64,6 +65,7 @@ class QuestionType extends AbstractType
             } elseif ($question->getType() == 5) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices' => $question->getMore(),
+                    'choice_label' => function ($value, $key, $index) { return $value; },
                     'required' => true,
                     'multiple' => false,
                     'expanded' => true,
@@ -88,6 +90,7 @@ class QuestionType extends AbstractType
             } elseif ($question->getType() == 8) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices' => $question->getMore(),
+                    'choice_label' => function ($value, $key, $index) { return $value; },
                     'required' => true,
                     'multiple' => false,
                     'expanded' => false,

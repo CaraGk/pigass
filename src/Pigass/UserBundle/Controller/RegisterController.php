@@ -310,7 +310,7 @@ class RegisterController extends Controller
         $token = $tokenGenerator->generateToken();
 
         $form = $this->createForm(RegisterType::class);
-        $form_handler = new RegisterHandler($form, $request, $this->em, $this->um);
+        $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $token);
 
         if($username = $form_handler->process()) {
             $this->session->set('user_register_tmp', 1);

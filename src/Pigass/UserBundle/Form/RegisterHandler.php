@@ -24,14 +24,15 @@ use Pigass\UserBundle\Entity\Membership,
  */
 class RegisterHandler
 {
-    private $form, $request, $em, $um;
+    private $form, $request, $em, $um, $token;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um)
+    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um, $token)
     {
       $this->form    = $form;
       $this->request = $request;
       $this->em      = $em;
       $this->um      = $um;
+      $this->token   = $token;
     }
 
     public function process()

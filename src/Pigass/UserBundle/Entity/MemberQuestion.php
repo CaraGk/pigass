@@ -72,6 +72,11 @@ class MemberQuestion
      */
     private $structure;
 
+    public function __toString()
+    {
+        return $this->name;
+    }
+
     /**
      * Get id
      *
@@ -242,5 +247,29 @@ class MemberQuestion
     public function getInfos()
     {
         return $this->infos;
+    }
+
+    /**
+     * Set structure
+     *
+     * @param \Pigass\CoreBundle\Entity\Structure $structure
+     *
+     * @return MemberQuestion
+     */
+    public function setStructure(\Pigass\CoreBundle\Entity\Structure $structure = null)
+    {
+        $this->structure = $structure;
+
+        return $this;
+    }
+
+    /**
+     * Get structure
+     *
+     * @return \Pigass\CoreBundle\Entity\Structure
+     */
+    public function getStructure()
+    {
+        return $this->structure;
     }
 }

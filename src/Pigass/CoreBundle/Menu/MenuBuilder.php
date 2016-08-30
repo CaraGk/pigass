@@ -56,7 +56,7 @@ class MenuBuilder
                 }
                 if ($security->isGranted('ROLE_ADMIN')) {
                     $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'home'));
-                    $adminMenu->addChild('Questions', array('route' => 'user_register_questions_index', 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-sign'));
+                    $adminMenu->addChild('Questions', array('route' => 'user_register_question_index', 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-sign'));
                     $adminMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => null), 'label' => 'Paramètres généraux', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
                 }
             }

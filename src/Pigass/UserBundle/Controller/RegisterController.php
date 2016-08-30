@@ -27,7 +27,9 @@ use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\JoinType,
     Pigass\UserBundle\Form\JoinHandler,
     Pigass\UserBundle\Form\QuestionType,
-    Pigass\UserBundle\Form\QuestionHandler;
+    Pigass\UserBundle\Form\QuestionHandler,
+    Pigass\UserBundle\Form\MemberQuestionType,
+    Pigass\UserBundle\Form\MemberQuestionHandler;
 
 /**
  * UserBundle RegisterController
@@ -440,11 +442,11 @@ class RegisterController extends Controller
     /**
      * List complementary questions
      *
-     * @Route("/questions", name="user_register_questions_index")
+     * @Route("/question", name="user_register_question_index")
      * @Template()
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function questionsIndexAction()
+    public function questionIndexAction()
     {
         $structure_filter = $this->session->get('admin_structure_filter');
 
@@ -452,6 +454,71 @@ class RegisterController extends Controller
 
         return array(
             'questions' => $questions,
+        );
+    }
+
+    /**
+     * Add a new complementary question
+     *
+     * @Route("/question/new", name="user_register_question_new")
+     * @Template("PigassUserBundle:Register:questionEdit.html.twig")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     */
+    public function questionNewAction(Request $request)
+    {
+        $structure_filter = $this->session->get('admin_structure_filter');
+        if ($structure_filter and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->find($structure_filter);
+            if (!$structure)
+                throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
+        } else {
+            $structure = null;
+        }
+
+        $question = new MemberQuestion();
+        $form = $this->createForm(MemberQuestionType::class, $question, array('structure' => $structure));
+        $formHandler = new MemberQuestionHandler($form, $request, $this->em, $structure);
+
+        if ($formHandler->process()) {
+            $this->get('session')->getFlashBag()->add('notice', 'Question complémentaire "' . $question . '" enregistrée.');
+            return $this->redirect($this->generateUrl('user_register_question_index'));
+        }
+
+        return array(
+            'form' => $form->createView(),
+            'question' => null,
+        );
+    }
+
+    /**
+     * Edit a complementary question
+     *
+     * @Route("/question/{id}/edit", name="user_register_question_edit")
+     * @Template()
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     */
+    public function questionEditAction(MemberQuestion $question, Request $request)
+    {
+        $structure_filter = $this->session->get('admin_structure_filter');
+        if ($structure_filter and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->find($structure_filter);
+            if (!$structure)
+                throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
+        } else {
+            $structure = null;
+        }
+
+        $form = $this->createForm(MemberQuestionType::class, $question, array('structure' => $structure));
+        $formHandler = new MemberQuestionHandler($form, $request, $this->em, $structure);
+
+        if ($formHandler->process()) {
+            $this->get('session')->getFlashBag()->add('notice', 'Question complémentaire "' . $question . '" enregistrée.');
+            return $this->redirect($this->generateUrl('user_register_question_index'));
+        }
+
+        return array(
+            'form'     => $form->createView(),
+            'question' => $question,
         );
     }
 

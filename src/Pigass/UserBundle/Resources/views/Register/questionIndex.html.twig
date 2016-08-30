@@ -6,7 +6,7 @@
 
 {% block action %}
     <li class="btn btn-primary">
-        <a href="{{ path('user_register_questions_index') }}" title="Ajouter une question">
+        <a href="{{ path('user_register_question_new') }}" title="Ajouter une question">
             {{ icon('plus-sign') }} Ajouter
         </a>
     </li>
@@ -15,26 +15,31 @@
 {% block content %}
     <ul class="entities list-group">
         {% for question in questions %}
-            <li class="entity list-group-item">
+            <li class="entity list-group-item row">
                 <span class="btn-group pull-right">
                     <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="{{ path('user_register_questions_index') }}" title="Modifier la question complémentaire" class="edit">
+                            <a href="{{ path('user_register_question_edit', {'id': question.id}) }}" title="Modifier la question complémentaire" class="edit">
                                 {{ icon('pencil') }} Modifier
                             </a>
                         </li>
                         <li>
-                            <a href="{{ path('user_register_questions_index') }}" title="Supprimer la question complémentaire" class="delete confirm">
+                            <a href="{{ path('user_register_question_index') }}" title="Supprimer la question complémentaire" class="delete confirm">
                                 {{ icon('trash') }} Supprimer
                             </a>
                         </li>
                     </ul>
                 </span>
 
-                <div class="col-sm-6">{{ question.name }}</div>
+                <div class="col-sm-3 title">{{ question.name }}</div>
+                <div class="col-sm-2">{{ question.structure }}</div>
                 <div class="col-sm-2">{{ question.readableType }}</div>
-                <div class="col-sm-4">{{ question.more }}</div>
+                <ul class="col-sm-3">
+                    {% for answer in question.more %}
+                        <li>{{ answer }}</li>
+                    {% endfor %}
+                </ul>
             </li>
         {% else %}
             <li class="noentity list-group-item">

@@ -41,6 +41,11 @@
                                 </a>
                             </li>
                             <li class="action">
+                                <a href="{{ path('parameter_admin_index', {'slug': structure.slug}) }}" title="Afficher les paramètres du site pour la structure '{{ structure.name }}'" class="index">
+                                    {{ icon('cog') }} Paramètres
+                                </a>
+                            </li>
+                            <li class="action">
                                 <a href="{{ path('core_structure_edit', {'id': structure.id}) }}" title="Modifier la structure '{{ structure.name }}'" class="edit">
                                     {{ icon('pencil') }} Modifier
                                 </a>

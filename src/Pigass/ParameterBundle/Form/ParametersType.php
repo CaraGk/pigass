@@ -11,37 +11,39 @@
 
 namespace Pigass\ParameterBundle\Form;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\AbstractType,
+    Symfony\Component\Form\FormBuilderInterface,
+    Symfony\Component\OptionsResolver\OptionsResolver,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
+    Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * ParametersType
  */
 class ParametersType extends AbstractType
 {
-    public function __construct($parameters)
-    {
-        $this->parameters = $parameters;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->parameters = $options['parameters'];
+
         foreach ($this->parameters as $parameter) {
             if ($parameter->getType() == "string") {
-                $builder->add($parameter->getName(), 'text', array(
+                $builder->add($parameter->getName(), TextType::class, array(
                     'required' => false,
                     'label'    => $parameter->getLabel(),
                     'data'     => $parameter->getValue(),
                 ));
             } elseif ($parameter->getType() == "boolean") {
-                $builder->add($parameter->getName(), 'checkbox', array(
+                $builder->add($parameter->getName(), CheckboxType::class, array(
                     'required' => false,
                     'value'    => false,
                     'label'    => $parameter->getLabel(),
                     'data'     => (bool) $parameter->getValue(),
                 ));
             } elseif ($parameter->getType() == "choice") {
-                $builder->add($parameter->getName(), 'choice', array(
+                $builder->add($parameter->getName(), ChoiceType::class, array(
                     'required'    => false,
                     'choices'     => $parameter->getMore(),
                     'multiple'    => false,
@@ -51,11 +53,18 @@ class ParametersType extends AbstractType
                 ));
             }
         }
-        $builder->add('Enregistrer', 'submit');
+        $builder->add('Enregistrer', SubmitType::class);
     }
 
-  public function getName()
-  {
-    return 'pigass_parameterbundle_parameterstype';
-  }
+    public function getName()
+    {
+        return 'pigass_parameterbundle_parameterstype';
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'parameters' => null,
+        ));
+    }
 }

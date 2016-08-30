@@ -67,11 +67,12 @@ class StructureController extends Controller
         $formHandler = new StructureHandler($form, $request, $this->em);
 
         if ($formHandler->process()) {
+            $slug = $structure->getSlug();
             $now = new \DateTime('now');
             $parameters = array(
-                0 => array('setName' => 'reg_date', 'setValue' => $now->format('Y-m-d H:i:s'), 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
-                1 => array('setName' => 'reg_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => 'a:6:{s:9:"+ 1 month";s:6:"1 mois";s:10:"+ 2 months";s:6:"2 mois";s:10:"+ 6 months";s:6:"6 mois";s:8:"+ 1 year";s:4:"1 an";s:9:"+ 2 years";s:5:"2 ans";s:9:"+ 3 years";s:5:"3 ans";}', 'setStructure' => $structure),
-                2 => array('setName' => 'reg_payment', 'setValue' => 60, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                0 => array('setName' => 'reg_' . $slug . '_date', 'setValue' => $now->format('d/m/Y'), 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                1 => array('setName' => 'reg_' . $slug . '_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("1 mois" => "+ 1 month", "2 mois" => "+ 2 months", "6 mois" => "+ 6 months", "1 an" => "+ 1 year", "2 ans" => "+ 2 years", "3 ans" => "+ 3 years"), 'setStructure' => $structure),
+                2 => array('setName' => 'reg_' . $slug . '_payment', 'setValue' => 60, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
             );
             foreach ($parameters as $parameter) {
                 $structure_parameter = new Parameter();
@@ -83,8 +84,7 @@ class StructureController extends Controller
 
             $gateway = new Gateway();
             $gateway->setStructure($structure);
-            $gateway->setReadableName('Chèque ou espèces');
-            $gateway->setGatewayName($structure->getSlug() . '_offline');
+            $gateway->setGatewayName($slug . '_offline');
             $gateway->setFactoryName('offline');
             $this->em->persist($gateway);
 

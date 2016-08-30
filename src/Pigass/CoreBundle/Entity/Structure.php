@@ -20,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *
  * @ORM\Table(name="structure")
  * @ORM\Entity(repositoryClass="Pigass\CoreBundle\Entity\StructureRepository")
- * @UniqueEntity(fields={"name"}, message={"Une structure ayant ce nom-là existe déjà."})
+ * @UniqueEntity(fields={"name"}, message="Une structure ayant ce nom-là existe déjà.")
  */
 class Structure
 {

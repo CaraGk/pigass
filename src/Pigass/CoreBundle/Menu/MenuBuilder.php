@@ -47,18 +47,16 @@ class MenuBuilder
                 $menu->addChild('My identity', array('route' => 'user_person_edit_me', 'label' => 'Mon profil', 'attributes' => array('title' => 'Mon profil sur le site')));
                 $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
             }
-            if ($security->isGranted('ROLE_STRUCTURE') or $security->isGranted('ROLE_ADMIN')) {
+            if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
+                $slug = $session->get('slug');
+                $strMenu = $menu->addChild('Structure', array('label' => $slug, 'dropdown' => true, 'caret' => true, 'icon' => 'king'));
+                $strMenu->addChild('Persons', array('route' => 'user_person_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'home'));
+                $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
+            }
+            if ($security->isGranted('ROLE_ADMIN')) {
                 $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer', 'dropdown' => true, 'caret' => true, 'icon' => 'king'));
-                if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
-                    $slug = $session->get('slug');
-                    $adminMenu->addChild('Persons', array('route' => 'user_person_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'home'));
-                    $adminMenu->addChild('Parameters', array('route' => 'GParameter_PAIndex', 'route_parameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
-                }
-                if ($security->isGranted('ROLE_ADMIN')) {
-                    $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'home'));
-                    $adminMenu->addChild('Questions', array('route' => 'user_register_question_index', 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-sign'));
-                    $adminMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => null), 'label' => 'Paramètres généraux', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
-                }
+                $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'home'));
+                $adminMenu->addChild('Questions', array('route' => 'user_register_question_index', 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-sign'));
             }
             $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site'), 'icon' => 'log-out'));
         }

@@ -7,6 +7,10 @@ Pré-requis
 ----------
 
 Section à compléter
+En vrac :
+- php >= 5.6
+- php-intl
+- php-curl
 
 Installation
 ------------

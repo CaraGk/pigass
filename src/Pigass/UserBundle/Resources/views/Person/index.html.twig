@@ -59,16 +59,14 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if kparam('reg_active') == true %}
-                                <li class="action">
-                                    <a href="{{ path('user_register_list', {'userid': person.user.id}) }}" title="Afficher les adhésions de '{{ person }}'">
-                                            {{ icon('list') }} Adhésions
-                                        {% if members is not null and person.id in members %}
-                                            {{ icon('thumbs-up')}}
-                                        {% endif %}
-                                    </a>
-                                </li>
-                            {% endif %}
+                            <li class="action">
+                                <a href="{{ path('user_register_list', {'userid': person.user.id}) }}" title="Afficher les adhésions de '{{ person }}'">
+                                    {{ icon('list') }} Adhésions
+                                    {% if members is not null and person.id in members %}
+                                        {{ icon('thumbs-up')}}
+                                    {% endif %}
+                                </a>
+                            </li>
                         {% else %}
                             <li class="action"><img src="{{ asset('bundles/pigasscore/images/File_List.png') }}" alt="Adhésions" title="{{ person }} est adhérent." /></li>
                         {% endif %}

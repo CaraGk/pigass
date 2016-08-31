@@ -24,6 +24,9 @@ use Pigass\UserBundle\Entity\Gateway,
 
 class PaymentController extends Controller
 {
+    /** @DI\Inject */
+    private $session;
+
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
@@ -37,14 +40,21 @@ class PaymentController extends Controller
      * Prepare action
      *
      * @Route("/member/{memberid}/payment/{gateway}", name="user_payment_prepare", requirements={"memberid" = "\d+", "gateway" = "\w+"})
+     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.session.get('user_register_tmp')")
      */
     public function prepareAction($gateway, $memberid)
     {
-        $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
         $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($memberid);
+        if ($this->session->get('user_register_tmp', false)) {
+            $user = $membership->getPerson()->getUser();
+        } else {
+            $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+        }
 
         if (!$membership or $membership->getPerson()->getUser() !== $user)
             throw $this->createNotFoundException('Impossible d\'effectuer la transaction. Contactez un administrateur.');
+
+        $slug = $membership->getStructure()->getSlug();
 
         $storage = $this->get('payum')->getStorage('Pigass\UserBundle\Entity\Payment');
 
@@ -52,9 +62,9 @@ class PaymentController extends Controller
 
         $payment->setNumber(uniqid());
         $payment->setCurrencyCode('EUR');
-        $payment->setTotalAmount($this->pm->findParamByName('reg_payment')->getValue() * 100);
+        $payment->setTotalAmount($this->pm->findParamByName('reg_' . $slug . '_payment')->getValue() * 100);
         $payment->setDescription('Adhésion de ' . $user->getEmail() . ' via ' . $gateway);
-        $payment->setClientId($memberid);
+        $payment->setClientId($membership->getId());
         $payment->setClientEmail($user->getEmail());
 
         $storage->update($payment);
@@ -72,6 +82,7 @@ class PaymentController extends Controller
      * Done transaction action
      *
      * @Route("/member/payment/valid", name="user_payment_done")
+     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.session.get('user_register_tmp')")
      */
     public function doneAction(Request $request)
     {
@@ -81,11 +92,14 @@ class PaymentController extends Controller
         $payment = $status->getFirstModel();
 
         if ($status->isCaptured()) {
-            if ($gateway == 'offline') {
+            if ($this->session->get('user_register_tmp'))
+                $this->session->unset('user_register_tmp');
+
+            $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
+            if ($method->getFactoryName() == 'offline') {
                  $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée un fois le chèque reçu.');
             } else {
                 $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
-                $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
                 $membership->setPayedOn(new \DateTime('now'));
                 $membership->setPayment($payment);
                 $membership->setMethod($method);

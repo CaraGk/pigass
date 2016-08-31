@@ -15,17 +15,28 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * JoinType
  */
-class JoinType extends AbstractType {
+class JoinType extends AbstractType
+{
+    private $structure;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->structure = $options['structure'];
+
         $builder
             ->add('method', EntityType::class, array(
                 'class'        => 'PigassUserBundle:Gateway',
                 'choice_label' => 'description',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.structure = :structure_id')
+                        ->setParameter('structure_id', $this->structure->getId());
+                },
                 'required'     => true,
                 'multiple'     => false,
                 'expanded'     => true,
@@ -44,6 +55,7 @@ class JoinType extends AbstractType {
     {
         $resolver->setDefaults(array(
             'data_class' => 'Pigass\UserBundle\Entity\Membership',
+            'structure'  => null,
         ));
     }
 }

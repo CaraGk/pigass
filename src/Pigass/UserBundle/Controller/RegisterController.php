@@ -396,10 +396,11 @@ class RegisterController extends Controller
                 return $this->redirect($this->generateUrl('user_register_list'));
         }
 
-        $form = $this->createForm(JoinType::class);
-        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_date')->getValue(), $this->pm->findParamByName('reg_periodicity')->getValue());
+        $membership = new Membership();
+        $form = $this->createForm(JoinType::class, $membership, array('structure' => $structure));
+        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(), $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue());
 
-        if($membership = $form_handler->process()) {
+        if($form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
 
             return $this->redirect($this->generateUrl('user_payment_prepare', array('gateway' => $membership->getMethod()->getGatewayName(), 'memberid' => $membership->getId())));

@@ -134,11 +134,9 @@ class PersonController extends Controller
     {
         $search = $request->query->get('search', null);
 
-        if (true == $this->pm->findParamByName('reg_active')->getValue()) {
-            if ($memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person))) {
-                foreach($memberships as $membership) {
-                    $this->em->remove($membership);
-                }
+        if ($memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person))) {
+            foreach($memberships as $membership) {
+                $this->em->remove($membership);
             }
         }
 

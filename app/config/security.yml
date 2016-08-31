@@ -4,6 +4,7 @@ security:
 
     role_hierarchy:
         ROLE_STRUCTURE: [ROLE_MEMBER]
+        ROLE_MEMBER: [ROLE_USER]
 
     providers:
         fos_userbundle:
@@ -27,6 +28,3 @@ security:
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/fieldset/, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin/, roles: [ROLE_ADMIN] }
-        - { path: ^/user/, roles: [ROLE_STUDENT, ROLE_ADMIN] }

@@ -7,12 +7,22 @@ Pré-requis
 ----------
 
 Section à compléter
+
 En vrac :
 - php >= 5.6
-- php-intl
-- php-curl
+- Extensions PHP : php-intl, php-curl, php-mbstring, php-xml, php-mysql
+- MySQL (par défaut)
 
 Installation
 ------------
+Procédure d'installation en console sur un serveur GNU/Linux :
 
-Section à compléter
+1. git clone https://github.com/CaraGk/pigass.git pigass/
+2. cd pigass/
+3. ./composer.phar selfupdate ; ./composer.phar install
+4. Corriger les éventuelles erreurs de dépendances et indiquer les paramètres pour la génération du parameters.yml
+5. ./bin/console doctrine:migrations:migrate --no-interaction
+6. ./bin/console fos:user:create user@exemple.fr user@exemple.fr MonMotDePasse
+7. ./bin/console fos:user:promote user@exemple.fr ROLE_ADMIN
+
+À partir de là on peut accéder au site et se connecter avec l'utilisateur user@exemple.fr pour créer les structures.

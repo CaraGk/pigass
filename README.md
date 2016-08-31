@@ -24,5 +24,7 @@ Procédure d'installation en console sur un serveur GNU/Linux :
 5. ./bin/console doctrine:migrations:migrate --no-interaction
 6. ./bin/console fos:user:create user@exemple.fr user@exemple.fr MonMotDePasse
 7. ./bin/console fos:user:promote user@exemple.fr ROLE_ADMIN
+8. ./bin/console assets:install web
+9. ./bin/console assetic:dump
 
 À partir de là on peut accéder au site et se connecter avec l'utilisateur user@exemple.fr pour créer les structures.

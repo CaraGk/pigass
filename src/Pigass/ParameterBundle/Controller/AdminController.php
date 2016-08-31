@@ -42,7 +42,7 @@ class AdminController extends Controller
     /**
      * List all parameters and edit them
      *
-     * @Route("/{slug}/param", name="parameter_admin_index")
+     * @Route("/{slug}/param", name="parameter_admin_index", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\Secure(roles="ROLE_ADMIN, ROLE_STRUCTURE")
      */

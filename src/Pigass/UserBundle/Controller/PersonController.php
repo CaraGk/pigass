@@ -49,7 +49,7 @@ class PersonController extends Controller
     /**
      * List persons
      *
-     * @Route("/{slug}/persons", name="user_person_index")
+     * @Route("/{slug}/persons", name="user_person_index", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\Secure(roles="ROLE_ADMIN")
      */
@@ -151,7 +151,7 @@ class PersonController extends Controller
     /**
      * Promote a person to higher rights
      *
-     * @Route("/{slug}/person/{id}/promote", name="user_person_promote", requirements={"id" = "\d+"})
+     * @Route("/{slug}/person/{id}/promote", name="user_person_promote", requirements={"id" = "\d+", "slug" = "\w+"})
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function promoteAction(Person $person, Request $request, $slug)
@@ -168,7 +168,7 @@ class PersonController extends Controller
     /**
      * Demote a person to lower rights
      *
-     * @Route("/{slug}/person/{id}/demote", name="user_person_demote", requirements={"id" = "\d+"})
+     * @Route("/{slug}/person/{id}/demote", name="user_person_demote", requirements={"id" = "\d+", "slug" = "\w+"})
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function demoteAction(Person $person, Request $request, $slug)
@@ -186,7 +186,7 @@ class PersonController extends Controller
     /**
      * Export mail by structure
      *
-     * @Route("/export/{slug}/mail", name="user_person_export")
+     * @Route("/export/{slug}/mail", name="user_person_export", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\PreAuthorize("hasRole('ROLE_STRUCTURE')")
      */

@@ -53,7 +53,7 @@ class RegisterController extends Controller
     /**
      * List active memberships
      *
-     * @Route("/{slug}/members", name="user_register_index")
+     * @Route("/{slug}/members", name="user_register_index", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
@@ -129,7 +129,7 @@ class RegisterController extends Controller
     /**
      * Export active memberships
      *
-     * @Route("/{slug}/members/export", name="user_register_export")
+     * @Route("/{slug}/members/export", name="user_register_export", requirements={"slug" = "\w+"})
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function exportAction($slug)
@@ -234,7 +234,7 @@ class RegisterController extends Controller
     /**
      * Add Filter action
      *
-     * @Route("/{slug}/filter/add/{type}/{id}/{value}", name="user_register_filter_add")
+     * @Route("/{slug}/filter/add/{type}/{id}/{value}", name="user_register_filter_add", requirements={"slug" = "\w+"})
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function addFilterAction($type, $id, $value, $slug)
@@ -262,7 +262,7 @@ class RegisterController extends Controller
     /**
      * Remove Filter action
      *
-     * @Route("/{slug}/filter/remove/{type}/{id}", name="user_register_filter_remove")
+     * @Route("/{slug}/filter/remove/{type}/{id}", name="user_register_filter_remove", requirements={"slug" = "\w+"})
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function removeFilterAction($type, $id, $slug)
@@ -292,7 +292,7 @@ class RegisterController extends Controller
     /**
      * Register Person and create Membership
      *
-     * @Route("/{slug}/register/", name="user_register_register")
+     * @Route("/{slug}/register/", name="user_register_register", requirements={"slug" = "\w+"})
      * @Template()
      */
     public function registerAction(Request $request, $slug)
@@ -327,7 +327,7 @@ class RegisterController extends Controller
     /**
      * Send confirmation email
      *
-     * @Route("/{slug}/register/send/{email}", name="user_register_confirmation_send", requirements={"email" = ".+\@.+\.\w+" })
+     * @Route("/{slug}/register/send/{email}", name="user_register_confirmation_send", requirements={"email" = ".+\@.+\.\w+", "slug" = "\w+" })
      * @Template()
      */
     public function sendConfirmationAction($email, Request $request, $slug)
@@ -367,7 +367,7 @@ class RegisterController extends Controller
     /**
      * Join action
      *
-     * @Route("/{slug}/member/join", name="user_register_join")
+     * @Route("/{slug}/member/join", name="user_register_join", requirements={"slug" = "\w+"})
      * @Template()
      */
     public function joinAction(Request $request, $slug)

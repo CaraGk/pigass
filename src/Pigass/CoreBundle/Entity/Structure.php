@@ -123,7 +123,7 @@ class Structure
      */
     private function slugify($text)
     {
-        $text = preg_replace('/\W+/', '-', $text);
+        $text = preg_replace('/\W+/', '_', $text);
         $text = strtolower(trim($text, '-'));
 
         return $text;

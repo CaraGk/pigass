@@ -40,7 +40,7 @@ class PaymentController extends Controller
      * Prepare action
      *
      * @Route("/member/{memberid}/payment/{gateway}", name="user_payment_prepare", requirements={"memberid" = "\d+", "gateway" = "\w+"})
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.session.get('user_register_tmp')")
+     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.get('session').get('user_register_tmp')")
      */
     public function prepareAction($gateway, $memberid)
     {
@@ -82,7 +82,7 @@ class PaymentController extends Controller
      * Done transaction action
      *
      * @Route("/member/payment/valid", name="user_payment_done")
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.session.get('user_register_tmp')")
+     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.get('session').get('user_register_tmp')")
      */
     public function doneAction(Request $request)
     {
@@ -93,7 +93,7 @@ class PaymentController extends Controller
 
         if ($status->isCaptured()) {
             if ($this->session->get('user_register_tmp'))
-                $this->session->unset('user_register_tmp');
+                $this->session->remove('user_register_tmp');
 
             $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
             if ($method->getFactoryName() == 'offline') {
@@ -118,7 +118,7 @@ class PaymentController extends Controller
     /**
      * Show gateways for structure
      *
-     * @Route("/{slug}/gateway/index", name="user_payment_index")
+     * @Route("/{slug}/gateway/index", name="user_payment_index", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
@@ -138,7 +138,7 @@ class PaymentController extends Controller
     /**
      * Add a new gateway for structure
      *
-     * @Route("/{slug}/gateway/new", name="user_payment_new")
+     * @Route("/{slug}/gateway/new", name="user_payment_new", requirements={"slug" = "\w+"})
      * @Template("PigassUserBundle:Payment:edit.html.twig")
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
@@ -167,7 +167,7 @@ class PaymentController extends Controller
     /**
      * Edit a gateway
      *
-     * @Route("/{slug}/gateway/{id}/edit", name="user_payment_edit", requirements={"id" = "\d+"})
+     * @Route("/{slug}/gateway/{id}/edit", name="user_payment_edit", requirements={"id" = "\d+", "slug" = "\w+"})
      * @Template("PigassUserBundle:Payment:edit.html.twig")
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
@@ -195,7 +195,7 @@ class PaymentController extends Controller
     /**
      * Delete a gateway
      *
-     * @Route("/{slug}/gateway/{id}/delete", name="user_payment_delete", requirements={"id" = "\d+"})
+     * @Route("/{slug}/gateway/{id}/delete", name="user_payment_delete", requirements={"id" = "\d+", "slug" = "\w+"})
      * @Security\Secure(roles="ROLE_ADMIN")
      */
     public function deleteAction(Gateway $gateway, $slug)

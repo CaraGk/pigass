@@ -80,7 +80,7 @@ class RegisterController extends Controller
      * Validate offline payment
      *
      * @Route("/member/{id}/validate", name="user_register_validate", requirements={"id" = "\d+"})
-     * @Security\Secure(roles="ROLE_STRUCTURE")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function validateAction(Membership $membership, Request $request)
     {

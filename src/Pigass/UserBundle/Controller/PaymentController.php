@@ -97,7 +97,7 @@ class PaymentController extends Controller
 
             $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
             if ($method->getFactoryName() == 'offline') {
-                 $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée un fois le chèque reçu.');
+                 $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée une fois le chèque reçu.');
             } else {
                 $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
                 $membership->setPayedOn(new \DateTime('now'));

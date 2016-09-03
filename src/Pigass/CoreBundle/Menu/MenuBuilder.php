@@ -50,8 +50,8 @@ class MenuBuilder
             if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
                 $slug = $session->get('slug');
                 $strMenu = $menu->addChild('Structure', array('label' => $slug, 'dropdown' => true, 'caret' => true, 'icon' => 'king'));
-                $strMenu->addChild('Persons', array('route' => 'user_person_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'home'));
-                $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'route_parameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
+                $strMenu->addChild('Persons', array('route' => 'user_person_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'home'));
+                $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
             }
             if ($security->isGranted('ROLE_ADMIN')) {
                 $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer', 'dropdown' => true, 'caret' => true, 'icon' => 'king'));

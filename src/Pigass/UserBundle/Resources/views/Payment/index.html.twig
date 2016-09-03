@@ -9,20 +9,14 @@
 {% endblock %}
 
 {% block action %}
-    {% if is_granted('ROLE_ADMIN') %}
-        <li class="btn btn-primary">
-            <a href="{{ path('user_payment_new', {'slug': slug}) }}" title="Ajouter une nouvelle gateway">
-                {{ icon('plus') }} Ajouter
-            </a>
-        </li>
-    {% endif %}
+    <li class="btn btn-primary">
+        <a href="{{ path('user_payment_new', {'slug': slug}) }}" title="Ajouter une nouvelle gateway">
+            {{ icon('plus') }} Ajouter
+        </a>
+    </li>
 {% endblock %}
 
 {% block content %}
-    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-        <div>Pour adhérer, veuillez cliquer sur la gateway de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
-    {% endif %}
-
     <ul class="entities gateways list-group">
         {% for gateway in gateways %}
             <li class="entity gateway list-group-item">

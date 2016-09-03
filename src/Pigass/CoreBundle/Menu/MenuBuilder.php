@@ -50,7 +50,7 @@ class MenuBuilder
             if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
                 $slug = $session->get('slug');
                 $strMenu = $menu->addChild('Structure', array('label' => $slug, 'dropdown' => true, 'caret' => true, 'icon' => 'king'));
-                $strMenu->addChild('Persons', array('route' => 'user_person_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'user'));
+                $strMenu->addChild('Memberships', array('route' => 'user_register_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'user'));
                 $strMenu->addChild('Gateways', array('route' => 'user_payment_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Modyens de paiement', 'attributes' => array('title' => 'Gérer les moyens de paiement'), 'icon' => 'piggy-bank'));
                 $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
 //                $strMenu->addChild('Edit', array('route' => 'core_structure_edit', 'routeParameters' => array('slug' => $slug), 'label' => 'Modifier', 'attributes' => array('title' => 'Modifier la structure'), 'icon' => 'edit'));

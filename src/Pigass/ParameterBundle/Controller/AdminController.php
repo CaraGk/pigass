@@ -57,7 +57,7 @@ class AdminController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondante.');
 
-        $parameters = $this->pm->findActiveParams(array('structure' => $structure->getId()));
+        $parameters = $this->pm->findActiveParamsBy(array('structure' => $structure->getId()));
 
         $form = $this->createForm(ParametersType::class, $parameters, array('parameters' => $parameters));
         $formHandler = new ParametersHandler($form, $request, $this->pm, $parameters);

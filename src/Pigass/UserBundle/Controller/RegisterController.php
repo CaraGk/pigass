@@ -93,11 +93,12 @@ class RegisterController extends Controller
         $membership->setPayedOn(new \DateTime('now'));
         $this->em->persist($membership);
         $this->em->flush();
+        $slug = $membership->getStructure()->getSlug();
 
         $this->session->getFlashBag()->add('notice', 'Paiement validé !');
 
         if ($view == 'index')
-            return $this->redirect($this->generateUrl('user_registre_index'));
+            return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
         else
             return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid)));
     }

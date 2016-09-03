@@ -48,6 +48,7 @@ class AdminController extends Controller
      */
     public function indexAction(Request $request, $slug)
     {
+        $username = $this->get('security.token_storage')->getToken()->getUsername();
         if ($structure_filter = $this->session->get('slug') and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
             $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $structure_filter));
         } else {

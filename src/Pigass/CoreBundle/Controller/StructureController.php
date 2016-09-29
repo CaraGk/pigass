@@ -14,7 +14,8 @@ namespace Pigass\CoreBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request,
+    Symfony\Component\HttpFoundation\File\File;
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Pigass\CoreBundle\Entity\Structure,
@@ -96,11 +97,9 @@ class StructureController extends Controller
      */
     public function newAction(Request $request)
     {
-        $structures = $this->em->getRepository('PigassCoreBundle:Structure')->findAll();
-
         $structure = new Structure();
         $form = $this->createForm(StructureType::class, $structure);
-        $formHandler = new StructureHandler($form, $request, $this->em);
+        $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('logo_dir'));
 
         if ($formHandler->process()) {
             $slug = $structure->getSlug();
@@ -145,8 +144,11 @@ class StructureController extends Controller
      */
     public function editAction(Structure $structure, Request $request)
     {
+        if ($structure->getLogo()) {
+            $structure->setLogo(new File($this->getParameter('logo_dir') . '/' . $structure->getLogo()));
+        }
         $form = $this->createForm(StructureType::class, $structure);
-        $formHandler = new StructureHandler($form, $request, $this->em);
+        $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('logo_dir'));
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');

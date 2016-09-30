@@ -53,10 +53,10 @@ class Membership
     private $method;
 
     /**
+     * @var Structure $structure
+     *
      * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure", cascade={"persist"})
      * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
-     *
-     * @var Structure $structure
      */
     private $structure;
 
@@ -79,6 +79,13 @@ class Membership
      * @ORM\JoinColumn(name="payment_id")
      */
     private $payment;
+
+    /**
+     * @var string $status
+     *
+     * @ORM\Column(name="status", type="string", length=10)
+     */
+    private $status;
 
     /**
      * @ORM\OneToMany(targetEntity="MemberInfo", mappedBy="membership", cascade={"remove", "persist"}, orphanRemoval=true)

@@ -96,18 +96,33 @@ class PaymentController extends Controller
                 $this->session->remove('user_register_tmp');
 
             $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
+            $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
+            $structure = $membership->getStructure();
+            $toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print');
+
             if ($method->getFactoryName() == 'offline') {
-                 $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée une fois le chèque reçu.');
-            } else {
-                $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
+                $this->addFlash('warning', 'Demande d\'adhésion enregistrée. L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
+                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . $structure()->getName() . ' et à retourner à l\'adresse ' . $structure()->getPrintableAddress() . '.');
+                $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
+                if ($toPrintParam)
+                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+            } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
+                $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a réussi. L\'adhésion est validée.');
+
                 $membership->setPayedOn(new \DateTime('now'));
                 $membership->setPayment($payment);
                 $membership->setMethod($method);
+                if ($toPrintParam) {
+                    $membership->setStatus('paid');
+
+                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                } else {
+                    $membership->setStatus('validated');
+                }
 
                 $this->em->persist($membership);
                 $this->em->flush();
 
-                $this->addFlash('notice', 'Le paiement a réussi. L\'adhésion est validée.');
             }
         } else {
              $this->addFlash('error', 'Le paiement a échoué.');

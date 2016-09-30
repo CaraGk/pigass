@@ -259,6 +259,21 @@ class Structure
     }
 
     /**
+     * Get printable address
+     *
+     * @return string
+     */
+    public function getPrintableAddress()
+    {
+        $address = $this->address['number'] . ' ' . $this->address['type'] . ' ' . $this->address['street'];
+        if ($complement = $this->address['complement'])
+            $address .= ', ' . $complement;
+        $address .= ', ' . $this->address['code'] . ', ' . $this->address['city'] . ', ' . $this->address['country'];
+
+        return $address;
+    }
+
+    /**
      * Set area
      *
      * @param string $area

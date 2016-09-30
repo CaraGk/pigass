@@ -51,15 +51,21 @@
             <span class="btn-group pull-right">
                 <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                 <ul class="dropdown-menu">
-                    {% if membership.payedOn is null %}
+                    {% if membership.status == 'registered' %}
                         <li>
                             <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception du paiement pour cette adhésion">
-                                {{ icon('ok') }} Valider
+                                {{ icon('ok') }} Valider le paiement
                             </a>
                         </li>
                         <li>
                             <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': membership.person.user.id, 'view': 'index'}) }}" title="Supprimer cette adhésion">
                                 {{ icon('trash') }} Supprimer
+                            </a>
+                        </li>
+                    {% elseif membership.status == 'paid' %}
+                        <li>
+                            <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception de la fiche signée pour cette adhésion">
+                                {{ icon('ok') }} Valider la fiche
                             </a>
                         </li>
                     {% endif %}

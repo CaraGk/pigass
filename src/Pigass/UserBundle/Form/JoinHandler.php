@@ -64,6 +64,7 @@ class JoinHandler
         $membership->setExpiredOn($expire);
         $membership->setPerson($this->person);
         $membership->setStructure($this->structure);
+        $membership->setStatus('registered');
 
         $this->em->persist($membership);
         $this->em->flush();

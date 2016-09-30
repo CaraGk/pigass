@@ -91,7 +91,7 @@ class RegisterController extends Controller
             throw $this->createNotFoundException('Unable to find Membership entity');
 
         if ($membership->getStatus() == 'registered') {
-            if ($this->pm->findParamByName('reg_' . $membership->getStructure()->getSlug() . '_print')) {
+            if ($this->pm->findParamByName('reg_' . $membership->getStructure()->getSlug() . '_print')->getValue()) {
                 $membership->setStatus('paid');
                 $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. La fiche d\'adhésion doit encore être validée.');
             } else {

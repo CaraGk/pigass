@@ -16,6 +16,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Pigass\UserBundle\Form\AddressType;
 
 /**
  * GatewayConfigType
@@ -31,6 +32,14 @@ class GatewayConfigType extends AbstractType
             'required' => false,
         ))
         ->add('signature', TextType::class, array(
+            'required' => false,
+        ))
+        ->add('payableTo', TextType::class, array(
+            'label' => 'Ordre (chèque)',
+            'required' => false,
+        ))
+        ->add('address', AddressType::class, array(
+            'label' => 'Adresse d\'envoi (chèque)',
             'required' => false,
         ))
         ;

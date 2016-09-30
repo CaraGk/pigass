@@ -98,11 +98,17 @@ class PaymentController extends Controller
             $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
             $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
             $structure = $membership->getStructure();
-            $toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print');
+            $toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print')->getValue();
 
             if ($method->getFactoryName() == 'offline') {
+                $config = $method->getConfig();
+                $address = $config['address']['number'] . ' ' . $config['address']['type'] . ' ' . $config['address']['street'];
+                if ($config['address']['complement'])
+                    $address .= ', ' . $config['address']['complement'];
+                $address .= ', ' . $config['address']['code'] . ', ' . $config['address']['city'] . ', ' . $config['address']['country'];
+
                 $this->addFlash('warning', 'Demande d\'adhésion enregistrée. L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
-                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . $structure()->getName() . ' et à retourner à l\'adresse ' . $structure()->getPrintableAddress() . '.');
+                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . $config['payableTo'] . ' et à retourner à l\'adresse ' . $address . '.');
                 $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
                 if ($toPrintParam)
                     $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');

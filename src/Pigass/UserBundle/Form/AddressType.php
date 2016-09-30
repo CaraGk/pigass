@@ -82,7 +82,7 @@ class AddressType extends AbstractType
             ))
             ->add('country', CountryType::class, array(
                 'label' => 'Pays',
-                'preferred_choices' => array('France')
+                'preferred_choices' => array('FR')
             ))
         ;
     }

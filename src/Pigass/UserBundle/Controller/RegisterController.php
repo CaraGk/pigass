@@ -399,7 +399,7 @@ class RegisterController extends Controller
         if ($username = $this->session->get('user_register_tmp'))
             $user = $this->um->findUserByUsername($username);
         else
-            $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+            $user = $this->getUser();
 
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
@@ -549,7 +549,7 @@ class RegisterController extends Controller
      */
     public function listAction(Request $request)
     {
-        $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+        $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 
@@ -583,7 +583,7 @@ class RegisterController extends Controller
      */
     public function showInfosAction(Membership $membership, Request $request)
     {
-        $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+        $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 

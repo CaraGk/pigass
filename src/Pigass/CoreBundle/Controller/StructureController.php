@@ -151,7 +151,24 @@ class StructureController extends Controller
         $form = $this->createForm(StructureType::class, $structure);
         $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('logo_dir'));
 
-        if ($formHandler->process()) {
+        if ($oldName = $formHandler->process()) {
+            $parameters = $this->em->getRepository('PigassParameterBundle:Parameter')->getBySlug($oldName);
+            foreach ($parameters as $parameter) {
+                $name = $parameter->getName();
+                $name = str_replace($oldName, $structure->getSlug(), $name);
+                $parameter->setName($name);
+                $this->em->persist($parameter);
+            }
+            $gateways = $this->em->getRepository('PigassUserBundle:Gateway')->getBySlug($oldName);
+            foreach ($gateways as $gateway) {
+                $name = $gateway->getGatewayName();
+                $name = str_replace($oldName, $structure->getSlug(), $name);
+                $gateway->setGatewayName($name);
+                $this->em->persist($gateway);
+            }
+
+            $this->em->flush();
+
             $this->get('session')->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');
             return $this->redirect($this->generateUrl('core_structure_index'));
         }

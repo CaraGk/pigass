@@ -40,9 +40,9 @@ class StructureHandler
             $this->form->handleRequest($this->request);
 
             if ($this->form->isSubmitted() and $this->form->isValid()) {
-                $this->onSuccess($this->form->getData());
+                $oldName = $this->onSuccess($this->form->getData());
 
-            return true;
+                return $oldName;
             }
         }
 
@@ -60,7 +60,16 @@ class StructureHandler
             $structure->setLogo($fileName);
         }
 
+        $uow = $this->em->getUnitOfWork();
+        $metadata = $this->em->getClassMetadata('\Pigass\CoreBundle\Entity\Structure');
+        $uow->recomputeSingleEntityChangeSet($metadata, $structure);
+        $changeSet = $uow->getEntityChangeSet($structure);
+        $oldName = true;
+        if (isset($changeSet['slug']))
+            $oldName = $changeSet['slug'][0];
+
         $this->em->persist($structure);
-        $this->em->flush();
+
+        return $oldName;
     }
 }

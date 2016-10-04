@@ -22,4 +22,16 @@ class ParameterRepository extends EntityRepository
     {
         return $this->findBy(array(), array('category' => 'asc'));
     }
+
+    public function getBySlug($slug)
+    {
+        $query = $this->createQueryBuilder('p')
+            ->where('p.name like :slug')
+            ->setParameter('slug', '%' . $slug . '%')
+            ;
+
+        return $query->getQuery()
+            ->getResult()
+        ;
+    }
 }

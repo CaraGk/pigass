@@ -58,7 +58,7 @@ class QuestionType extends AbstractType
                 ));
             } elseif ($question->getType() == 4) {
                 $builder->add('question_' . $question->getId(), IntegerType::class, array(
-                    'precision' => $question->getMore(),
+                    'scale'     => (int) $question->getMore(),
                     'required'  => true,
                     'label'     => $question->getName(),
                 ));

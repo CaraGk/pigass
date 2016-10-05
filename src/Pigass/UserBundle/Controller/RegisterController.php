@@ -87,15 +87,30 @@ class RegisterController extends Controller
         $userid = $request->query->get('userid', null);
         $view = $request->query->get('view', null);
 
-        if (!$membership or $membership->getPayedOn() != null)
+        if (!$membership)
             throw $this->createNotFoundException('Unable to find Membership entity');
 
-        $membership->setPayedOn(new \DateTime('now'));
+        if ($membership->getStatus() == 'registered') {
+            if ($this->pm->findParamByName('reg_' . $membership->getStructure()->getSlug() . '_print')->getValue()) {
+                $membership->setStatus('paid');
+                $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. La fiche d\'adhésion doit encore être validée.');
+            } else {
+                $membership->setStatus('validated');
+                $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. L\'adhésion est validée.');
+            }
+            $membership->setPayedOn(new \DateTime('now'));
+        } elseif ($membership->getStatus() == 'paid') {
+            $membership->setStatus('validated');
+            $this->session->getFlashBag()->add('notice', 'La fiche d\'adhésion a été validée.');
+        } elseif ($membership->getStatus() == 'validated') {
+            $this->session->getFlashBag()->add('error', 'L\'adhésion a déjà été validée.');
+        } else {
+            $this->session->getFlashBag()->add('error', 'Le statut de l\'adhésion est inconnu.');
+        }
+
         $this->em->persist($membership);
         $this->em->flush();
         $slug = $membership->getStructure()->getSlug();
-
-        $this->session->getFlashBag()->add('notice', 'Paiement validé !');
 
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
@@ -384,7 +399,7 @@ class RegisterController extends Controller
         if ($username = $this->session->get('user_register_tmp'))
             $user = $this->um->findUserByUsername($username);
         else
-            $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+            $user = $this->getUser();
 
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
@@ -534,7 +549,7 @@ class RegisterController extends Controller
      */
     public function listAction(Request $request)
     {
-        $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+        $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 
@@ -568,7 +583,7 @@ class RegisterController extends Controller
      */
     public function showInfosAction(Membership $membership, Request $request)
     {
-        $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+        $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
 

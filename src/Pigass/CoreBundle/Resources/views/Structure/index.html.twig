@@ -25,7 +25,7 @@
 
     <ul class="entities structures list-group">
         {% for structure in structures %}
-            <li class="entity structure list-group-item">
+            <li class="entity structure list-group-item row">
                 {% if is_granted('ROLE_ADMIN') %}
                     <span class="btn-group pull-right">
                         <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
@@ -57,14 +57,37 @@
                             </li>
                         </ul>
                     </span>
-
-                    <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">{{ structure.name }}</a>
-                    ({{ structure.slug }})
-                {% elseif not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                    <a href="{{ path('user_register_register', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">{{ structure.name }}</a>
-                {% elseif is_granted('ROLE_MEMBER') %}
-                    <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">{{ structure.name }}</a>
                 {% endif %}
+
+                <span class="col-sm-1">
+                    {% if structure.logo is not null %}
+                        <img src="{{ asset('uploads/' ~ structure.logo) }}" alt="{{ structure.logo }}" />
+                    {% endif %}
+                </span>
+                <span class="col-sm-10">
+                    <span class="col-sm-12">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
+                                {{ structure.area }} :
+                                {{ structure.name }}
+                                ({{ structure.slug }})
+                            </a>
+                        {% elseif not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                            <a href="{{ path('user_register_register', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
+                                {{ structure.area }} :
+                                {{ structure.name }}
+                            </a>
+                        {% elseif is_granted('ROLE_MEMBER') %}
+                            <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
+                                {{ structure.area }} :
+                                {{ structure.name }}
+                            </a>
+                        {% endif %}
+                    </span>
+                    <span class="col-sm-12">
+                        {{ structure.printableAddress }}
+                    </span>
+                </span>
             </li>
         {% else %}
             <li class="noentity structure">

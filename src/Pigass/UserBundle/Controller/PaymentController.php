@@ -96,21 +96,47 @@ class PaymentController extends Controller
                 $this->session->remove('user_register_tmp');
 
             $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
+            $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
+            $structure = $membership->getStructure();
+            $toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print')->getValue();
+            $details = $payment->getDetails();
+
             if ($method->getFactoryName() == 'offline') {
-                 $this->addFlash('warning', 'Choix enregistré. L\'adhésion sera validée une fois le chèque reçu.');
-            } else {
-                $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
-                $membership->setPayedOn(new \DateTime('now'));
+                $config = $method->getConfig();
+                $address = $config['address']['number'] . ' ' . $config['address']['type'] . ' ' . $config['address']['street'];
+                if ($config['address']['complement'])
+                    $address .= ', ' . $config['address']['complement'];
+                $address .= ', ' . $config['address']['code'] . ', ' . $config['address']['city'] . ', ' . $config['address']['country'];
+
+                $this->addFlash('warning', 'Demande d\'adhésion enregistrée. L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
+                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . $config['payableTo'] . ' et à retourner à l\'adresse ' . $address . '.');
+                $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
+                if ($toPrintParam)
+                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+            } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
+                if ($details['ACK'] == 'Success') {
+                    $membership->setPayedOn(new \DateTime('now'));
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a réussi. L\'adhésion est validée.');
+                    if ($toPrintParam) {
+                        $membership->setStatus('paid');
+                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                    } else {
+                        $membership->setStatus('validated');
+                    }
+                } elseif ($details['ACK'] == 'Pending') {
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express est en attente d\'une confirmation. L\'adhésion sera validée dès la confirmation reçue.');
+                } else {
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a échoué. Veuillez contacter l\'administrateur du site.');
+                }
+
                 $membership->setPayment($payment);
                 $membership->setMethod($method);
 
                 $this->em->persist($membership);
                 $this->em->flush();
-
-                $this->addFlash('notice', 'Le paiement a réussi. L\'adhésion est validée.');
             }
         } else {
-             $this->addFlash('error', 'Le paiement a échoué.');
+             $this->addFlash('error', 'Le paiement a échoué ou a été annulé. En cas de problème, veuillez contacter l\'administrateur du site.');
         }
         return $this->redirect($this->generateUrl('user_register_list'));
     }

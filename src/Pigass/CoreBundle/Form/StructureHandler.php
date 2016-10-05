@@ -21,35 +21,55 @@ use Pigass\CoreBundle\Entity\Structure;
  */
 class StructureHandler
 {
-  private $form;
-  private $request;
-  private $em;
+    private $form;
+    private $request;
+    private $em;
+    private $targetDir;
 
-  public function __construct(Form $form, Request $request, EntityManager $em)
-  {
-    $this->form    = $form;
-    $this->request = $request;
-    $this->em      = $em;
-  }
-
-  public function process()
-  {
-    if ($this->request->getMethod() == 'POST') {
-      $this->form->handleRequest($this->request);
-
-      if ($this->form->isSubmitted() and $this->form->isValid()) {
-        $this->onSuccess($this->form->getData());
-
-        return true;
-      }
+    public function __construct(Form $form, Request $request, EntityManager $em, $targetDir)
+    {
+        $this->form    = $form;
+        $this->request = $request;
+        $this->em      = $em;
+        $this->targetDir = $targetDir;
     }
 
-    return false;
-  }
+    public function process()
+    {
+        if ($this->request->getMethod() == 'POST') {
+            $this->form->handleRequest($this->request);
 
-  public function onSuccess(Structure $structure)
-  {
-    $this->em->persist($structure);
-    $this->em->flush();
-  }
+            if ($this->form->isSubmitted() and $this->form->isValid()) {
+                $oldName = $this->onSuccess($this->form->getData());
+
+                return $oldName;
+            }
+        }
+
+        return false;
+    }
+
+    public function onSuccess(Structure $structure)
+    {
+        if ($file = $structure->getLogo()) {
+            $fileName = $structure->getSlug() . '.' . $file->guessExtension();
+            $file->move(
+                $this->targetDir,
+                $fileName
+            );
+            $structure->setLogo($fileName);
+        }
+
+        $uow = $this->em->getUnitOfWork();
+        $metadata = $this->em->getClassMetadata('\Pigass\CoreBundle\Entity\Structure');
+        $uow->recomputeSingleEntityChangeSet($metadata, $structure);
+        $changeSet = $uow->getEntityChangeSet($structure);
+        $oldName = true;
+        if (isset($changeSet['slug']))
+            $oldName = $changeSet['slug'][0];
+
+        $this->em->persist($structure);
+
+        return $oldName;
+    }
 }

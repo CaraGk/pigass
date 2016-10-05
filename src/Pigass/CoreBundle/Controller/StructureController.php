@@ -14,7 +14,8 @@ namespace Pigass\CoreBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request,
+    Symfony\Component\HttpFoundation\File\File;
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Pigass\CoreBundle\Entity\Structure,
@@ -96,11 +97,9 @@ class StructureController extends Controller
      */
     public function newAction(Request $request)
     {
-        $structures = $this->em->getRepository('PigassCoreBundle:Structure')->findAll();
-
         $structure = new Structure();
         $form = $this->createForm(StructureType::class, $structure);
-        $formHandler = new StructureHandler($form, $request, $this->em);
+        $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('logo_dir'));
 
         if ($formHandler->process()) {
             $slug = $structure->getSlug();
@@ -109,6 +108,7 @@ class StructureController extends Controller
                 0 => array('setName' => 'reg_' . $slug . '_date', 'setValue' => $now->format('d-m-Y'), 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
                 1 => array('setName' => 'reg_' . $slug . '_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("1 mois" => "+ 1 month", "2 mois" => "+ 2 months", "6 mois" => "+ 6 months", "1 an" => "+ 1 year", "2 ans" => "+ 2 years", "3 ans" => "+ 3 years"), 'setStructure' => $structure),
                 2 => array('setName' => 'reg_' . $slug . '_payment', 'setValue' => 60, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                3 => array('setName' => 'reg_' . $slug . '_print', 'setValue' => true, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Nécessité de retourner le bulletin d\'adhésion imprimé et signé', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("Oui" => true, "Non" => false), 'setStructure' => $structure),
             );
             foreach ($parameters as $parameter) {
                 $structure_parameter = new Parameter();
@@ -145,10 +145,30 @@ class StructureController extends Controller
      */
     public function editAction(Structure $structure, Request $request)
     {
+        if ($structure->getLogo()) {
+            $structure->setLogo(new File($this->getParameter('logo_dir') . '/' . $structure->getLogo()));
+        }
         $form = $this->createForm(StructureType::class, $structure);
-        $formHandler = new StructureHandler($form, $request, $this->em);
+        $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('logo_dir'));
 
-        if ($formHandler->process()) {
+        if ($oldName = $formHandler->process()) {
+            $parameters = $this->em->getRepository('PigassParameterBundle:Parameter')->getBySlug($oldName);
+            foreach ($parameters as $parameter) {
+                $name = $parameter->getName();
+                $name = str_replace($oldName, $structure->getSlug(), $name);
+                $parameter->setName($name);
+                $this->em->persist($parameter);
+            }
+            $gateways = $this->em->getRepository('PigassUserBundle:Gateway')->getBySlug($oldName);
+            foreach ($gateways as $gateway) {
+                $name = $gateway->getGatewayName();
+                $name = str_replace($oldName, $structure->getSlug(), $name);
+                $gateway->setGatewayName($name);
+                $this->em->persist($gateway);
+            }
+
+            $this->em->flush();
+
             $this->get('session')->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');
             return $this->redirect($this->generateUrl('core_structure_index'));
         }

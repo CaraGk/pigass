@@ -35,7 +35,7 @@ class Structure
 
     /**
      * @ORM\Column(name="name", type="string", length=150, unique=true)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="Donnez un nom à la structure")
      *
      * @var string $name
      */
@@ -47,6 +47,28 @@ class Structure
      * @var string $slug
      */
     private $slug;
+
+    /**
+     * @ORM\Column(name="address", type="array")
+     *
+     * @var array $address
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(name="area", type="string", length=150, nullable=true)
+     *
+     * @var string $area
+     */
+    private $area;
+
+    /**
+     * @ORM\Column(name="logo", type="string", length=255, nullable=true)
+     * @Assert\Image()
+     *
+     * @var string $logo
+     */
+    private $logo;
 
     /**
      * @ORM\OneToMany(targetEntity="\Pigass\ParameterBundle\Entity\Parameter", mappedBy="structure")
@@ -210,5 +232,92 @@ class Structure
     public function getGateways()
     {
         return $this->gateways;
+    }
+
+    /**
+     * Set address
+     *
+     * @param array $address
+     *
+     * @return Structure
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return array
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * Get printable address
+     *
+     * @return string
+     */
+    public function getPrintableAddress()
+    {
+        $address = $this->address['number'] . ' ' . $this->address['type'] . ' ' . $this->address['street'];
+        if ($complement = $this->address['complement'])
+            $address .= ', ' . $complement;
+        $address .= ', ' . $this->address['code'] . ', ' . $this->address['city'] . ', ' . $this->address['country'];
+
+        return $address;
+    }
+
+    /**
+     * Set area
+     *
+     * @param string $area
+     *
+     * @return Structure
+     */
+    public function setArea($area)
+    {
+        $this->area = $area;
+
+        return $this;
+    }
+
+    /**
+     * Get area
+     *
+     * @return string
+     */
+    public function getArea()
+    {
+        return $this->area;
+    }
+
+    /**
+     * Set logo
+     *
+     * @param string $logo
+     *
+     * @return Structure
+     */
+    public function setLogo($logo)
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    /**
+     * Get logo
+     *
+     * @return string
+     */
+    public function getLogo()
+    {
+        return $this->logo;
     }
 }

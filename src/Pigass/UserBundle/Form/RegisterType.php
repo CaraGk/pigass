@@ -46,6 +46,8 @@ class RegisterType extends AbstractType
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
+                'horizontal_input_wrapper_class' => 'col-lg-4',
+                'datepicker'   => true,
             ))
             ->add('birthplace', TextType::class, array(
                 'label' => 'Lieu de naissance',

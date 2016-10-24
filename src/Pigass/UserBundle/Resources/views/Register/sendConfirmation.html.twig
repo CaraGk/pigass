@@ -2,12 +2,28 @@
 
 {% block headline %}Adhésion - Validation{% endblock %}
 
+{% block action %}
+    <li class="btn btn-warning">
+        <a href="{{ path('user_register_confirmation_send', {'email': email, 'slug': slug}) }}" title="Renvoyer l'email de confirmation">
+            {{ icon('envelope') }} Renvoyer la confirmation
+        </a>
+    </li>
+    <li class="btn btn-primary">
+        <a href="{{ path('user_register_join', {'slug': slug}) }}" title="Finaliser l'adhésion">
+            Suivant {{ icon('arrow-right') }}
+        </a>
+    </li>
+{% endblock %}
+
 {% block content %}
-    <div>Un email de confirmation a été envoyé à l'adresse {{ email }}. Cliquez sur le lien présent dans l'email pour activer votre compte.</div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            Un email de confirmation a été envoyé à l'adresse {{ email }}. Cliquez sur le lien présent dans l'email pour activer votre compte.
+        </div>
+        <div class="panel-footer">En cas de non-réception du mail, <a href="{{ path('user_register_confirmation_send', {'email': email, 'slug': slug}) }}">renvoyer la confirmation</a>.</div>
+    </div>
 
-    <div>En cas de non-réception du mail, <a href="{{ path('user_register_confirmation_send', {'email': email, 'slug': slug}) }}">renvoyer la confirmation</a>.</div>
-
-    <div class="btn btn-primary">
+    <div class="btn btn-primary pull-right">
         <a href="{{ path('user_register_join', {'slug': slug}) }}" title="Finaliser l'adhésion">
             Suivant {{ icon('arrow-right') }}
         </a>

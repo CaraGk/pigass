@@ -3,5 +3,10 @@
 {% block headline %}Adhésion - enregistrement{% endblock %}
 
 {% block content %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            Pour s'inscrire au site et pouvoir adhérer à {{ structure }}, il est nécessaire d'indiquer des coordonnées postales, e-mail et téléphoniques ainsi que quelques informations d'état-civil. Ces informations sont nécessaires au fonctionnement interne de {{ structure }} qui s'engage à ne pas les diffuser à quelque tiers que ce soit sans votre consentement exprès.
+        </div>
+    </div>
     {{ form(form) }}
 {% endblock %}

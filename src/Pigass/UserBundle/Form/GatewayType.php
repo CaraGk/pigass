@@ -27,8 +27,8 @@ class GatewayType extends AbstractType
             ->add('factoryName', ChoiceType::class, array(
                 'label'   => 'Type',
                 'choices' => array(
-                    'Chèques ou espèces' => 'offline',
-                    'Paypal'             => 'paypal_express_checkout',
+                    'Chèques, virement ou espèces' => 'offline',
+                    'Paypal'                       => 'paypal_express_checkout',
                 ),
                 'multiple' => false,
                 'expanded' => false,

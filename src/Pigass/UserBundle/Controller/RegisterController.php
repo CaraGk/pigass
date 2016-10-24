@@ -349,7 +349,8 @@ class RegisterController extends Controller
         }
 
         return array(
-            'form' => $form->createView(),
+            'form'      => $form->createView(),
+            'structure' => $structure,
         );
     }
 
@@ -436,7 +437,8 @@ class RegisterController extends Controller
         }
 
         return array(
-            'form' => $form->createView(),
+            'form'      => $form->createView(),
+            'structure' => $structure,
         );
 
     }

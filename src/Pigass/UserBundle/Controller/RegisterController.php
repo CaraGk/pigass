@@ -122,12 +122,24 @@ class RegisterController extends Controller
      * Delete membership
      *
      * @Route("/member/{id}/delete", name="user_register_delete", requirements={"id" = "\d+"})
-     * @Security\Secure(roles="ROLE_ADMIN")
+     * @Security\Secure(roles="ROLE_MEMBER, ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function deleteAction(Membership $membership, Request $request)
     {
-        $userid = $request->query->get('userid', null);
+        $security = $this->container->get('security.authorization_checker');
+        $actualUser = $this->get('security.token_storage')->getToken()->getUser();
+        $actualPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($actualUser);
+        $actualMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($actualPerson, true);
+
+        if ($membership->getPerson()->getId() != $actualPerson->getId()) {
+            if (!($security->isGranted('ROLE_ADMIN')) and
+                !($security->isGranted('ROLE_STRUCTURE') and $membership->getStructure()->getId() != $actualMembership->getId())
+            ) {
+                throw $this->createAccessDeniedException();
+            }
+        }
         $view = $request->query->get('view', null);
+        $userid = $request->query->get('userid', null);
 
         if (!$membership or $membership->getPayedOn() != null)
             throw $this->createNotFoundException('Unable to find Membership entity');
@@ -140,7 +152,7 @@ class RegisterController extends Controller
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_register_index'));
         else
-            return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid)));
+            return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid, 'slug' => $membership()->getStructure()->getSlug())));
     }
 
     /**
@@ -442,7 +454,7 @@ class RegisterController extends Controller
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($username);
 
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
-        $membership = $this->em->getRepository('Pigass\UserBundle\Entity\Membership')->getCurrentForPerson($person);
+        $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
 
         $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
         $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);

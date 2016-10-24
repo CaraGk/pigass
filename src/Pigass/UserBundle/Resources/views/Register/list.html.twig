@@ -77,17 +77,25 @@
                                 Questions complémentaires
                             </a>
                         </li>
-                        {% if is_granted('ROLE_ADMIN') and membership.payedOn is null %}
-                            <li>
-                                <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">
-                                    <span class="glyphicon glyphicon-ok-circle"></span>
-                                    Valider
-                                </a>
-                            </li>
+                        {% if membership.status == 'registered' or membership.payedOn is null %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li>
+                                    <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">
+                                        <span class="glyphicon glyphicon-ok-circle"></span>
+                                        Valider
+                                    </a>
+                                </li>
+                            {% endif %}
                             <li>
                                 <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': userid}) }}" title="Supprimer cette adhésion">
                                     <span class="glyphicon glyphicon-remove-circle"></span>
                                     Supprimer
+                                </a>
+                            </li>
+                        {% elseif membership.status == 'paid' %}
+                            <li>
+                                <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception de la fiche signée pour cette adhésion">
+                                    {{ icon('ok') }} Valider la fiche
                                 </a>
                             </li>
                         {% endif %}

@@ -77,6 +77,18 @@ class PersonRepository extends EntityRepository
                  ->getSingleResult();
   }
 
+    public function getByUser($user)
+    {
+        $query = $this->getBaseQuery();
+        $query->where('u.id = :userid')
+            ->setParameter('userid', $user->getId())
+        ;
+
+        return $query->getQuery()
+            ->getSingleResult()
+        ;
+    }
+
     public function getMailsByStructure($grade_id)
     {
         $query = $this->getBaseQuery();

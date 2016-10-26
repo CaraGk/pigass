@@ -66,8 +66,8 @@ class RegisterController extends Controller
             $actualUser = $this->get('security.token_storage')->getToken()->getUser();
             $actualPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($actualUser);
             $actualMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($actualPerson, true);
-            $slug = $actualMembership->getStucture()->getSlug();
-            $this->session->set('slug', $actualSlug);
+            $slug = $actualMembership->getStructure()->getSlug();
+            $this->session->set('slug', $slug);
         }
         $limit = $request->query->get('limit', null);
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();

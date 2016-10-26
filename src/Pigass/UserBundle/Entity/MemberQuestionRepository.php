@@ -12,6 +12,7 @@
 namespace Pigass\UserBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Pigass\CoreBundle\Entity\Structure;
 
 /**
  * MemberQuestionRepository
@@ -23,7 +24,7 @@ class MemberQuestionRepository extends EntityRepository
         return $this->createQueryBuilder('q');
     }
 
-    public function countAll($structure_filter = null)
+    public function countAll(Structure $structure = null)
     {
         $query = $this->createQueryBuilder('q')
             ->select('COUNT(q)');
@@ -31,13 +32,15 @@ class MemberQuestionRepository extends EntityRepository
         return $query->getQuery()->getSingleScalarResult();
     }
 
-    public function getAll($structure_filter = null)
+    public function getAll(Structure $structure = null)
     {
         $query = $this->getBaseQuery();
 
-        if ($structure_filter) {
-            $query->where('q.structure = :structure_filter')
-                ->setParameter('structure_filter', $structure_filter)
+        if ($structure) {
+            $query->where('q.structure is null')
+                ->orWhere('q.structure = :structure_filter')
+                ->setParameter('structure_filter', $structure)
+                ->orderBy('q.structure', 'ASC')
             ;
         }
 

@@ -52,7 +52,7 @@ class MemberQuestionHandler
 
     public function onSuccess(MemberQuestion $question)
     {
-        if ($this->structure)
+        if (!$question->getStructure())
             $question->setStructure($this->structure);
 
         $this->em->persist($question);

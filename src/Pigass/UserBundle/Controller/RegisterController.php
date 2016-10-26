@@ -60,6 +60,15 @@ class RegisterController extends Controller
      */
     public function indexAction($slug, Request $request)
     {
+        $session_slug = $this->session->get('slug', null);
+        $security = $this->container->get('security.authorization_checker');
+        if (!$session_slug and !($security->isGranted('ROLE_ADMIN'))) {
+            $actualUser = $this->get('security.token_storage')->getToken()->getUser();
+            $actualPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($actualUser);
+            $actualMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($actualPerson, true);
+            $slug = $actualMembership->getStucture()->getSlug();
+            $this->session->set('slug', $actualSlug);
+        }
         $limit = $request->query->get('limit', null);
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
         $membership_filters = $this->session->get('user_register_filter', array(
@@ -480,12 +489,13 @@ class RegisterController extends Controller
      */
     public function questionIndexAction()
     {
-        $structure_filter = $this->session->get('slug');
-
-        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure_filter);
+        $slug = $this->session->get('slug');
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
 
         return array(
             'questions' => $questions,
+            'slug'      => $slug,
         );
     }
 
@@ -498,9 +508,10 @@ class RegisterController extends Controller
      */
     public function questionNewAction(Request $request)
     {
-        $structure_filter = $this->session->get('slug');
-        if ($structure_filter and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $structure_filter));
+        $slug = $this->session->get('slug');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        if ($slug and !$user->hasRole('ROLE_ADMIN')) {
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
             if (!$structure)
                 throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
         } else {
@@ -517,7 +528,7 @@ class RegisterController extends Controller
         }
 
         return array(
-            'form' => $form->createView(),
+            'form'     => $form->createView(),
             'question' => null,
         );
     }
@@ -531,9 +542,10 @@ class RegisterController extends Controller
      */
     public function questionEditAction(MemberQuestion $question, Request $request)
     {
-        $structure_filter = $this->session->get('slug');
-        if ($structure_filter and !$this->um->findUserByUsername($username)->hasRole('ROLE_ADMIN')) {
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $structure_filter));
+        $slug = $this->session->get('slug');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        if ($slug and !$user->hasRole('ROLE_ADMIN')) {
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
             if (!$structure)
                 throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
         } else {

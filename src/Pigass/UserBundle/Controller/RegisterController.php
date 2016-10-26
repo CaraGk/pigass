@@ -199,12 +199,9 @@ class RegisterController extends Controller
             ->setCellValue('L1', 'Code postal')
             ->setCellValue('M1', 'Ville')
             ->setCellValue('N1', 'Pays')
-            ->setCellValue('O1', 'Ville d\'externat')
-            ->setCellValue('P1', 'Rang de classement')
-            ->setCellValue('Q1', 'ECN')
-            ->setCellValue('R1', 'Stages validés')
+            ->setCellValue('O1', 'Stages validés')
             ;
-        $column = array('S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AZ');
+        $column = array('P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AZ');
         foreach ($memberquestions as $question) {
             $key = each($column);
             $phpExcelObject->setActiveSheetIndex(0)
@@ -237,8 +234,6 @@ class RegisterController extends Controller
                 ->setCellValue('L'.$i, $address['code'])
                 ->setCellValue('M'.$i, $address['city'])
                 ->setCellValue('N'.$i, $address['country'])
-                ->setCellValue('P'.$i, $membership->getPerson()->getRanking())
-                ->setCellValue('Q'.$i, $membership->getPerson()->getGraduate())
                 ->setCellValue($columns['Mode de paiement'].$i, $membership->getReadableMethod())
                 ->setCellValue($columns['Date d\'adhésion'].$i, $membership->getPayedOn())
             ;
@@ -634,7 +629,7 @@ class RegisterController extends Controller
      */
     private function testAdminTakeOver($user, $user_id = null)
     {
-        if ($user->hasRole('ROLE_ADMIN') and $user_id != null) {
+        if (($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) and $user_id != null) {
             $user = $this->um->findUserBy(array(
                 'id' => $user_id,
             ));

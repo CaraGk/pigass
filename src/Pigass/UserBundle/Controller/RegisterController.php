@@ -370,11 +370,10 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $username = $request->query->get('username');
         $user = $this->um->findUserByUsername($email);
-
         if(!$user)
             throw $this->createNotFoundException('Aucun utilisateur lié à cette adresse mail.');
+        $person = $this->em->getRepository('PigassUserBundle:Person')->findOneBy(array('user' => $user));
 
         if(!$user->getConfirmationToken())
             throw $this->createNotFoundException('Cet utilisateur n\'a pas de jeton de confirmation défini. Est-il déjà validé ? Contactez un administrateur.');
@@ -383,12 +382,18 @@ class RegisterController extends Controller
             $this->session->set('user_register_tmp', $email);
 
         $url = $this->generateUrl('fos_user_registration_confirm', array('token' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL);
+        $params = array(
+            'user'      => $user,
+            'url'       => $url,
+            'person'    => $person,
+            'structure' => $structure,
+        );
         $sendmail = \Swift_Message::newInstance()
                 ->setSubject('PIGASS - Confirmation d\'adresse mail')
                 ->setFrom($this->container->getParameter('mailer_mail'))
                 ->setTo($user->getEmailCanonical())
-                ->setBody($this->renderView('PigassUserBundle:Register:confirmation.html.twig', array('user' => $user, 'url' => $url)), 'text/html')
-                ->addPart($this->renderView('PigassUserBundle:Register:confirmation.txt.twig', array('user' => $user, 'url' => $url)), 'text/plain')
+                ->setBody($this->renderView('PigassUserBundle:Register:confirmation.html.twig', $params, 'text/html'))
+                ->addPart($this->renderView('PigassUserBundle:Register:confirmation.txt.twig', $params, 'text/plain'))
         ;
         $this->get('mailer')->send($sendmail);
 

@@ -4,11 +4,11 @@ Votre inscription sur le site des adhésions de {{ structure.name }} s'est corre
 
 Votre identifiant de connexion : {{ user.emailCanonical }}
 
-Si vous ne retrouvez plus votre mot de passe, demandez à le réinitialiser : {{ path('fos_user_resetting_request') }}
+Si vous ne retrouvez plus votre mot de passe, demandez à le réinitialiser : {{ url('fos_user_resetting_request') }}
 
 Il reste une dernière étape pour valider votre inscription sur le site : confirmer votre email en cliquant sur le lien suivant :
 {{ url }}
 
-Enfin, si vous ne l'avez déjà fait, vous pourrez adhérer à {{ structure.name }} en réglant votre cotisation : {{ path('user_register_join', {'slug': structure.slug}) }}
+Enfin, si vous ne l'avez déjà fait, vous pourrez adhérer à {{ structure.name }} en réglant votre cotisation : {{ url('user_register_join', {'slug': structure.slug}) }}
 
 Ce message a été généré automatiquement par le portail d'adhésions.

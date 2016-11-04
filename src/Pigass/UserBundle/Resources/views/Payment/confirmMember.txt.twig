@@ -1,0 +1,21 @@
+Votre adhésion à {{ membership.structure.name }} a été enregistrée.
+
+L'adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d-m-Y') }} a été enregistrée.
+
+{% if membership.status == 'paid' or membership.status == 'validated' %}
+    Le paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € par {{ membership.method.readableName }} a été bien reçu.
+{% else %}
+    Une fois votre paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € reçu, votre adhésion pourra être validée.
+{% endif %}
+
+{% if kparam('reg_' ~ membership.structure.slug ~ '_print') %}
+    Pour finaliser votre adhésion il faut encore que vous renvoyiez la fiche d'adhésion préremplie signée à :
+
+    {{ membership.structure.name }}
+    {{ membership.structure.PrintableAddress(false) }}
+
+{% elseif membership.status == 'validated' %}
+    L'adhésion a été complètement validée le {{ membership.payedOn|date('d-m-Y') }}.
+{% endif %}
+
+Ce message a été généré automatiquement par le portail d'adhésions.

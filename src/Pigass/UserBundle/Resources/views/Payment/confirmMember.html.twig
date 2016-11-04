@@ -1,0 +1,20 @@
+<div class="panel panel-default">
+    <div class="panel-header">Votre adhésion à {{ membership.structure.name }} a été enregistrée.</div>
+    <div class="panel-body">
+        <p>L'adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d-m-Y') }} a été enregistrée.</p>
+        {% if membership.status == 'paid' or membership.status == 'validated' %}
+            <p>Le paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € par {{ membership.method.readableName }} a été bien reçu.</p>
+        {% else %}
+            <p>Une fois votre paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € reçu, votre adhésion pourra être validée.</p>
+        {% endif %}
+        {% if kparam('reg_' ~ membership.structure.slug ~ '_print') %}
+            <p>Pour finaliser votre adhésion il faut encore que vous renvoyiez la fiche d'adhésion préremplie signée à :</p>
+            <p class="centered">{{ membership.structure.name }}
+                <br/>{{ membership.structure.PrintableAddress(true) }}
+            </p>
+        {% elseif membership.status == 'validated' %}
+            <p>L'adhésion a été complètement validée le {{ membership.payedOn|date('d-m-Y') }}.</p>
+        {% endif %}
+    </div>
+    <div class="panel-footer">Ce message a été généré automatiquement par le portail d'adhésions.</div>
+</div>

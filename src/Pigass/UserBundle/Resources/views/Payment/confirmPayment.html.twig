@@ -1,0 +1,14 @@
+<div class="panel panel-default">
+    <div class="panel-header">Votre paiement à {{ membership.structure.name }} a été reçu.</div>
+    <div class="panel-body">
+        {% if print %}
+            <p>Pour finaliser votre adhésion il faut encore que vous renvoyiez la fiche d'adhésion préremplie signée à :</p>
+            <p class="centered">{{ membership.structure.name }}
+                <br/>{{ membership.structure.PrintableAddress(true) }}
+            </p>
+        {% else %}
+            <p>L'adhésion a été complètement validée le {{ membership.payedOn|date('d-m-Y') }}.</p>
+        {% endif %}
+    </div>
+    <div class="panel-footer">Ce message a été généré automatiquement par le portail d'adhésions.</div>
+</div>

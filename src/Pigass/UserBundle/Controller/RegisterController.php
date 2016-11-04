@@ -100,7 +100,7 @@ class RegisterController extends Controller
             throw $this->createNotFoundException('Unable to find Membership entity');
 
         if ($membership->getStatus() == 'registered') {
-            if ($this->pm->findParamByName('reg_' . $membership->getStructure()->getSlug() . '_print')->getValue()) {
+            if ($toPrintParam = $this->pm->findParamByName('reg_' . $membership->getStructure()->getSlug() . '_print')->getValue()) {
                 $membership->setStatus('paid');
                 $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. La fiche d\'adhésion doit encore être validée.');
             } else {
@@ -108,9 +108,30 @@ class RegisterController extends Controller
                 $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. L\'adhésion est validée.');
             }
             $membership->setPayedOn(new \DateTime('now'));
+
+            $params = array(
+                'membership' => $membership,
+                'print'      => $toPrintParam,
+            );
+            $sendmail = \Swift_Message::newInstance()
+                ->setSubject('PIGASS - Paiement reçu')
+                ->setFrom($this->container->getParameter('mailer_mail'))
+                ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
+                ->setBody($this->renderView('PigassUserBundle:Payment:confirmPayment.html.twig', $params, 'text/html'))
+                ->addPart($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
+            ;
+            $this->get('mailer')->send($sendmail);
         } elseif ($membership->getStatus() == 'paid') {
             $membership->setStatus('validated');
             $this->session->getFlashBag()->add('notice', 'La fiche d\'adhésion a été validée.');
+            $sendmail = \Swift_Message::newInstance()
+                ->setSubject('PIGASS - Adhésion validée')
+                ->setFrom($this->container->getParameter('mailer_mail'))
+                ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
+                ->setBody($this->renderView('PigassUserBundle:Payment:confirmPrint.html.twig', array('membership' => $membership), 'text/html'))
+                ->addPart($this->renderView('PigassUserBundle:Payment:confirmPrint.txt.twig', array('membership' => $membership), 'text/plain'))
+            ;
+            $this->get('mailer')->send($sendmail);
         } elseif ($membership->getStatus() == 'validated') {
             $this->session->getFlashBag()->add('error', 'L\'adhésion a déjà été validée.');
         } else {
@@ -124,7 +145,7 @@ class RegisterController extends Controller
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
         else
-            return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid)));
+            return $this->redirect($this->generateUrl('user_register_list', array('slug' => $slug, 'userid' => $userid)));
     }
 
     /**

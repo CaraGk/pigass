@@ -263,12 +263,13 @@ class Structure
      *
      * @return string
      */
-    public function getPrintableAddress()
+    public function getPrintableAddress($html = false)
     {
         $address = $this->address['number'] . ' ' . $this->address['type'] . ' ' . $this->address['street'];
-        if ($complement = $this->address['complement'])
-            $address .= ', ' . $complement;
-        $address .= ', ' . $this->address['code'] . ', ' . $this->address['city'] . ', ' . $this->address['country'];
+        if ($complement = $this->address['complement']) {
+            $address .= ($html?'<br />':', ') . $complement;
+        }
+        $address .= ($html?'<br />':', ') . $this->address['code'] . ', ' . $this->address['city'] . ', ' . $this->address['country'];
 
         return $address;
     }

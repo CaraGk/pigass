@@ -103,23 +103,28 @@ class PaymentController extends Controller
 
             if ($method->getFactoryName() == 'offline') {
                 $config = $method->getConfig();
-                $address = $config['address']['number'] . ' ' . $config['address']['type'] . ' ' . $config['address']['street'];
-                if ($config['address']['complement'])
-                    $address .= ', ' . $config['address']['complement'];
-                $address .= ', ' . $config['address']['code'] . ', ' . $config['address']['city'] . ', ' . $config['address']['country'];
+                if (isset($config['address'])) {
+                    $address = $config['address']['number'] . ' ' . $config['address']['type'] . ' ' . $config['address']['street'];
+                    if ($config['address']['complement'])
+                        $address .= ', ' . $config['address']['complement'];
+                    $address .= ', ' . $config['address']['code'] . ', ' . $config['address']['city'] . ', ' . $config['address']['country'];
+                } else {
+                    $address = 'non définie';
+                }
 
                 $this->addFlash('warning', 'Demande d\'adhésion enregistrée. L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
-                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . $config['payableTo'] . ' et à retourner à l\'adresse ' . $address . '.');
+                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . (isset($config['payableTo'])?$config['payableTo']:'non défini') . ' et à retourner à l\'adresse ' . $address . '.');
                 $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
-                if ($toPrintParam)
-                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                if ($toPrintParam) {
+                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                }
             } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
                 if ($details['ACK'] == 'Success') {
                     $membership->setPayedOn(new \DateTime('now'));
                     $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a réussi. L\'adhésion est validée.');
                     if ($toPrintParam) {
                         $membership->setStatus('paid');
-                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhision et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
                     } else {
                         $membership->setStatus('validated');
                     }
@@ -130,11 +135,25 @@ class PaymentController extends Controller
                 }
 
                 $membership->setPayment($payment);
-                $membership->setMethod($method);
-
-                $this->em->persist($membership);
-                $this->em->flush();
             }
+            $membership->setMethod($method);
+
+            $this->em->persist($membership);
+            $this->em->flush();
+
+            $params = array(
+                'membership'  => $membership,
+                'print'       => $toPrintParam,
+                'pay_address' => ($address?$address:null),
+            );
+            $sendmail = \Swift_Message::newInstance()
+                ->setSubject('PIGASS - Demande d\'adhésion enregistré')
+                ->setFrom($this->container->getParameter('mailer_mail'))
+                ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
+                ->setBody($this->renderView('PigassUserBundle:Payment:confirmMember.html.twig', $params, 'text/html'))
+                ->addPart($this->renderView('PigassUserBundle:Payment:confirmMember.txt.twig', $params, 'text/plain'))
+            ;
+            $this->get('mailer')->send($sendmail);
         } else {
              $this->addFlash('error', 'Le paiement a échoué ou a été annulé. En cas de problème, veuillez contacter l\'administrateur du site.');
         }

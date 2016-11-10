@@ -28,3 +28,12 @@ Procédure d'installation en console sur un serveur GNU/Linux :
 9. ./bin/console assetic:dump
 
 À partir de là on peut accéder au site et se connecter avec l'utilisateur user@exemple.fr pour créer les structures.
+
+Problèmes fréquents
+-------------------
+Si sur un formulaire, vous obtenez l'erreur « There is no suitable CSPRNG installed on your system », c'est vraisemenbablement que votre système utilise PHP5. Il existe 2 possibilité pour se débarrasser de ce problème :
+- Ajouter paragonie/random_compat au composer.json (./composer.phar require paragonie/random_compat ~1.4 ; ./composer.phar install)
+- Passer à la version 7.0 de PHP.
+
+Si à l'identification de l'utilisateur, rien ne se passe et que les logs indiquent un « Populated the TokenStorage with an anonymous Token. » : 
+- Ajouter à la configuration d'Apache : FcgidPassHeader     Authorization

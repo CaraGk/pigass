@@ -14,6 +14,9 @@
 {% endblock %}
 
 {% block content %}
+    {% if error %}
+        <div class="alert alert-danger fade in">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
     <form action="{{ path("fos_user_security_check") }}" method="post" class="form">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
         <fieldset>

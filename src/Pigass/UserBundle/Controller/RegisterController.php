@@ -31,6 +31,7 @@ use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\QuestionHandler,
     Pigass\UserBundle\Form\MemberQuestionType,
     Pigass\UserBundle\Form\MemberQuestionHandler;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * UserBundle RegisterController
@@ -473,6 +474,51 @@ class RegisterController extends Controller
 
     }
 
+    /**
+     * Get printable PDF for membership
+     *
+     * @Route("/member/{id}/print/", name="user_register_print", requirements={"id" = "\d+"})
+     */
+    public function printPDFAction(Membership $membership)
+    {
+        $offline_gateway = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $membership->getStructure()->getSlug() . '_offline'));
+        $config = $offline_gateway->getConfig();
+        if (isset($config['address'])) {
+            $address = $config['address']['number'] . ' ' . $config['address']['type'] . ' ' . $config['address']['street'];
+            if ($config['address']['complement'])
+                $address .= ', ' . $config['address']['complement'];
+            $address .= ', ' . $config['address']['code'] . ', ' . $config['address']['city'] . ', ' . $config['address']['country'];
+        } else {
+            $address = 'non définie';
+        }
+        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($membership->getStructure());
+        $infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($membership->getPerson(), $membership);
+        if (count($questions) > count($infos)) {
+            $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
+        }
+
+        $html = $this->renderView(
+            'PigassUserBundle:Register:printPDF.html.twig',
+            array(
+                'membership' => $membership,
+                'config'     => $config,
+                'address'    => $address,
+                'payableTo'  => (isset($config['payableTo'])?$config['payableTo']:'non défini'),
+                'form'       => ($form?$form->createView():null),
+                'questions'  => $questions,
+                'infos'      => $infos,
+        ));
+        $filename = "Adhesion_" . $membership->getPerson()->getName() . "_" . $membership->getExpiredOn()->format('Y');
+
+        return new Response(
+            $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+            200,
+            [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+            ]
+        );
+    }
     /**
      * Complementary questions to member
      *

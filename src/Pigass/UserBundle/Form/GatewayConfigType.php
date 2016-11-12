@@ -14,7 +14,7 @@ namespace Pigass\UserBundle\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Component\Form\Extension\Core\Type\TextType,
-    Symfony\Component\Form\Extension\Core\Type\ChechkboxType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Pigass\UserBundle\Form\AddressType;
 

@@ -55,7 +55,13 @@
                     {% else %}
                         <div class="col-xs-12">Je règle la somme de {{ membership.amount }} euros à {{ membership.structure.name }} par {{ membership.method.description|lower }}.</div>
                         <div class="col-xs-12">Le chèque est à libeller à l'ordre de {{ payableTo }} et à retourner à l'adresse {{ address }}.</div>
-                        <div class="col-xs-12">Pour un paiement par virement, veuillez contacter la structure.</div>
+                        <div class="col-xs-12">
+                            {% if iban is not null %}
+                                Le virement bancaire est à effectuer sur le compte {{ iban }}. N'oubliez pas de préciser « Adhésion {{ membership.person.surname }} {{ membership.person.name }} » en commentaire.
+                            {% else %}
+                                Pour un paiement par virement, veuillez contacter la structure.
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
                 <div class="panel-footer jumbotron row">

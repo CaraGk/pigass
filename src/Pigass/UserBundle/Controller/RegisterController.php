@@ -507,6 +507,7 @@ class RegisterController extends Controller
                 'form'       => ($form?$form->createView():null),
                 'questions'  => $questions,
                 'infos'      => $infos,
+                'iban'       => (isset($config['iban'])?$config['iban']:null),
         ));
         $filename = "Adhesion_" . $membership->getPerson()->getName() . "_" . $membership->getExpiredOn()->format('Y');
 

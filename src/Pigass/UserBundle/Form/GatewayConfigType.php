@@ -47,6 +47,9 @@ class GatewayConfigType extends AbstractType
             'label' => 'Adresse d\'envoi (chèque)',
             'required' => false,
         ))
+        ->add('iban', TextType::class, array(
+            'required' => false,
+        ))
         ;
     }
 

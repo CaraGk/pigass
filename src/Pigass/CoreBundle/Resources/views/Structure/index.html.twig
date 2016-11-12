@@ -9,6 +9,12 @@
 {% endblock %}
 
 {% block action %}
+    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        <li class="panel panel-primary">
+            <div class="panel-heading">Pour adhérer, veuillez cliquer sur la structure de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
+        </li>
+    {% endif %}
+
     {% if is_granted('ROLE_ADMIN') %}
         <li class="btn btn-primary">
             <a href="{{ path('core_structure_new') }}" title="Ajouter une nouvelle structure">
@@ -19,12 +25,6 @@
 {% endblock %}
 
 {% block content %}
-    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-        <div class="panel panel-primary">
-            <div class="panel-heading">Pour adhérer, veuillez cliquer sur la structure de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
-        </div>
-    {% endif %}
-
     <ul class="entities structures list-group">
         {% for structure in structures %}
             <li class="entity structure list-group-item row">

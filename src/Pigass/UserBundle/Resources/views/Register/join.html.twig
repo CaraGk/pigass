@@ -2,11 +2,14 @@
 
 {% block headline %}Adhésion - enregistrement{% endblock %}
 
-{% block content %}
-    <div class="panel panel-primary">
+{% block action %}
+    <li class="panel panel-danger">
         <div class="panel-heading">
             Vous vous apprêtez à adhérer à {{ structure }} en réglant la cotisation d'un montant de {{ kparam('reg_' ~ structure.slug ~ '_payment') }} €.
         </div>
-    </div>
+    </li>
+{% endblock %}
+
+{% block content %}
     {{ form(form) }}
 {% endblock %}

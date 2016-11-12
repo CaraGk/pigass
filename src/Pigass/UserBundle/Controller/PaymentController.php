@@ -112,7 +112,7 @@ class PaymentController extends Controller
                     $address = 'non définie';
                 }
 
-                $this->addFlash('warning', 'Demande d\'adhésion enregistrée. L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
+                $this->addFlash('warning', 'L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
                 $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . (isset($config['payableTo'])?$config['payableTo']:'non défini') . ' et à retourner à l\'adresse ' . $address . '.');
                 if (isset($config['iban'])) {
                     $this->addFlash('notice', 'Pour un paiement par virement bancaire : l\'IBAN du compte est ' . $config['iban'] . '. N\'oubliez pas de préciser « Adhésion ' . $membership->getPerson()->getSurname() . ' ' . $membership->getPerson()->getName() . ' » en commentaire.');
@@ -120,7 +120,7 @@ class PaymentController extends Controller
                     $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
                 }
                 if ($toPrintParam) {
-                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez <a href="' . $this->generateUrl('user_register_print', $membership->getId()) . '" title="Télécharger la fiche d\'adhésion.">la fiche d\'adhésion</a> et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
                 }
             } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
                 if ($details['ACK'] == 'Success') {
@@ -128,7 +128,7 @@ class PaymentController extends Controller
                     $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a réussi. L\'adhésion est validée.');
                     if ($toPrintParam) {
                         $membership->setStatus('paid');
-                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez <a href="' . $this->generateUrl('user_register_print', $membership->getId()) . '" title="Télécharger la fiche d\'adhésion.">la fiche d\'adhésion</a> et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
                     } else {
                         $membership->setStatus('validated');
                     }

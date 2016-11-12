@@ -87,7 +87,7 @@ class Gateway extends BaseGatewayConfig
     public function getDescription()
     {
         if ($this->factoryName == "offline")
-            return "Chèques ou espèces";
+            return "Chèque, virement bancaire ou espèces";
         elseif ($this->factoryName == "paypal_express_checkout")
             return "Paypal";
         else

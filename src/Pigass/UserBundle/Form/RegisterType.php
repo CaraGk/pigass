@@ -58,7 +58,7 @@ class RegisterType extends AbstractType
                 'label' => 'Téléphone',
             ))
             ->add('address', AddressType::class, array(
-                'label' => 'Adresse :'
+                'label' => 'Adresse professionnelle :'
             ))
             ->add('Enregistrer', SubmitType::class)
         ;

@@ -33,13 +33,12 @@ class MemberQuestionType extends AbstractType
             ->add('name')
             ->add('type', ChoiceType::class, array(
               'choices' => array(
-                'Choix unique pondéré' => 1,
                 'Choix unique non pondéré' => 5,
-                'Échelle visuelle analogique' => 7,
-                'Choix multiple' => 3,
-                'Valeur numérique' => 4,
-                'Horaire' => 6,
-                'Texte long' => 2,
+                'Choix multiple'           => 3,
+                'Valeur numérique'         => 4,
+                'Horaire'                  => 6,
+                'Date'                     => 7,
+                'Texte long'               => 2,
               ),
               'required' => true,
               'multiple' => false,

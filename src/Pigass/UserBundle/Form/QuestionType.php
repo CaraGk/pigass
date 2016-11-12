@@ -76,6 +76,8 @@ class QuestionType extends AbstractType
                     'input'        => 'string',
                     'widget'       => 'single_text',
                     'with_seconds' => false,
+                    'horizontal_input_wrapper_class' => 'col-lg-4',
+                    'timepicker'   => true,
                     'required'     => true,
                     'label'        => $question->getName(),
                 ));
@@ -83,7 +85,8 @@ class QuestionType extends AbstractType
                 $builder->add('question_' . $question->getId(), DateType::class, array(
                     'input'        => 'string',
                     'widget'       => 'single_text',
-                    'format'       => 'dd/MM/yyyy',
+                    'horizontal_input_wrapper_class' => 'col-lg-4',
+                    'datepicker'   => true,
                     'required'     => true,
                     'label'        => $question->getName(),
                 ));

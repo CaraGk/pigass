@@ -113,6 +113,7 @@ class QuestionType extends AbstractType
                     'class' => 'btn btn-primary pull-right',
                 ),
             ))
+        ;
     }
 
     public function getName()

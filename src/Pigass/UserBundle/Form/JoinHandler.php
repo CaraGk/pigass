@@ -25,16 +25,17 @@ class JoinHandler
 {
     private $form, $request, $em, $um, $payment, $person, $structure;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, $payment, Person $person, Structure $structure, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year")
+    public function __construct(Form $form, Request $request, EntityManager $em, $payment, Person $person, Structure $structure, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year", $reg_anticipated = "+ 0 day")
     {
-      $this->form    = $form;
-      $this->request = $request;
-      $this->em      = $em;
-      $this->payment = $payment;
-      $this->person  = $person;
-      $this->date    = $reg_date;
+      $this->form        = $form;
+      $this->request     = $request;
+      $this->em          = $em;
+      $this->payment     = $payment;
+      $this->person      = $person;
+      $this->date        = $reg_date;
       $this->periodicity = $reg_periodicity;
-      $this->structure = $structure;
+      $this->anticipated = $reg_anticipated;
+      $this->structure   = $structure;
     }
 
     public function process()
@@ -56,6 +57,7 @@ class JoinHandler
     {
         $expire = new \DateTime($this->date);
         $now = new \DateTime('now');
+        $now->modify($this->anticipated);
         while ($expire <= $now) {
             $expire->modify($this->periodicity);
         }

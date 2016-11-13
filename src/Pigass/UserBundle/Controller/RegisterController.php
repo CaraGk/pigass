@@ -448,8 +448,12 @@ class RegisterController extends Controller
 
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
+        $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+        $now = new \DateTime('now');
+        $reg_anticipated = $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue();
+        $anticipated = $now->modify($reg_anticipated);
 
-        if (null !== $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person)) {
+        if (null !== $current_membership and $current_membership->getExpiredOn() > $anticipated) {
             $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
 
             if ($userid and $user->hasRole('ROLE_ADMIN'))
@@ -460,7 +464,7 @@ class RegisterController extends Controller
 
         $membership = new Membership();
         $form = $this->createForm(JoinType::class, $membership, array('structure' => $structure));
-        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(), $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue());
+        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(), $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(), $reg_anticipated);
 
         if($form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');

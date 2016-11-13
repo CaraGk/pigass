@@ -120,7 +120,7 @@ class PaymentController extends Controller
                     $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
                 }
                 if ($toPrintParam) {
-                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez <a href="' . $this->generateUrl('user_register_print', $membership->getId()) . '" title="Télécharger la fiche d\'adhésion.">la fiche d\'adhésion</a> et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                    $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
                 }
             } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
                 if ($details['ACK'] == 'Success') {
@@ -128,7 +128,7 @@ class PaymentController extends Controller
                     $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a réussi. L\'adhésion est validée.');
                     if ($toPrintParam) {
                         $membership->setStatus('paid');
-                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez <a href="' . $this->generateUrl('user_register_print', $membership->getId()) . '" title="Télécharger la fiche d\'adhésion.">la fiche d\'adhésion</a> et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
+                        $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
                     } else {
                         $membership->setStatus('validated');
                     }

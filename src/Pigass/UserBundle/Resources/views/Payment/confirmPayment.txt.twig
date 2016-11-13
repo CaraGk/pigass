@@ -6,7 +6,7 @@ Votre paiement à {{ membership.structure.name }} a été reçu.
     {{ membership.structure.name }}
     {{ membership.structure.PrintableAddress(true) }}
 
-Pour récupérer la fiche d'adhesion : {{ absolute_url(path('user_register_print', {'id': membership.id})) }}
+Pour récupérer la fiche d'adhésion : {{ absolute_url(path('user_register_print', {'id': membership.id})) }}
 {% else %}
 L'adhésion a été complètement validée le {{ membership.payedOn|date('d-m-Y') }}.
 {% endif %}

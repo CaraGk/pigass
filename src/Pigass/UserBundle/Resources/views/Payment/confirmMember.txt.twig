@@ -14,7 +14,7 @@ L'adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|
     {{ membership.structure.name }}
     {{ membership.structure.PrintableAddress(false) }}
 
-Pour récupérer la fiche d'adhesion : {{ absolute_url(path('user_register_print', {'id': membership.id})) }}
+Pour récupérer la fiche d'adhésion : {{ absolute_url(path('user_register_print', {'id': membership.id})) }}
 
 {% elseif membership.status == 'validated' %}
 L'adhésion a été complètement validée le {{ membership.payedOn|date('d-m-Y') }}.

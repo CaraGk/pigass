@@ -40,7 +40,7 @@ class Membership
     /**
      * @var integer
      *
-     * @ORM\Column(name="amount", type="decimal", precision=2)
+     * @ORM\Column(name="amount", type="decimal", precision=5, scale=2)
      */
     private $amount;
 

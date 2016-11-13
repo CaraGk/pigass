@@ -175,6 +175,7 @@ class RegisterController extends Controller
         if (!$membership or $membership->getPayedOn() != null)
             throw $this->createNotFoundException('Unable to find Membership entity');
 
+        $slug = $membership->getStructure()->getSlug();
         $this->em->remove($membership);
         $this->em->flush();
 
@@ -183,7 +184,7 @@ class RegisterController extends Controller
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_register_index'));
         else
-            return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid, 'slug' => $membership()->getStructure()->getSlug())));
+            return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid, 'slug' => $slug)));
     }
 
     /**

@@ -60,7 +60,12 @@ class RegisterType extends AbstractType
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse professionnelle :'
             ))
-            ->add('Enregistrer', SubmitType::class)
+            ->add('Save', SubmitType::class, array(
+                'label' => 'Continuer',
+                'attr'  => array(
+                    'class' => 'btn btn-primary pull-right',
+                ),
+            ))
         ;
 
     }

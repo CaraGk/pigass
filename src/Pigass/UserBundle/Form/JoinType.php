@@ -42,7 +42,12 @@ class JoinType extends AbstractType
                 'expanded'     => true,
                 'label'        => 'Moyen de paiement'
             ))
-            ->add('Payer', SubmitType::class)
+            ->add('Save', SubmitType::class, array(
+                'label' => 'Payer',
+                'attr'  => array(
+                    'class' => 'btn btn-primary pull-right',
+                ),
+            ))
         ;
     }
 

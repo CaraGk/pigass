@@ -107,7 +107,12 @@ class QuestionType extends AbstractType
                 ));
             }
         }
-        $builder->add('Enregistrer', SubmitType::class);
+        $builder->add('Save', SubmitType::class, array(
+                'label' => 'Terminer',
+                'attr'  => array(
+                    'class' => 'btn btn-primary pull-right',
+                ),
+            ))
     }
 
     public function getName()

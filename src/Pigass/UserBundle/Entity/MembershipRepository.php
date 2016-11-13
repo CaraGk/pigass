@@ -41,6 +41,7 @@ class MembershipRepository extends EntityRepository
             ->setParameter('person', $person->getId())
             ->andWhere('m.expiredOn > :now')
             ->setParameter('now', new \DateTime('now'))
+            ->orderBy('m.expiredOn', 'desc')
             ->setMaxResults(1)
         ;
 

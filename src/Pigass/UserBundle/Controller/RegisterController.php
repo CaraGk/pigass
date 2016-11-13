@@ -651,14 +651,21 @@ class RegisterController extends Controller
         $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
+        $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+        $reJoinable = false;
 
-        if ($userid == null && $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person)) {
+        if ($userid == null && $current_membership) {
             $count_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->countByMembership($person, $current_membership);
             $count_questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->countAll();
             if ($count_infos < $count_questions) {
                 return $this->redirect($this->generateUrl('user_register_question'));
             }
             $slug = $current_membership->getStructure()->getSlug();
+            $now = new \DateTime('now');
+            $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
+            if ($current_membership->getExpiredOn() <= $now) {
+                $reJoinable = true;
+            }
         } else {
             $slug = $request->get('slug');
         }
@@ -670,6 +677,7 @@ class RegisterController extends Controller
             'userid'      => $userid,
             'person'      => $person,
             'slug'        => isset($slug)?$slug:null,
+            'reJoinable'  => $reJoinable,
         );
     }
 

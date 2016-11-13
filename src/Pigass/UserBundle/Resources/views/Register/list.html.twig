@@ -17,16 +17,22 @@
         </li>
     {% endif %}
     {% if slug is not null %}
-        <li class="btn btn-primary">
-            <a href="{{ path('user_register_join', {'slug': slug}) }}?{{ app.request.queryString }}">
-                {{ icon('euro') }} Ré-adhérer
-            </a>
-        </li>
-        {% if 'ROLE_STRUCTURE' not in person.user.roles %}
+        {% if reJoinable == true %}
             <li class="btn btn-primary">
-                <a href="{{ path('core_structure_index') }}" title="Adhérer à une autre structure">
-                    {{ icon('euro') }} Autre structure
+                <a href="{{ path('user_register_join', {'slug': slug}) }}?{{ app.request.queryString }}">
+                    {{ icon('euro') }} Ré-adhérer
                 </a>
+            </li>
+            {% if 'ROLE_STRUCTURE' not in person.user.roles %}
+                <li class="btn btn-primary">
+                    <a href="{{ path('core_structure_index') }}" title="Adhérer à une autre structure">
+                        {{ icon('euro') }} Autre structure
+                    </a>
+                </li>
+            {% endif %}
+        {% else %}
+            <li class="btn btn-warning">
+                Adhésion en cours
             </li>
         {% endif %}
         {% if is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN') %}

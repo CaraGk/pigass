@@ -52,6 +52,7 @@ class MemberQuestionType extends AbstractType
                 'delete_empty' => true,
                 'prototype'    => true,
             ))
+            ->add('required')
         ;
 
         if (null == $this->structure)

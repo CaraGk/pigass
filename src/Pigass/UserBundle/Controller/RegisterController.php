@@ -536,9 +536,20 @@ class RegisterController extends Controller
     {
         $username = $this->get('security.token_storage')->getToken()->getUsername();
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($username);
-
-        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
         $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+        $slug = $membership->getStructure()->getSlug();
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
+        $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);
+
+        if ($member_infos and count($member_infos) < count($questions)) {
+            $exclude = '(';
+            foreach ($member_infos as $member_info) {
+                $exclude .= $member_info->getQuestion()->getId() . ', ';
+            }
+            $exclude .= '0)';
+            $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure, $exclude);
+        }
 
         $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
         $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
@@ -655,12 +666,13 @@ class RegisterController extends Controller
         $reJoinable = false;
 
         if ($userid == null && $current_membership) {
-            $count_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->countByMembership($person, $current_membership);
-            $count_questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->countAll();
-            if ($count_infos < $count_questions) {
+            $slug = $current_membership->getStructure()->getSlug();
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+            $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
+            $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $current_membership);
+            if (count($member_infos) < count($questions)) {
                 return $this->redirect($this->generateUrl('user_register_question'));
             }
-            $slug = $current_membership->getStructure()->getSlug();
             $now = new \DateTime('now');
             $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
             if ($current_membership->getExpiredOn() <= $now) {

@@ -32,17 +32,23 @@ class MemberQuestionRepository extends EntityRepository
         return $query->getQuery()->getSingleScalarResult();
     }
 
-    public function getAll(Structure $structure = null)
+    public function getAll(Structure $structure = null, $exclude = null)
     {
         $query = $this->getBaseQuery();
 
         if ($structure) {
-            $query->where('q.structure is null')
-                ->orWhere('q.structure = :structure_filter')
+            $query->where('q.structure is null OR q.structure = :structure_filter')
                 ->setParameter('structure_filter', $structure)
                 ->orderBy('q.structure', 'ASC')
             ;
         }
+
+        if ($exclude) {
+            $query->andWhere('q.id NOT IN ' . $exclude)
+            ;
+        }
+
+        $query->addOrderBy('q.rank', 'ASC');
 
         return $query->getQuery()
             ->getResult()

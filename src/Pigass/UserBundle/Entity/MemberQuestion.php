@@ -65,6 +65,13 @@ class MemberQuestion
     private $infos;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="required", type="boolean", nullable=true)
+     */
+    private $required;
+
+    /**
      * @var Structure
      *
      * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure")
@@ -271,5 +278,28 @@ class MemberQuestion
     public function getStructure()
     {
         return $this->structure;
+    }
+
+    /**
+     * Set required
+     *
+     * @param  boolean  $required
+     * @return Question
+     */
+    public function setRequired($required)
+    {
+        $this->required = $required;
+
+        return $this;
+    }
+
+    /**
+     * Is required
+     *
+     * @return boolean
+     */
+    public function isRequired()
+    {
+        return $this->required;
     }
 }

@@ -35,14 +35,14 @@ class QuestionType extends AbstractType
             if($question->getType() == 1) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices'  => $this->getQuestionSubjectiveChoiceOptions($question->getMore()),
-                    'required' => true,
+                    'required' => $question->isRequired()?true:false,
                     'multiple' => false,
                     'expanded' => true,
                     'label'    => $question->getName(),
                  ));
             } elseif($question->getType() == 2) {
                 $builder->add('question_' . $question->getId(), TextareaType::class, array(
-                    'required'   => true,
+                    'required' => $question->isRequired()?true:false,
                     'trim'       => true,
                     'max_length' => 250,
                     'label'      => $question->getName(),
@@ -51,7 +51,7 @@ class QuestionType extends AbstractType
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices' => $question->getMore(),
                     'choice_label' => function ($value, $key, $index) { return $value; },
-                    'required' => true,
+                    'required' => $question->isRequired()?true:false,
                     'multiple' => true,
                     'expanded' => true,
                     'label'    => $question->getName(),
@@ -59,14 +59,14 @@ class QuestionType extends AbstractType
             } elseif ($question->getType() == 4) {
                 $builder->add('question_' . $question->getId(), IntegerType::class, array(
                     'scale'     => (int) $question->getMore(),
-                    'required'  => true,
+                    'required' => $question->isRequired()?true:false,
                     'label'     => $question->getName(),
                 ));
             } elseif ($question->getType() == 5) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices' => $question->getMore(),
                     'choice_label' => function ($value, $key, $index) { return $value; },
-                    'required' => true,
+                    'required' => $question->isRequired()?true:false,
                     'multiple' => false,
                     'expanded' => true,
                     'label'    => $question->getName(),
@@ -78,7 +78,7 @@ class QuestionType extends AbstractType
                     'with_seconds' => false,
                     'horizontal_input_wrapper_class' => 'col-lg-4',
                     'timepicker'   => true,
-                    'required'     => true,
+                    'required' => $question->isRequired()?true:false,
                     'label'        => $question->getName(),
                 ));
             } elseif ($question->getType() == 7) {
@@ -87,22 +87,21 @@ class QuestionType extends AbstractType
                     'widget'       => 'single_text',
                     'horizontal_input_wrapper_class' => 'col-lg-4',
                     'datepicker'   => true,
-                    'required'     => true,
+                    'required' => $question->isRequired()?true:false,
                     'label'        => $question->getName(),
                 ));
             } elseif ($question->getType() == 8) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(
                     'choices' => $question->getMore(),
                     'choice_label' => function ($value, $key, $index) { return $value; },
-                    'required' => true,
+                    'required' => $question->isRequired()?true:false,
                     'multiple' => false,
                     'expanded' => false,
-                    'required' => true,
                     'label'    => $question->getName(),
                 ));
             } elseif ($question->getType() == 9) {
                 $builder->add('question_' . $question->getId(), TextType::class, array(
-                    'required'     => true,
+                    'required' => $question->isRequired()?true:false,
                     'label'        => $question->getName(),
                 ));
             }

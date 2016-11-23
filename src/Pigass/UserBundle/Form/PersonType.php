@@ -42,8 +42,5 @@ class PersonType extends AbstractType
     $resolver->setDefaults(array(
         'data_class' => 'Pigass\UserBundle\Entity\Person',
     ));
-
-    $resolver->setAllowedValues(array(
-    ));
   }
 }

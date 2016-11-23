@@ -30,7 +30,9 @@ use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\QuestionType,
     Pigass\UserBundle\Form\QuestionHandler,
     Pigass\UserBundle\Form\MemberQuestionType,
-    Pigass\UserBundle\Form\MemberQuestionHandler;
+    Pigass\UserBundle\Form\MemberQuestionHandler,
+    Pigass\UserBundle\Form\MembershipType,
+    Pigass\UserBundle\Form\MembershipHandler;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -71,11 +73,16 @@ class RegisterController extends Controller
             $this->session->set('slug', $slug);
         }
         $limit = $request->query->get('limit', null);
-        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneby(array('slug' => $slug));
+        $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
         $membership_filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
+        if (!isset($membership_filters['valid']) or !isset($membership_filters['questions'])) {
+            $membership_filters['valid'] = null;
+            $membership_filters['questions'] = null;
+        }
         $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $membership_filters);
 
         return array(
@@ -534,11 +541,12 @@ class RegisterController extends Controller
      */
     public function questionAction(Request $request)
     {
-        $username = $this->get('security.token_storage')->getToken()->getUsername();
-        $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($username);
+        $user = $this->getUser();
+        $filter = $this->session->get('user_register_filter', null);
+        $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
+        $person = $this->testAdminTakeOver($user, $userid);
         $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
-        $slug = $membership->getStructure()->getSlug();
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $structure = $membership->getStructure();
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
         $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);
 
@@ -660,18 +668,22 @@ class RegisterController extends Controller
     public function listAction(Request $request)
     {
         $user = $this->getUser();
-        $userid = $request->query->get('userid');
+        $filter = $this->session->get('user_register_filter', null);
+        $register = $this->session->get('user_register_register', false);
+        $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
         $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
         $reJoinable = false;
 
-        if ($userid == null && $current_membership) {
+        if (($userid == null or $register == true) and $current_membership) {
             $slug = $current_membership->getStructure()->getSlug();
             $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
             $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $current_membership);
             if (count($member_infos) < count($questions)) {
                 return $this->redirect($this->generateUrl('user_register_question'));
+            } elseif ($register) {
+                $this->session->remove('user_register_register');
             }
             $now = new \DateTime('now');
             $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
@@ -721,6 +733,54 @@ class RegisterController extends Controller
     }
 
     /**
+     * Add membership and person
+     *
+     * @Route("/{slug}/new", name="user_register_membership_new")
+     * @Template("PigassUserBundle:Register:join.html.twig")
+     * @Security\Secure(roles="ROLE_ADMIN, ROLE_STRUCTURE")
+     */
+    public function newMembershipAction($slug, Request $request)
+    {
+        $adminUser = $this->getUser();
+        $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
+        $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+        if (!$adminUser->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
+            throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
+
+        $membership = new Membership();
+        $options = array(
+            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
+            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
+            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
+            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
+        );
+        $form = $this->createForm(MembershipType::class, $membership, array('structure' => $structure));
+        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options);
+
+        if($form_handler->process()) {
+            $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $membership->getPerson() . '.');
+
+            $filter = $this->session->get('user_register_filter', array());
+            $filter['user'] = $membership->getPerson()->getUser()->getId();
+            $this->session->set('user_register_filter', $filter);
+            $this->session->set('user_register_register', true);
+
+            return $this->redirect($this->generateUrl('user_payment_prepare', array(
+                'gateway' => $membership->getMethod()->getGatewayName(),
+                'memberid' => $membership->getId()
+            )));
+        }
+
+        return array(
+            'form'      => $form->createView(),
+            'structure' => $structure,
+        );
+    }
+
+    /**
      * Test for admin take over function
      *
      * @return Person
@@ -742,5 +802,4 @@ class RegisterController extends Controller
             return $person;
         }
     }
-
 }

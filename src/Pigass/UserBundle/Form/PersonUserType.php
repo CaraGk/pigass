@@ -25,9 +25,9 @@ use Pigass\UserBundle\Form\AddressType,
  */
 class PersonUserType extends AbstractType
 {
-  public function buildForm(FormBuilderInterface $builder, array $options)
-  {
-      $builder
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
             ->add('title', ChoiceType::class, array(
                 'label' => 'Titre',
                 'choices' => array(
@@ -45,23 +45,28 @@ class PersonUserType extends AbstractType
             ->add('birthday', BirthdayType::class, array(
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
+                'horizontal_input_wrapper_class' => 'col-lg-4',
+                'datepicker'   => true,
             ))
             ->add('birthplace', TextType::class, array(
                 'label' => 'Lieu de naissance',
             ))
-            ->add('anonymous')
             ->add('user', UserType::class, array(
-                'label' => ' ',
+                'label' => 'Identifiant',
             ))
             ->add('phone', TextType::class, array(
                 'label' => 'Téléphone',
             ))
             ->add('address', AddressType::class, array(
-                'label' => 'Adresse :'
+                'label' => 'Adresse professionnelle :'
             ))
-            ->add('Enregistrer', SubmitType::class)
-    ;
+            ->add('Save', SubmitType::class, array(
+                'label' => 'Continuer',
+                'attr'  => array(
+                    'class' => 'btn btn-primary pull-right',
+                ),
+            ))
+        ;
   }
 
   public function getName()

@@ -38,6 +38,11 @@
                                 </a>
                             </li>
                             <li class="action">
+                                <a href="{{ path('user_register_membership_new', {'slug': structure.slug}) }}" title="Ajouter un adhérent à la structure '{{ structure.name }}'" class="">
+                                    {{ icon('user') }} Ajouter
+                                </a>
+                            </li>
+                            <li class="action">
                                 <a href="{{ path('user_payment_index', {'slug': structure.slug}) }}" title="Afficher les moyens de paiement pour la structure '{{ structure.name }}'" class="index">
                                     {{ icon('piggy-bank') }} Moyens de paiement
                                 </a>

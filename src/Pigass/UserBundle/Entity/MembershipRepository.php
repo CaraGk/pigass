@@ -68,22 +68,22 @@ class MembershipRepository extends EntityRepository
             ->setParameter('slug', $slug)
             ->orderBy('s.name', 'asc');
 
-        if ($filter) {
+        if (isset($filter['valid'])) {
             if ($filter['valid'])
                 $query->andWhere('m.payedOn is not NULL');
             elseif ($filter['valid'] != null)
                 $query->andWhere('m.payedOn is NULL');
+        }
 
-            if ($filter['questions'] != null) {
-                foreach ($filter['questions'] as $question_id => $value) {
-                    $query->join('m.infos', 'i')
-                        ->join('i.question', 'q')
-                        ->andWhere('q.id = :question_id')
-                        ->setParameter('question_id', $question_id)
-                        ->andWhere('i.value = :info_value')
-                        ->setParameter('info_value', $value)
-                    ;
-                }
+        if (isset($filter['questions']) and $filter['questions']) {
+            foreach ($filter['questions'] as $question_id => $value) {
+                $query->join('m.infos', 'i')
+                    ->join('i.question', 'q')
+                    ->andWhere('q.id = :question_id')
+                    ->setParameter('question_id', $question_id)
+                    ->andWhere('i.value = :info_value')
+                    ->setParameter('info_value', $value)
+                ;
             }
         }
 

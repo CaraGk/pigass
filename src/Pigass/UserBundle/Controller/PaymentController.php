@@ -51,7 +51,7 @@ class PaymentController extends Controller
             $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
         }
 
-        if (!$membership or $membership->getPerson()->getUser() !== $user)
+        if (!$membership or ($membership->getPerson()->getUser() !== $user and !($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE')))))
             throw $this->createNotFoundException('Impossible d\'effectuer la transaction. Contactez un administrateur.');
 
         $slug = $membership->getStructure()->getSlug();

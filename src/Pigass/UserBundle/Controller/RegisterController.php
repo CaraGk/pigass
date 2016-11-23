@@ -75,19 +75,24 @@ class RegisterController extends Controller
         $limit = $request->query->get('limit', null);
         $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneby(array('slug' => $slug));
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
-        $membership_filters = $this->session->get('user_register_filter', array(
+
+        $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
-        if (!isset($membership_filters['valid']) or !isset($membership_filters['questions'])) {
-            $membership_filters['valid'] = null;
-            $membership_filters['questions'] = null;
+        if (!isset($filters['valid']) or !isset($filters['questions'])) {
+            $filters['valid'] = null;
+            $filters['questions'] = null;
         }
-        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $membership_filters);
+        if (isset($filters['user']))
+            $filters['user'] = null;
+        $this->session->set('user_register_filter', $filters);
+
+        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters);
 
         return array(
             'memberships' => $memberships,
-            'filters'     => $membership_filters,
+            'filters'     => $filters,
             'questions'   => $questions,
             'slug'        => $slug,
         );
@@ -306,18 +311,18 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $membership_filters = $this->session->get('user_register_filter', array(
+        $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
 
         if ($type == "valid") {
-            $membership_filters['valid'] = $value;
+            $filters['valid'] = $value;
         } else {
-            $membership_filters[$type][$id] = $value;
+            $filters[$type][$id] = $value;
         }
 
-        $this->session->set('user_register_filter', $membership_filters);
+        $this->session->set('user_register_filter', $filters);
 
         return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
     }
@@ -334,20 +339,20 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $membership_filters = $this->session->get('user_register_filter', array(
+        $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'questions' => null,
         ));
 
         if ($type == "valid") {
-            $membership_filters['valid'] = null;
+            $filters['valid'] = null;
         } else {
-            if ($membership_filters[$type][$id] != null) {
-                unset($membership_filters[$type][$id]);
+            if ($filters[$type][$id] != null) {
+                unset($filters[$type][$id]);
             }
         }
 
-        $this->session->set('user_register_filter', $membership_filters);
+        $this->session->set('user_register_filter', $filters);
 
         return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
     }
@@ -676,8 +681,8 @@ class RegisterController extends Controller
         $reJoinable = false;
 
         if (($userid == null or $register == true) and $current_membership) {
-            $slug = $current_membership->getStructure()->getSlug();
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+            $structure = $current_membership->getStructure();
+            $slug = $structure->getSlug();
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
             $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $current_membership);
             if (count($member_infos) < count($questions)) {
@@ -691,7 +696,7 @@ class RegisterController extends Controller
                 $reJoinable = true;
             }
         } else {
-            $slug = $request->get('slug');
+            $slug = $request->get('slug', null);
         }
 
         $memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person));
@@ -700,7 +705,7 @@ class RegisterController extends Controller
             'memberships' => $memberships,
             'userid'      => $userid,
             'person'      => $person,
-            'slug'        => isset($slug)?$slug:null,
+            'slug'        => $slug,
             'reJoinable'  => $reJoinable,
         );
     }

@@ -18,4 +18,22 @@ use Doctrine\ORM\EntityRepository;
  */
 class StructureRepository extends EntityRepository
 {
+    public function getBaseQuery()
+    {
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.area', 'asc')
+        ;
+    }
+
+    public function getAll($activated = true)
+    {
+        $query = $this->getBaseQuery();
+
+        if ($activated)
+            $query->where('s.activated = TRUE');
+
+        return $query->getQuery()
+            ->getResult()
+        ;
+    }
 }

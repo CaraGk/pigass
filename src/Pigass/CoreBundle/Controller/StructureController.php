@@ -81,7 +81,13 @@ class StructureController extends Controller
      */
     public function indexAction()
     {
-        $structures = $this->em->getRepository('PigassCoreBundle:Structure')->findAll();
+        $user = $this->getUser();
+        if (isset($user) and $user->hasRole('ROLE_ADMIN'))
+            $activated = false;
+        else
+            $activated = true;
+
+        $structures = $this->em->getRepository('PigassCoreBundle:Structure')->getAll($activated);
 
         return array(
             'structures' => $structures,

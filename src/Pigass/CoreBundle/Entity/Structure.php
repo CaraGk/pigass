@@ -84,6 +84,13 @@ class Structure
      */
     private $gateways;
 
+    /**
+     * @ORM\Column(name="activated", type="boolean", nullable=true)
+     *
+     * @var boolean $activated
+     */
+    private $activated;
+
     public function __construct()
     {
     }
@@ -320,5 +327,29 @@ class Structure
     public function getLogo()
     {
         return $this->logo;
+    }
+
+    /**
+     * Set activated
+     *
+     * @param boolean $activated
+     *
+     * @return Structure
+     */
+    public function setActivated($activated)
+    {
+        $this->activated = $activated;
+
+        return $this;
+    }
+
+    /**
+     * Is activated?
+     *
+     * @return boolean
+     */
+    public function isActivated()
+    {
+        return $this->activated;
     }
 }

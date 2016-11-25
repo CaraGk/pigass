@@ -14,6 +14,7 @@ namespace Pigass\CoreBundle\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Component\Form\Extension\Core\Type\FileType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Pigass\UserBundle\Form\AddressType;
 
@@ -30,8 +31,12 @@ class StructureType extends AbstractType
                 'label' => 'Adresse postale'
             ))
             ->add('logo', FileType::class, array(
-                'label' => 'Logo (image)',
+                'label'    => 'Logo (image)',
                 'required' => false,
+            ))
+            ->add('activated', CheckboxType::class, array(
+                'label'      => 'Activé ?',
+                'required'   => false,
             ))
             ->add('Enregistrer', SubmitType::class)
         ;

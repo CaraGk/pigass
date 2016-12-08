@@ -302,4 +302,14 @@ class MemberQuestion
     {
         return $this->required;
     }
+
+    /**
+     * Get required
+     *
+     * @return boolean
+     */
+    public function getRequired()
+    {
+        return $this->required;
+    }
 }

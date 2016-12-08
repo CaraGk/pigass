@@ -498,8 +498,7 @@ class RegisterController extends Controller
      */
     public function printPDFAction(Membership $membership)
     {
-        $offline_gateway = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $membership->getStructure()->getSlug() . '_offline'));
-        $config = $offline_gateway->getConfig();
+        $config = $membership->getMethod()->getConfig();
         if (isset($config['address'])) {
             $address = $config['address']['number'] . ' ' . $config['address']['type'] . ' ' . $config['address']['street'];
             if ($config['address']['complement'])

@@ -14,6 +14,7 @@ namespace Pigass\UserBundle\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
@@ -27,11 +28,14 @@ class GatewayType extends AbstractType
             ->add('factoryName', ChoiceType::class, array(
                 'label'   => 'Type',
                 'choices' => array(
-                    'Chèques, virement ou espèces' => 'offline',
-                    'Paypal'                       => 'paypal_express_checkout',
+                    'Paiement hors-ligne' => 'offline',
+                    'Paypal'              => 'paypal_express_checkout',
                 ),
                 'multiple' => false,
                 'expanded' => false,
+            ))
+            ->add('label', TextType::class, array(
+                'label' => 'Nom',
             ))
             ->add('config', GatewayConfigType::class, array(
                 'label'   => 'Configuration',

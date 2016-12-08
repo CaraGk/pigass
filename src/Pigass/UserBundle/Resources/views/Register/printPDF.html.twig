@@ -51,9 +51,9 @@
                     {% endif %}
                     <div class="col-xs-12">Je désire adhérer à {{ membership.structure.name }} du {{ membership.payedOn|date('d/m/Y') }} au {{ membership.expiredOn|date('d/m/Y') }}.</div>
                     {% if membership.status == 'paid' %}
-                        <div class="col-xs-12">J'ai déjà réglé la somme de {{ membership.amount }} euros à {{ membership.structure.name }} par {{ membership.method.description|lower }} le {{ membership.payedOn|date('d/m/Y') }}.</div>
+                        <div class="col-xs-12">J'ai déjà réglé la somme de {{ membership.amount }} euros à {{ membership.structure.name }} par {{ membership.method.label|lower }} le {{ membership.payedOn|date('d/m/Y') }}.</div>
                     {% else %}
-                        <div class="col-xs-12">Je règle la somme de {{ membership.amount }} euros à {{ membership.structure.name }} par {{ membership.method.description|lower }}.</div>
+                        <div class="col-xs-12">Je règle la somme de {{ membership.amount }} euros à {{ membership.structure.name }} par {{ membership.method.label|lower }}.</div>
                         <div class="col-xs-12">Le chèque est à libeller à l'ordre de {{ payableTo }} et à retourner à l'adresse {{ address }}.</div>
                         <div class="col-xs-12">
                             {% if iban is not null %}

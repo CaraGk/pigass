@@ -36,7 +36,7 @@ class MembershipType extends AbstractType
             ))
             ->add('method', EntityType::class, array(
                 'class'        => 'PigassUserBundle:Gateway',
-                'choice_label' => 'description',
+                'choice_label' => 'label',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.structure = :structure_id')

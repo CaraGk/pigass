@@ -38,7 +38,9 @@
                     </ul>
                 </span>
 
-                {{ gateway.gatewayName }} ({{ gateway.factoryName }}) : {{ gateway.Description }}
+                <div class="">Nom machine : {{ gateway.gatewayName }}</div>
+                <div class="">Type : {{ gateway.factoryName }}</div>
+                <div class="">Étiquette : {{ gateway.label }}</div>
             </li>
         {% else %}
             <li class="noentity gateway">

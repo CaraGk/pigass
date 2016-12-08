@@ -40,9 +40,16 @@ class Gateway extends BaseGatewayConfig
      */
     private $structure;
 
+    /**
+     * @ORM\Column(name="label", type="string", length=100)
+     *
+     * @var integer $label
+     */
+    private $label;
+
     public function __toString()
     {
-        return $this->gatewayName;
+        return $this->label;
     }
 
     /**
@@ -92,5 +99,29 @@ class Gateway extends BaseGatewayConfig
             return "Paypal";
         else
             return false;
+    }
+
+    /**
+     * Set label
+     *
+     * @param string $label
+     *
+     * @return Gateway
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * Get label
+     *
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
     }
 }

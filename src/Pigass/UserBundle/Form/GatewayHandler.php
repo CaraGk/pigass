@@ -52,7 +52,13 @@ class GatewayHandler
 
     public function onSuccess(Gateway $gateway)
     {
-        $gateway->setGatewayName($this->structure->getSlug() . '_' . $gateway->getFactoryName());
+        $gatewayName = $this->structure->getSlug() . '_' . $gateway->getFactoryName();
+        $otherGateways = $this->structure->getGateways();
+        foreach ($otherGateways as $otherGateway) {
+            if ($otherGateway->getGatewayName() == $gatewayName)
+                $gatewayName .= '_' . md5($gateway->getLabel());
+        }
+        $gateway->setGatewayName($gatewayName);
         $gateway->setStructure($this->structure);
         $this->em->persist($gateway);
         $this->em->flush();

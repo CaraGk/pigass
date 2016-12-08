@@ -85,7 +85,7 @@
             <div class="field title">{{ membership.person }}</div>
             <div class="field">({{ membership.person.birthday|date('d/m/y') }})</div>
             {% if membership.payedOn is not null %}
-                <div class="">Adhésion par {{ membership.method.description|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>
+                <div class="">Adhésion par {{ membership.method.label|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>
             {% endif %}
         </li>
     {% else %}

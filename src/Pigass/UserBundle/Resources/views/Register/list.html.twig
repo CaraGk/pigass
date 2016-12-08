@@ -108,7 +108,7 @@
                     </ul>
                 </span>
                 <div>
-                    Adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d/m/Y') }} payée ({{ membership.amount }} €) par {{ membership.method.description|lower }}
+                    Adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d/m/Y') }} payée ({{ membership.amount }} €) par {{ membership.method.label|lower }}
                     {% if membership.payedOn is not null %}
                         le {{ membership.payedOn|date('d/m/Y') }}.
                     {% else %}

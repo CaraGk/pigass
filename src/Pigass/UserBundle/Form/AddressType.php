@@ -26,7 +26,7 @@ class AddressType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('number', IntegerType::class, array(
+            ->add('number', TextType::class, array(
                 'label' => 'Nº dans la voie',
             ))
             ->add('type', ChoiceType::class, array(

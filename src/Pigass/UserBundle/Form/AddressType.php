@@ -66,12 +66,14 @@ class AddressType extends AbstractType
                 ),
                 'multiple' => false,
                 'expanded' => false,
+                'required' => false,
             ))
             ->add('street', textType::class, array(
-                'label' => 'Nom de voie',
+                'label'    => 'Nom de voie',
+                'required' => false,
             ))
             ->add('complement', TextType::class, array(
-                'label' => 'Complément d\'adresse',
+                'label'    => 'Complément d\'adresse',
                 'required' => false,
             ))
             ->add('code', IntegerType::class, array(

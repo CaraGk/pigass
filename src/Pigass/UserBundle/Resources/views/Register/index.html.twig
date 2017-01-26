@@ -70,12 +70,7 @@
                         </li>
                     {% endif %}
                     <li>
-                        <a href="{{ path('user_register_list', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher le détail des adhésions de l'étudiant">
-                            {{ icon('euro') }} Adhésions
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ path('user_register_index', {'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">
+                        <a href="{{ path('user_register_list', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">
                             {{ icon('user') }} Informations
                         </a>
                     </li>

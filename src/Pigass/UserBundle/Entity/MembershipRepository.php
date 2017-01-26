@@ -12,6 +12,7 @@
 namespace Pigass\UserBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Pigass\UserBundle\Entity\Person;
 
 /**
  * MembershipRepository
@@ -34,7 +35,7 @@ class MembershipRepository extends EntityRepository
         return $query->getQuery()->getSingleResult();
     }
 
-    public function getCurrentForPerson($person, $payed = false)
+    public function getCurrentForPerson(Person $person, $payed = false)
     {
         $query = $this->createQueryBuilder('m');
         $query->where('m.person = :person')
@@ -43,6 +44,8 @@ class MembershipRepository extends EntityRepository
             ->setParameter('now', new \DateTime('now'))
             ->orderBy('m.expiredOn', 'desc')
             ->setMaxResults(1)
+            ->join('m.structure', 't')
+            ->addSelect('t')
         ;
 
         if ($payed)

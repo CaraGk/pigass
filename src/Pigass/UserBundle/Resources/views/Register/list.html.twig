@@ -19,7 +19,7 @@
     {% if slug is not null %}
         {% if reJoinable == true %}
             <li class="btn btn-primary">
-                <a href="{{ path('user_register_join', {'slug': slug}) }}?{{ app.request.queryString }}">
+                <a href="{{ path('user_person_edit_me', {'slug': slug, 'redirect': 'user_register_join'}) }}&{{ app.request.queryString }}">
                     {{ icon('euro') }} Ré-adhérer
                 </a>
             </li>

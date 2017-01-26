@@ -210,22 +210,31 @@ class PersonController extends Controller
      */
     public function editMeAction(Request $request)
     {
-        $user = $this->get('security.token_storage')->getToken()->getUsername();
-        $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user);
+        $user = $this->getUser();
+        $userid = $request->query->get('userid', null);
+        $person = $this->testAdminTakeOver($user, $userid);
+        $redirect = $request->query->get('redirect', 'user_person_edit_me');
+        $slug = $request->query->get('slug');
 
         if (!$person)
             throw $this->createNotFoundException('Unable to find person entity.');
+
+        if (!$slug) {
+            $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+            $slug = $membership->getStructure()->getSlug();
+        }
 
         $form = $this->createForm(PersonUserType::class, $person);
         $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Votre compte a bien été modifié.');
-            return $this->redirect($this->generateUrl('user_person_edit_me'));
+            return $this->redirect($this->generateUrl($redirect, array('slug' => $slug, 'userid' => $userid)));
         }
 
         return array(
-            'form' => $form->createView(),
+            'form'   => $form->createView(),
+            'userid' => $userid,
         );
     }
 
@@ -255,4 +264,26 @@ class PersonController extends Controller
         );
     }
 
+    /**
+     * Test for admin take over function
+     *
+     * @return Person
+     */
+    private function testAdminTakeOver($user, $userid = null)
+    {
+        if ($user->hasRole('ROLE_ADMIN') and $userid != null) {
+            $user = $this->um->findUserBy(array(
+                'id' => $userid,
+            ));
+        }
+
+        $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
+
+        if (!$person) {
+            $this->session->getFlashBag()->add('error', 'Adhérent inconnu.');
+            return $this->redirect($this->generateUrl('Pigass_register_index'));
+        } else {
+            return $person;
+        }
+    }
 }

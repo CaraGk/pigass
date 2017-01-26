@@ -696,6 +696,8 @@ class RegisterController extends Controller
             }
         } else {
             $slug = $request->get('slug', null);
+            if (!$current_membership)
+                $reJoinable = true;
         }
 
         $memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person));

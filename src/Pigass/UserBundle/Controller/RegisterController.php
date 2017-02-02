@@ -214,7 +214,7 @@ class RegisterController extends Controller
      */
     public function exportAction($slug)
     {
-        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructureComplete($slug);
+        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructureWithInfos($slug);
         $memberquestions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->findAll();
         $memberinfos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getCurrentInArray();
 
@@ -241,9 +241,8 @@ class RegisterController extends Controller
             ->setCellValue('L1', 'Code postal')
             ->setCellValue('M1', 'Ville')
             ->setCellValue('N1', 'Pays')
-            ->setCellValue('O1', 'Stages validés')
             ;
-        $column = array('P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AZ');
+        $column = array('O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AZ');
         foreach ($memberquestions as $question) {
             $key = each($column);
             $phpExcelObject->setActiveSheetIndex(0)
@@ -276,19 +275,10 @@ class RegisterController extends Controller
                 ->setCellValue('L'.$i, $address['code'])
                 ->setCellValue('M'.$i, $address['city'])
                 ->setCellValue('N'.$i, $address['country'])
-                ->setCellValue($columns['Mode de paiement'].$i, $membership->getReadableMethod())
+                ->setCellValue($columns['Mode de paiement'].$i, $membership->getMethod()->getDescription())
                 ->setCellValue($columns['Date d\'adhésion'].$i, $membership->getPayedOn())
             ;
             $count = 0;
-            foreach ($membership->getPerson()->getPlacements() as $placement) {
-                if ($placement->getRepartition()->getPeriod()->getEnd() < new \DateTime('now')) {
-                    $count++;
-                    $phpExcelObject->setActiveSheetIndex(0)
-                        ->setCellValue($columns[$placement->getRepartiton()->getDepartment()->getSector()->getName()].$i, 'oui');
-                }
-            }
-            $phpExcelObject->setActiveSheetIndex(0)
-                ->setCellValue('R'.$i, $count);
             foreach ($memberinfos[$membership->getId()] as $question => $info) {
                 $phpExcelObject->setActiveSheetIndex(0)
                     ->setCellValue($columns[$question].$i, $info);

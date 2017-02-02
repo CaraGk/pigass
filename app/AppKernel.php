@@ -30,6 +30,7 @@ class AppKernel extends Kernel
             new Pigass\UserBundle\PigassUserBundle(),
             new Pigass\ParameterBundle\PigassParameterBundle(),
             new Pigass\CoreBundle\PigassCoreBundle(),
+            new Liuggio\ExcelBundle\LiuggioExcelBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

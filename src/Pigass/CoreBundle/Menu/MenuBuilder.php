@@ -54,7 +54,7 @@ class MenuBuilder
                 $strMenu->addChild('Gateways', array('route' => 'user_payment_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Moyens de paiement', 'attributes' => array('title' => 'Gérer les moyens de paiement'), 'icon' => 'piggy-bank'));
                 $strMenu->addChild('Questions', array('route' => 'user_register_question_index', 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-sign'));
                 $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
-//                $strMenu->addChild('Edit', array('route' => 'core_structure_edit', 'routeParameters' => array('slug' => $slug), 'label' => 'Modifier', 'attributes' => array('title' => 'Modifier la structure'), 'icon' => 'edit'));
+                $strMenu->addChild('Edit', array('route' => 'core_structure_edit', 'routeParameters' => array('slug' => $slug), 'label' => 'Modifier', 'attributes' => array('title' => 'Modifier la structure'), 'icon' => 'edit'));
             }
             if ($security->isGranted('ROLE_ADMIN')) {
                 $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer', 'dropdown' => true, 'caret' => true, 'icon' => 'king'));

@@ -5,6 +5,15 @@
 {% block headline %}Adhérents actuels{% endblock %}
 
 {% block action %}
+    <li class="btn btn-info">
+        {% if count < 1 %}
+            Aucun adhérent
+        {% elseif count == 1 %}
+            {{ count }} adhérent
+        {% else %}
+            {{ count }} adhérents
+        {% endif %}
+    </li>
     <li class="btn btn-primary">
         <a href="{{ path('user_register_export', {'slug': slug}) }}">
             {{ icon('folder-open') }} Exporter (xls)

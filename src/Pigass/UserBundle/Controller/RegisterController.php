@@ -80,19 +80,26 @@ class RegisterController extends Controller
             'valid'     => null,
             'questions' => null,
         ));
-        if (!isset($filters['valid']) or !isset($filters['questions'])) {
+
+        if (!isset($filters['valid'])) {
             $filters['valid'] = null;
+        }
+
+        if (!isset($filters['questions'])) {
             $filters['questions'] = null;
         }
+
         if (isset($filters['user']))
             $filters['user'] = null;
         $this->session->set('user_register_filter', $filters);
 
         $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters);
+        $count = count($memberships);
 
         return array(
             'memberships' => $memberships,
             'filters'     => $filters,
+            'count'       => $count,
             'questions'   => $questions,
             'slug'        => $slug,
         );

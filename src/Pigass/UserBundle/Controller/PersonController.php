@@ -213,7 +213,7 @@ class PersonController extends Controller
         $user = $this->getUser();
         $userid = $request->query->get('userid', null);
         $person = $this->testAdminTakeOver($user, $userid);
-        $redirect = $request->query->get('redirect', 'user_person_edit_me');
+        $redirect = $request->query->get('redirect', 'user_register_list');
         $slug = $request->query->get('slug');
 
         if (!$person)
@@ -228,7 +228,10 @@ class PersonController extends Controller
         $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
         if ($formHandler->process()) {
-            $this->get('session')->getFlashBag()->add('notice', 'Votre compte a bien été modifié.');
+            if ($userid)
+                $this->get('session')->getFlashBag()->add('notice', 'Le compte de ' . $person . ' a bien été modifié.');
+            else
+                $this->get('session')->getFlashBag()->add('notice', 'Votre compte a bien été modifié.');
             return $this->redirect($this->generateUrl($redirect, array('slug' => $slug, 'userid' => $userid)));
         }
 

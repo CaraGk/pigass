@@ -60,11 +60,21 @@
 {% block content %}
     <ul class="entities list-group">
         <li class="list-group-item">
+            <span class="btn btn-primary pull-right">
+                <a href="{{ path('user_person_edit_me') }}?{{ app.request.queryString }}" title="Modifier">
+                    {{ icon('edit') }} Modifier
+                </a>
+            </span>
             <div class="title">État civil</div>
             <div class="">{{ person.title }} {{ person.surname }} {{ person.name }}</div>
             <div class="">Naissance : {{ person.birthday|date('d/m/Y') }} à {{ person.birthplace }}</div>
         </li>
         <li class="list-group-item">
+            <span class="btn btn-primary pull-right">
+                <a href="{{ path('fos_user_change_password') }}?{{ app.request.queryString }}" title="Modifier le mot de passe">
+                    {{ icon('edit') }} Mot de passe
+                </a>
+            </span>
             <div class="title">Contact</div>
             <div class="">Téléphone : {{ person.phone }}</div>
             <div class="">Adresse : {% for item in person.address %} {{ item }} {% endfor %}</div>

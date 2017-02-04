@@ -146,7 +146,7 @@ class StructureController extends Controller
     /**
      * Edit a structure
      *
-     * @Route("/structure/{id}/edit", name="core_structure_edit", requirements={"id" = "\d+"})
+     * @Route("/structure/{slug}/edit", name="core_structure_edit", requirements={"slug" = "\w+"})
      * @Template("PigassCoreBundle:Structure:edit.html.twig")
      * @Security\Secure(roles="ROLE_ADMIN")
      */

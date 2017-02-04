@@ -50,23 +50,24 @@ class StructureController extends Controller
      */
     public function redirectAction()
     {
-        $username = $this->get('security.token_storage')->getToken()->getUsername();
-        if ($username != "anon.") {
-            $user = $this->um->findUserByUsername($username);
-            if ($user->hasRole('ROLE_ADMIN')) {
-                return $this->redirect($this->generateUrl('core_structure_index'));
-            } elseif($slug = $this->session->get('slug', false)) {
+        $user = $this->getUser();
+        if ($user) {
+            if ($slug = $this->session->get('slug', false)) {
                 return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
             } elseif ($user->hasRole('ROLE_STRUCTURE')) {
-                $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($username);
+                $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
                 $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
                 $slug = $membership->getStructure()->getSlug();
                 $this->session->set('slug', $slug);
                 return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
-            } elseif ($user->hasRole('ROLE_MEMBER')) {
-                return $this->redirect($this->generateUrl('user_register_list'));
-            } else {
+            }
+
+            if ($user->hasRole('ROLE_ADMIN')) {
                 return $this->redirect($this->generateUrl('core_structure_index'));
+            }
+
+            if ($user->hasRole('ROLE_MEMBER')) {
+                return $this->redirect($this->generateUrl('user_register_list'));
             }
         } else {
             return $this->redirect($this->generateUrl('core_structure_index'));
@@ -148,10 +149,20 @@ class StructureController extends Controller
      *
      * @Route("/structure/{slug}/edit", name="core_structure_edit", requirements={"slug" = "\w+"})
      * @Template("PigassCoreBundle:Structure:edit.html.twig")
-     * @Security\Secure(roles="ROLE_ADMIN")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function editAction(Structure $structure, Request $request)
     {
+        $user = $this->getUser();
+        if (!$user->hasRole('ROLE_ADMIN')) {
+            $slug = $this->session->get('slug');
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+            if (!$structure) {
+                $this->session->getFlashBag()->add('error', 'La structure n\'existe pas ou vous n\'y avez pas accès.');
+                return $this->redirect($this->generateUrl('core_structure_edit', array('slug' => $slug)));
+            }
+        }
+
         if ($structure->getLogo()) {
             $structure->setLogo(new File($this->getParameter('logo_dir') . '/' . $structure->getLogo()));
         }
@@ -177,7 +188,10 @@ class StructureController extends Controller
             $this->em->flush();
 
             $this->get('session')->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');
-            return $this->redirect($this->generateUrl('core_structure_index'));
+            if ($user->hasRole('ROLE_ADMIN'))
+                return $this->redirect($this->generateUrl('core_structure_index'));
+            else
+                return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
         }
 
         return array(

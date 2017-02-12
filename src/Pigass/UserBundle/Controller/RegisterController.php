@@ -279,10 +279,13 @@ class RegisterController extends Controller
                 ->setCellValue($columns['Date d\'adhésion'].$i, $membership->getPayedOn())
             ;
             $count = 0;
-            foreach ($memberinfos[$membership->getId()] as $question => $info) {
-                $phpExcelObject->setActiveSheetIndex(0)
-                    ->setCellValue($columns[$question].$i, $info);
+            if (isset($memberinfos[$membership->getId()])) {
+                foreach ($memberinfos[$membership->getId()] as $question => $info) {
+                    $phpExcelObject->setActiveSheetIndex(0)
+                        ->setCellValue($columns[$question].$i, $info);
+                }
             }
+            $i++;
         }
 
         $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel5');

@@ -41,9 +41,9 @@ class RegisterHandler
             $this->form->handleRequest($this->request);
 
             if ($this->form->isSubmitted() and $this->form->isValid()) {
-                $username = $this->onSuccess($this->form->getData());
+                $result = $this->onSuccess($this->form->getData());
 
-                return $username;
+                return $result;
             }
         }
 
@@ -58,12 +58,17 @@ class RegisterHandler
         $user->addRole('ROLE_MEMBER');
         $user->setConfirmationToken($this->token);
 
-        $this->em->persist($person);
-        $this->um->createUser();
-        $this->um->updateUser($user);
+        if (!$db_user = $this->em->getRepository('PigassUserBundle:User')->findOneBy(array('username' => $user->getUsername()))) {
+            $this->em->persist($person);
+            $this->um->createUser();
+            $this->um->updateUser($user);
 
-        $this->em->flush();
+            $this->em->flush();
 
-        return $user->getUsername();
+            return array('user' => $user, 'error' => false);
+        } else {
+            return array('user' => $db_user, 'error' => true);
+        }
+
     }
 }

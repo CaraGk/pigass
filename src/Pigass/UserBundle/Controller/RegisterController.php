@@ -380,11 +380,28 @@ class RegisterController extends Controller
         $form = $this->createForm(RegisterType::class);
         $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $token);
 
-        if($username = $form_handler->process()) {
-            $this->session->set('user_register_tmp', 1);
-            $this->session->getFlashBag()->add('notice', 'Utilisateur ' . $username . ' créé.');
+        if($result = $form_handler->process()) {
+            /* If User is allready in db (former registration error) */
+            if (!$result['error']) {
+                $this->session->set('user_register_tmp', 1);
+                $this->session->getFlashBag()->add('notice', 'Utilisateur ' . $result['user']->getUsername() . ' créé.');
 
-            return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $username, 'slug' => $slug)));
+                return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $result['user']->getUsername(), 'slug' => $slug)));
+            } else {
+                $this->session->getFlashBag()->add('error', 'L\'utilisateur ' . $result['user']->getUsername() . ' existe déjà en base de données.');
+
+                /* If User has never been activated, act as new */
+                if (!$result['user']->isEnabled()) {
+                    $this->session->set('user_register_tmp', 1);
+                    $this->session->getFlashBag()->add('error', 'L\'utilisateur n\'a jamais été activé. Renvoi du mail d\'activation en cours.');
+
+                    return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $result['user']->getUsername(), 'slug' => $slug)));
+                } else {
+                    $this->session->getFlashBag()->add('error', 'Veuillez vous connecter pour adhérer. En cas de perte du mot de passe, réinitialisez-le ci-dessous.');
+
+                    return $this->redirect($this->generateUrl('fos_user_resetting_request'));
+                }
+            }
         }
 
         return array(

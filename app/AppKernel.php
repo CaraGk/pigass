@@ -31,6 +31,7 @@ class AppKernel extends Kernel
             new Pigass\ParameterBundle\PigassParameterBundle(),
             new Pigass\CoreBundle\PigassCoreBundle(),
             new Liuggio\ExcelBundle\LiuggioExcelBundle(),
+            new Vich\UploaderBundle\VichUploaderBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

@@ -155,3 +155,18 @@ knp_snappy:
         #binary:  /usr/bin/wkhtmltopdf
         options:
             - { name: 'page-size', value: 'A4' }
+
+vich_uploader:
+    db_driver: orm
+    mappings:
+        structure_logo:
+            uri_prefix: /images/logos
+            upload_destination: '%kernel.root_dir%/../web/uploads/logos'
+        receipt_sign:
+            uri_prefix: /images/signs
+            upload_destination: '%kernel.root_dir%/../web/uploads/signs'
+            inject_on_load:     false
+            delete_on_update:   true
+            delete_on_remove:   true
+    form_themes:
+        - 'VichUploaderBundle:Form:fields.html.twig'

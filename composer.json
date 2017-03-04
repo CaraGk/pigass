@@ -39,7 +39,8 @@
         "symfony/assetic-bundle": "^2.8",
         "knplabs/knp-snappy-bundle": "^1.4",
         "h4cc/wkhtmltopdf-amd64": "^0.12.3",
-        "liuggio/excelbundle": "~2.0"
+        "liuggio/excelbundle": "~2.0",
+        "vich/uploader-bundle": "^1.4"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

@@ -1,4 +1,4 @@
-PigassRegister:
+PigassCore:
     resource: "@PigassCoreBundle/Controller/"
     type:     annotation
 

@@ -19,13 +19,13 @@
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="{{ absolute_url(asset('bundles/mopabootstrap/js/modernizr-2.7.1-respond-1.4.2.min.js')) }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/mopabootstrap/js/modernizr-2.7.1-respond-1.4.2.min.js') }}"></script>
     </head>
     <body>
         <div class="container">
             <div class="panel panel-default">
                 <div class="panel-header jumbotron row">
-                    <div class="col-xs-2"><img src="{{ membership.structure.logo }}" alt="Logo de {{ membership.structure.name }}" /></div>
+                    <div class="col-xs-2"><img src="{{ asset(membership.structure.logo) }}" alt="Logo de {{ membership.structure.name }}" /></div>
                     <h1 class="col-xs-10 centered">Reçu fiscal {% if receipt.end|date('Y') != receipt.begin|date('Y') %}{{ receipt.begin|date('Y') }} - {% endif %}{{ receipt.end|date('Y') }}</h1>
                 </div>
                 <div class="panel-body row">

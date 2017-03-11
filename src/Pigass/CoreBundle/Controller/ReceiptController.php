@@ -170,11 +170,32 @@ class ReceiptController extends Controller
      */
     public function buildAction(Membership $membership)
     {
+        $user = $this->getUser();
+        if (!$user->hasRole('ROLE_ADMIN')) {
+            if ($user->hasRole('ROLE_STRUCTURE')) {
+                if ($membership->getStructure()->getSlug() != $this->session->get('slug')) {
+                    $this->session->getFlashBag()->add('error', 'Vous n\'avez pas les autorisations pour accéder à cette adhésion.');
+                    return $this->redirect($this->generateUrl('user_register_index', ['slug' => $this->session->get('slug')]));
+                }
+            } else {
+                $person = $this->em->getRepository('PigassUserBundle:Person')->findOneBy(['user' => $user->getId()]);
+                if ($membership->getPerson() !== $person) {
+                    $this->session->getFlashBag()->add('error', 'Vous n\'avez pas les autorisations pour accéder à cette adhésion.');
+                    return $this->redirect($this->generateUrl('user_register_list'));
+                }
+            }
+
+        }
         $receipt = $this->em->getRepository('PigassCoreBundle:Receipt')->getOneByDate($membership->getStructure(), $membership->getExpiredOn());
+        if (!$receipt) {
+            $this->session->getFlashBag()->add('error', 'Aucun signataire de reçu fiscal défini. Contactez votre structure.');
+            return $this->redirect($this->generateUrl('user_register_list'));
+        }
+
         $html = $this->renderView(
             'PigassCoreBundle:Receipt:printPDF.html.twig',
             [
-                'receipt' => $receipt,
+                'receipt'    => $receipt,
                 'membership' => $membership,
             ]
         );

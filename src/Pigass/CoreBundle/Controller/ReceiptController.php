@@ -16,12 +16,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Response;
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Pigass\CoreBundle\Entity\Receipt,
     Pigass\CoreBundle\Form\ReceiptType,
     Pigass\CoreBundle\Form\ReceiptHandler,
-    Pigass\CoreBundle\Entity\Structure;
+    Pigass\CoreBundle\Entity\Structure,
+    Pigass\UserBundle\Entity\Membership;
 
 /**
  * Receipt controller.
@@ -149,7 +151,7 @@ class ReceiptController extends Controller
      * Delete a receipt
      *
      * @Route("/receipt/{id}/delete", name="core_receipt_delete", requirements={"id" = "\d+"})
-     * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
     public function deleteAction(Receipt $receipt)
     {
@@ -158,5 +160,33 @@ class ReceiptController extends Controller
 
         $this->session->getFlashBag()->add('notice', 'Session "' . $receipt . '" supprimée.');
         return $this->redirect($this->generateUrl('core_receipt_index'));
+    }
+
+    /**
+     * Build and download receipt for membership
+     *
+     * @Route("/member/{id}/receipt", name="core_receipt_build", requirements={"id" = "\d+"})
+     * @Security\Secure(roles="ROLE_MEMBER")
+     */
+    public function buildAction(Membership $membership)
+    {
+        $receipt = $this->em->getRepository('PigassCoreBundle:Receipt')->getOneByDate($membership->getStructure(), $membership->getExpiredOn());
+        $html = $this->renderView(
+            'PigassCoreBundle:Receipt:printPDF.html.twig',
+            [
+                'receipt' => $receipt,
+                'membership' => $membership,
+            ]
+        );
+        $filename = "Recu_" . $membership->getStructure()->getSlug() . "_" . $membership->getPerson()->getName() . "_" . $membership->getExpiredOn()->format('Y');
+
+        return new Response(
+            $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+            200,
+            [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+            ]
+        );
     }
 }

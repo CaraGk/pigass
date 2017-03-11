@@ -26,15 +26,34 @@ class ReceiptRepository extends EntityRepository
         ;
     }
 
-    public function getForStructure(Structure $structure)
+    private function getForStructureQuery(Structure $structure)
     {
         $query = $this->getBaseQuery();
-        $query->where('r.structure = :structure')
+
+        return $query->where('r.structure = :structure')
             ->setParameter('structure', $structure->getId())
         ;
+    }
+
+    public function getForStructure(Structure $structure)
+    {
+        return $this->getForStructureQuery($structure)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getOneByDate(Structure $structure, \DateTime $date)
+    {
+        $query = $this->getForStructureQuery($structure);
+        $query->andWhere('r.begin < :date')
+            ->andWhere('r.end > :date')
+            ->setParameter('date', $date)
+            ->setMaxResults(1)
+            ;
 
         return $query->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
     }
 }

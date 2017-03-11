@@ -1,0 +1,13 @@
+{% extends 'PigassCoreBundle::layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - {% if receipt is not null %}{{ receipt.imageName }} - Modification {% else %} Signataire - Ajout {% endif %}
+{% endblock %}
+
+{% block headline %}
+    {% if receipt is not null %}{{ receipt.imageName }} - Modification {% else %} Signataire - Ajout {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form(form) }}
+{% endblock %}

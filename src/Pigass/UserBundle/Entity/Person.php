@@ -98,6 +98,12 @@ class Person
    */
   private $anonymous;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Membership", mappedBy="person", cascade={"remove", "persist"}, orphanRemoval=true)
+     * @ORM\OrderBy({"end" = "asc"})
+     */
+    private $memberships;
+
   public function __toString()
   {
     if ($this->isAnonymous())
@@ -105,6 +111,14 @@ class Person
     else
       return $this->name . ' ' . $this->surname;
   }
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->memberships = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Set surname
@@ -291,13 +305,6 @@ class Person
         $address .= ($html?'<br />':', ') . $this->address['code'] . ', ' . $this->address['city'] . ', ' . $this->address['country'];
 
         return $address;
-    }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->placements = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**

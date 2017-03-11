@@ -40,6 +40,8 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    form_themes:
+        - 'PigassCoreBundle:Form:fields.html.twig'
 
 # Doctrine Configuration
 doctrine:
@@ -163,10 +165,9 @@ vich_uploader:
             uri_prefix: /images/logos
             upload_destination: '%kernel.root_dir%/../web/uploads/logos'
         receipt_sign:
-            uri_prefix: /images/signs
+            uri_prefix:         /uploads/signs
             upload_destination: '%kernel.root_dir%/../web/uploads/signs'
-            inject_on_load:     false
+            inject_on_load:     true
             delete_on_update:   true
             delete_on_remove:   true
-    form_themes:
-        - 'VichUploaderBundle:Form:fields.html.twig'
+            #namer:              vich_uploader.namer_origname

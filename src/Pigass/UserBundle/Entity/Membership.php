@@ -32,7 +32,7 @@ class Membership
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\Pigass\UserBundle\Entity\Person", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="\Pigass\UserBundle\Entity\Person", inversedBy="memberships", cascade={"persist"})
      * @ORM\JoinColumn(name="person_id", referencedColumnName="id")
      */
     private $person;

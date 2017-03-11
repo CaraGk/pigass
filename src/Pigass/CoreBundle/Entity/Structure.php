@@ -91,6 +91,13 @@ class Structure
      */
     private $activated;
 
+    /**
+     * @ORM\OneToMany(targetEntity="\Pigass\CoreBundle\Entity\Receipt", mappedBy="structure")
+     *
+     * @var EntityCollection $receipts
+     */
+    private $receipts;
+
     public function __construct()
     {
     }

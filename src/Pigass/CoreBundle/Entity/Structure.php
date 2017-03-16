@@ -34,7 +34,7 @@ class Structure
     private $id;
 
     /**
-     * @ORM\Column(name="name", type="string", length=150, unique=true)
+     * @ORM\Column(name="name", type="string", length=100, unique=true)
      * @Assert\NotBlank(message="Donnez un nom à la structure")
      *
      * @var string $name
@@ -42,11 +42,26 @@ class Structure
     private $name;
 
     /**
-     * @ORM\Column(name="slug", type="string", length=150, unique=true)
+     * @ORM\Column(name="fullname", type="string", length=255, nullable=true)
+     *
+     * @var string $fullname
+     */
+    private $fullname;
+
+    /**
+     * @ORM\Column(name="slug", type="string", length=100, unique=true)
      *
      * @var string $slug
      */
     private $slug;
+
+    /**
+     * @ORM\Column(name="email", type="string", length=150, nullable=true)
+     * @Assert\Email
+     *
+     * @var string $email
+     */
+    private $email;
 
     /**
      * @ORM\Column(name="address", type="array")
@@ -56,7 +71,7 @@ class Structure
     private $address;
 
     /**
-     * @ORM\Column(name="area", type="string", length=150, nullable=true)
+     * @ORM\Column(name="area", type="string", length=100, nullable=true)
      *
      * @var string $area
      */
@@ -358,5 +373,97 @@ class Structure
     public function isActivated()
     {
         return $this->activated;
+    }
+
+    /**
+     * Set fullname
+     *
+     * @param string $fullname
+     *
+     * @return Structure
+     */
+    public function setFullname($fullname)
+    {
+        $this->fullname = $fullname;
+
+        return $this;
+    }
+
+    /**
+     * Get fullname
+     *
+     * @return string
+     */
+    public function getFullname()
+    {
+        return $this->fullname;
+    }
+
+    /**
+     * Set email
+     *
+     * @param string $email
+     *
+     * @return Structure
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Get email
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Get activated
+     *
+     * @return boolean
+     */
+    public function getActivated()
+    {
+        return $this->activated;
+    }
+
+    /**
+     * Add receipt
+     *
+     * @param \Pigass\CoreBundle\Entity\Receipt $receipt
+     *
+     * @return Structure
+     */
+    public function addReceipt(\Pigass\CoreBundle\Entity\Receipt $receipt)
+    {
+        $this->receipts[] = $receipt;
+
+        return $this;
+    }
+
+    /**
+     * Remove receipt
+     *
+     * @param \Pigass\CoreBundle\Entity\Receipt $receipt
+     */
+    public function removeReceipt(\Pigass\CoreBundle\Entity\Receipt $receipt)
+    {
+        $this->receipts->removeElement($receipt);
+    }
+
+    /**
+     * Get receipts
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getReceipts()
+    {
+        return $this->receipts;
     }
 }

@@ -25,8 +25,11 @@ class StructureType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name')
+        $builder
+            ->add('name')
+            ->add('fullname')
             ->add('area')
+            ->add('email')
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse postale'
             ))

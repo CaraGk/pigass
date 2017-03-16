@@ -1,19 +1,21 @@
 {% extends 'PigassCoreBundle::layout.html.twig' %}
 
 {% block title %}
-    {{ parent() }} - Moyens de paiement
+    {{ parent() }} - {{ structure.name }} - Moyens de paiement
 {% endblock %}
 
 {% block headline %}
-    Moyens de paiement
+    {{ structure.name }} - Moyens de paiement
 {% endblock %}
 
 {% block action %}
-    <li class="btn btn-primary">
-        <a href="{{ path('user_payment_new', {'slug': slug}) }}" title="Ajouter une nouvelle gateway">
-            {{ icon('plus') }} Ajouter
-        </a>
-    </li>
+        <li class="btn btn-primary">
+            <a href="{{ path('user_payment_new', {'slug': structure.slug}) }}" title="Ajouter une nouvelle gateway">
+                {{ icon('plus') }} Ajouter un moyen de paiement
+            </a>
+        </li>
+    </ul>
+    {{ mopa_bootstrap_menu('parameter') }}
 {% endblock %}
 
 {% block content %}
@@ -24,13 +26,13 @@
                     <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li class="action">
-                            <a href="{{ path('user_payment_edit', {'id': gateway.id, 'slug': slug}) }}" title="Modifier le moyen de paiement '{{ gateway.gatewayName }}'" class="edit">
+                            <a href="{{ path('user_payment_edit', {'id': gateway.id, 'slug': structure.slug}) }}" title="Modifier le moyen de paiement '{{ gateway.gatewayName }}'" class="edit">
                                 {{ icon('pencil') }} Modifier
                             </a>
                         </li>
                         {% if is_granted('ROLE_ADMIN') %}
                             <li class="action">
-                                <a href="{{ path('user_payment_delete', {'id': gateway.id, 'slug': slug}) }}" title="Supprimer le moyen de paiement '{{ gateway.gatewayName }}'" class="confirm delete" confirm="Attention, vous allez supprimer la gateway et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
+                                <a href="{{ path('user_payment_delete', {'id': gateway.id, 'slug': structure.slug}) }}" title="Supprimer le moyen de paiement '{{ gateway.gatewayName }}'" class="confirm delete" confirm="Attention, vous allez supprimer la gateway et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
                                     {{ icon('trash') }} Supprimer
                                 </a>
                             </li>
@@ -46,7 +48,7 @@
             <li class="noentity gateway">
                 Aucun moyen de paiement enregistré enregistrée.
                 {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('user_payment_new', {'slug': slug}) }}" title="Ajouter un moyen de paiement">Ajouter un moyen de paiement</a>.
+                <a href="{{ path('user_payment_new', {'slug': structure.slug}) }}" title="Ajouter un moyen de paiement">Ajouter un moyen de paiement</a>.
                 {% else %}
                     Contactez un administrateur.
                 {% endif %}

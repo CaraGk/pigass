@@ -10,3 +10,10 @@ services:
     arguments: ["@request_stack","@security.authorization_checker"]
     tags:
       - { name: knp_menu.menu, alias: main }
+
+  pigass_core.menu.parameter:
+    class: Knp\Menu\MenuItem
+    factory: ["@pigass_core.menu_builder", createParameterMenu]
+    arguments: ["@request_stack","@security.authorization_checker"]
+    tags:
+      - { name: knp_menu.menu, alias: parameter }

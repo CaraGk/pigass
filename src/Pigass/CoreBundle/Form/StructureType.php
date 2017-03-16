@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Component\Form\Extension\Core\Type\FileType,
     Symfony\Component\Form\Extension\Core\Type\CheckboxType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Pigass\UserBundle\Form\AddressType;
 
@@ -26,12 +27,21 @@ class StructureType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
-            ->add('fullname')
-            ->add('area')
+            ->add('name', TextType::class, array(
+                'label' => 'Nom',
+            ))
+            ->add('fullname', TextType::class, array(
+                'label' => 'Nom complet',
+                'required' => false,
+            ))
+            ->add('area', TextType::class, array(
+                'label' => 'Zone géographique',
+                'required' => false,
+            ))
             ->add('email')
             ->add('address', AddressType::class, array(
-                'label' => 'Adresse postale'
+                'label' => 'Adresse postale',
+                'label_render' => false,
             ))
             ->add('logo', FileType::class, array(
                 'label'    => 'Logo (image)',

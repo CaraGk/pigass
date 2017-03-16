@@ -173,14 +173,15 @@ class PaymentController extends Controller
      */
     public function indexAction($slug)
     {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
         $gateways = $this->em->getRepository('PigassUserBundle:Gateway')->getBySlug($slug);
 
         if (!$gateways)
             throw $this->createNotFoundException('Impossible de trouver une Gateway associée à ' . $slug);
 
         return array(
-            'gateways' => $gateways,
-            'slug'     => $slug,
+            'gateways'  => $gateways,
+            'structure' => $structure,
         );
     }
 

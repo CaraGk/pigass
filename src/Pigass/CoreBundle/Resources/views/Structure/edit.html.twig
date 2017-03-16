@@ -8,6 +8,11 @@
     {% if structure is not null %}{{ structure.name }} - Modification {% else %} Structure - Ajout {% endif %}
 {% endblock %}
 
+{% block action %}
+    </ul>
+    {{ mopa_bootstrap_menu('parameter') }}
+{% endblock %}
+
 {% block content %}
     {{ form(form) }}
 {% endblock %}

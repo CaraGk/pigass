@@ -43,23 +43,8 @@
                                 </a>
                             </li>
                             <li class="action">
-                                <a href="{{ path('user_payment_index', {'slug': structure.slug}) }}" title="Afficher les moyens de paiement pour la structure '{{ structure.name }}'" class="index">
-                                    {{ icon('piggy-bank') }} Moyens de paiement
-                                </a>
-                            </li>
-                            <li class="action">
                                 <a href="{{ path('parameter_admin_index', {'slug': structure.slug}) }}" title="Afficher les paramètres du site pour la structure '{{ structure.name }}'" class="index">
                                     {{ icon('cog') }} Paramètres
-                                </a>
-                            </li>
-                            <li class="action">
-                                <a href="{{ path('core_structure_edit', {'slug': structure.slug}) }}" title="Modifier la structure '{{ structure.name }}'" class="edit">
-                                    {{ icon('pencil') }} Modifier
-                                </a>
-                            </li>
-                            <li class="action">
-                                <a href="{{ path('core_structure_delete', {'id': structure.id}) }}" title="Supprimer la structure '{{ structure.name }}'" class="confirm delete" confirm="Attention, vous allez supprimer la structure et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
-                                    {{ icon('trash') }} Supprimer
                                 </a>
                             </li>
                         </ul>

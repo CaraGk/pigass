@@ -70,6 +70,7 @@ class AdminController extends Controller
 
         return array(
             'parameter_form' => $form->createView(),
+            'structure'      => $structure,
     );
   }
 

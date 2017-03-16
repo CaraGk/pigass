@@ -6,7 +6,7 @@
 
 {% block action %}
     <li class="btn btn-primary">
-        <a href="{{ path('user_register_question_index') }}" title="Retour à la liste des questions complémentaires">
+        <a href="{{ path('user_register_question_index', {'slug': slug}) }}" title="Retour à la liste des questions complémentaires">
             {{ icon('hand-left') }} Retour
         </a>
     </li>

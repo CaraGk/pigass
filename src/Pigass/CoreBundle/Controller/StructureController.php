@@ -203,11 +203,13 @@ class StructureController extends Controller
     /**
      * Delete a structure
      *
-     * @Route("/structure/{id}/delete", name="core_structure_delete", requirements={"id" = "\d+"})
+     * @Route("/structure/{slug}/delete", name="core_structure_delete", requirements={"id" = "\d+"})
      * @Security\PreAuthorize("hasRole('ROLE_ADMIN')")
      */
-    public function deleteAction(Structure $structure)
+    public function deleteAction($slug)
     {
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
+
         $this->em->remove($structure);
         $this->em->flush();
 

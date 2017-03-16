@@ -596,14 +596,19 @@ class RegisterController extends Controller
     /**
      * List complementary questions
      *
-     * @Route("/question", name="user_register_question_index")
+     * @Route("/{slug}/question", name="user_register_question_index", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function questionIndexAction()
+    public function questionIndexAction($slug)
     {
-        $slug = $this->session->get('slug');
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $user = $this->getUser();
+        if (!$user->hasRole('ROLE_ADMIN'))
+            $slug = $this->session->get('slug');
+        if ($slug != 'all')
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        else
+            $structure = null;
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
 
         return array(
@@ -615,15 +620,16 @@ class RegisterController extends Controller
     /**
      * Add a new complementary question
      *
-     * @Route("/question/new", name="user_register_question_new")
+     * @Route("/{slug}/question/new", name="user_register_question_new", requirements={"slug" = "\w+"})
      * @Template("PigassUserBundle:Register:questionEdit.html.twig")
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function questionNewAction(Request $request)
+    public function questionNewAction($slug, Request $request)
     {
-        $slug = $this->session->get('slug');
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        if ($slug and !$user->hasRole('ROLE_ADMIN')) {
+        $user = $this->getUser();
+        if (!$user->hasRole('ROLE_ADMIN'))
+            $slug = $this->session->get('slug');
+        if ($slug != 'all') {
             $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
             if (!$structure)
                 throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
@@ -637,27 +643,29 @@ class RegisterController extends Controller
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Question complémentaire "' . $question . '" enregistrée.');
-            return $this->redirect($this->generateUrl('user_register_question_index'));
+            return $this->redirect($this->generateUrl('user_register_question_index', ['slug' => $slug]));
         }
 
         return array(
             'form'     => $form->createView(),
             'question' => null,
+            'slug'     => $slug,
         );
     }
 
     /**
      * Edit a complementary question
      *
-     * @Route("/question/{id}/edit", name="user_register_question_edit")
+     * @Route("/{slug}/question/{id}/edit", name="user_register_question_edit", requirements={"slug" = "\w+"})
      * @Template()
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      */
-    public function questionEditAction(MemberQuestion $question, Request $request)
+    public function questionEditAction(MemberQuestion $question, $slug, Request $request)
     {
-        $slug = $this->session->get('slug');
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        if ($slug and !$user->hasRole('ROLE_ADMIN')) {
+        $user = $this->getUser();
+        if (!$user->hasRole('ROLE_ADMIN'))
+            $slug = $this->session->get('slug');
+        if ($slug != 'all') {
             $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
             if (!$structure)
                 throw $this->createNotFoundException('Impossible de trouver la structure réferente.');
@@ -670,12 +678,13 @@ class RegisterController extends Controller
 
         if ($formHandler->process()) {
             $this->get('session')->getFlashBag()->add('notice', 'Question complémentaire "' . $question . '" enregistrée.');
-            return $this->redirect($this->generateUrl('user_register_question_index'));
+            return $this->redirect($this->generateUrl('user_register_question_index', ['slug' => $slug]));
         }
 
         return array(
             'form'     => $form->createView(),
             'question' => $question,
+            'slug'     => $slug,
         );
     }
 

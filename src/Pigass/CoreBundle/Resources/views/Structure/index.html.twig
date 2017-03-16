@@ -94,7 +94,7 @@
                     {% if structure.fullname is not null %}<div class="col-sm-12">{{ structure.fullname }}</div>{% endif %}
                     <div class="col-sm-12">
                         {% if structure.email is not null %}<a href="mailto:{{ structure.email }}" title="{{ structure.email }}">{{ icon('envelope') }}</a>{% endif %}
-                        {% if structure.address['number'] is not null %}<a href="#" title="{{ structure.printableAddress }}">{{ icon('home') }}</a>{% endif %}
+                        {% if structure.address['city'] is not null %}<a href="#" title="{{ structure.printableAddress }}">{{ icon('home') }}</a>{% endif %}
                     </div>
                 </div>
             </li>

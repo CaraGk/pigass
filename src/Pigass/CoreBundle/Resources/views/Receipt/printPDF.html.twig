@@ -54,7 +54,11 @@
                 </div>
                 <div class="panel-footer jumbotron row">
                     <span class="pull-right"><img src="{{ absolute_url(asset('uploads/' ~ membership.structure.logo)) }}" alt="Logo de {{ membership.structure.name }}" class="logo-large" /></span>
-                    {{ membership.structure.fullname }}
+                    {% if membership.structure.fullname is not null %}
+                        {{ membership.structure.fullname }}
+                    {% else %}
+                        {{ membership.structure.name }}
+                    {% endif %}
                 </div>
             </div>
         </div>

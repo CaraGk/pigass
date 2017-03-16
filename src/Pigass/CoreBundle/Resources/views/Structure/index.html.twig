@@ -75,7 +75,7 @@
                     <div class="col-sm-12 title">
                         {% if is_granted('ROLE_ADMIN') %}
                             <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
-                                {{ structure.area }}
+                                {{ structure.area }} :
                                 {{ structure.name }}
                                 ({{ structure.slug }})
                             </a>

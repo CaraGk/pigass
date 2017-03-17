@@ -568,6 +568,299 @@
                         tooltip: {content: "<span style=\"font-weight: bold\">Corse</span>"}
                         {% endif %}
                     }
+                },
+                plots: {
+                    {% if areaMap['bretagne'] is defined %}
+                        "plot-region-53": {
+                            plotsOn: "region-53",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['bretagne'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['paysdelaloire'] is defined %}
+                        "plot-region-52": {
+                            plotsOn: "region-52",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['paysdelaloire'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['bassenormandie'] is defined %}
+                        "plot-region-25": {
+                            plotsOn: "region-25",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['bassenormandie'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['poitoucharentes'] is defined %}
+                        "plot-region-54": {
+                            plotsOn: "region-54",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['poitoucharentes'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['aquitaine'] is defined %}
+                        "plot-region-72": {
+                            plotsOn: "region-72",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['aquitaine'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['midipyrenees'] is defined %}
+                        "plot-region-73": {
+                            plotsOn: "region-73",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['midipyrenees'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['languedocroussillon'] is defined %}
+                        "plot-region-91": {
+                            plotsOn: "region-91",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['languedocroussillon'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['centre'] is defined %}
+                        "plot-region-24": {
+                            plotsOn: "region-24",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['centre'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['hautenormandie'] is defined %}
+                        "plot-region-23": {
+                            plotsOn: "region-23",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['hautenormandie'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            },
+                            attrHover: {
+                                transform: "s1.5"
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['picardie'] is defined %}
+                        "plot-region-22": {
+                            plotsOn: "region-22",
+                            type: "image",
+                            url: "{{ asset('uploads/' ~ areaMap['picardie'].logo) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 0.9
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['iledefrance'] is defined %}
+                        "plot-region-11": {
+                            plotsOn: "region-11",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['iledefrance'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['limousin'] is defined %}
+                        "plot-region-74": {
+                            plotsOn: "region-74",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['limousin'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['auvergne'] is defined %}
+                        "plot-region-83": {
+                            plotsOn: "region-83",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['auvergne'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['rhonesalpes'] is defined %}
+                        "plot-region-82": {
+                            plotsOn: "region-82",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['rhonesalpes'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['paca'] is defined %}
+                        "plot-region-93": {
+                            plotsOn: "region-93",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['paca'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['bourgogne'] is defined %}
+                        "plot-region-26": {
+                            plotsOn: "region-26",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['bourgogne'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['champagneardennes'] is defined %}
+                        "plot-region-21": {
+                            plotsOn: "region-21",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['champagneardennes'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['nordpasdecalais'] is defined %}
+                        "plot-region-31": {
+                            plotsOn: "region-31",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['nordpasdecalais'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['lorraine'] is defined %}
+                        "plot-region-41": {
+                            plotsOn: "region-41",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['lorraine'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['alsace'] is defined %}
+                        "plot-region-42": {
+                            plotsOn: "region-42",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['alsace'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['franchecomte'] is defined %}
+                        "plot-region-43": {
+                            plotsOn: "region-43",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['franchecomte'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
+                    {% if areaMap['corse'] is defined %}
+                        "plot-region-94": {
+                            plotsOn: "region-94",
+                            type: "image",
+                            url: "{{ absolute_url(asset('uploads/' ~ areaMap['corse'].logo)) }}",
+                            width: 30,
+                            height: 30,
+                            attrs: {
+                                opacity: 1
+                            }
+                        },
+                    {% endif %}
                 }
             });
         });

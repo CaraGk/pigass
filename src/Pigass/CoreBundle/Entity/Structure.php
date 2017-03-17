@@ -71,11 +71,34 @@ class Structure
     private $address;
 
     /**
+     * @ORM\Column(name="url", type="string", length=255, nullable=true)
+     * @Assert\Url
+     *
+     * @var string $url
+     */
+    private $url;
+
+    /**
+     * @ORM\Column(name="phone", type="string", length=15, nullable=true)
+     * @Assert\Length(min=10, max=13)
+     *
+     * @var integer $phone
+     */
+    private $phone;
+
+    /**
      * @ORM\Column(name="area", type="string", length=100, nullable=true)
      *
      * @var string $area
      */
     private $area;
+
+    /**
+     * @ORM\Column(name="areamap", type="array", nullable=true)
+     *
+     * @var array $areamap
+     */
+    private $areamap;
 
     /**
      * @ORM\Column(name="logo", type="string", length=255, nullable=true)
@@ -465,5 +488,77 @@ class Structure
     public function getReceipts()
     {
         return $this->receipts;
+    }
+
+    /**
+     * Set areamap
+     *
+     * @param array $areamap
+     *
+     * @return Structure
+     */
+    public function setAreamap($areamap)
+    {
+        $this->areamap = $areamap;
+
+        return $this;
+    }
+
+    /**
+     * Get areamap
+     *
+     * @return array
+     */
+    public function getAreamap()
+    {
+        return $this->areamap;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     *
+     * @return Structure
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set phone
+     *
+     * @param integer $phone
+     *
+     * @return Structure
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Get phone
+     *
+     * @return integer
+     */
+    public function getPhone()
+    {
+        return $this->phone;
     }
 }

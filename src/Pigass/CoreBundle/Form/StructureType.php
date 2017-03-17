@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Component\Form\Extension\Core\Type\FileType,
     Symfony\Component\Form\Extension\Core\Type\CheckboxType,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Pigass\UserBundle\Form\AddressType;
@@ -38,7 +39,38 @@ class StructureType extends AbstractType
                 'label' => 'Zone géographique',
                 'required' => false,
             ))
+            ->add('areamap', ChoiceType::class, array(
+                'label'    => 'Zones de la carte',
+                'required' => false,
+                'choices'  => [
+                    'Alsace'   => 'alsace',
+                    'Aquitaine' => 'aquitaine',
+                    'Auvergne' => 'auvergne',
+                    'Basse-Normandie' => 'bassenormandie',
+                    'Bourgogne' => 'bourgogne',
+                    'Bretagne' => 'bretagne',
+                    'Centre' => 'centre',
+                    'Champagne-Ardennes' => 'champagneardennes',
+                    'Corse' => 'corse',
+                    'Franche-Comté' => 'franchecomte',
+                    'Haute-Normandie' => 'hautenormandie',
+                    'Île-de-France' => 'iledefrance',
+                    'Languedoc-Roussillon' => 'languedocroussillon',
+                    'Limousin' => 'limousin',
+                    'Lorraine' => 'lorraine',
+                    'Midi-Pyrénées' => 'midipyrenees',
+                    'Nord-Pas-de-Calais' => 'nordpasdecalais',
+                    'Pays-de-la-Loire' => 'paysdelaloire',
+                    'Picardie' => 'picardie',
+                    'Provence-Alpes-Côte-d\'Azur' => 'paca',
+                    'Rhones-Alpes' => 'rhonesalpes',
+                ],
+                'expanded' => false,
+                'multiple' => true,
+            ))
             ->add('email')
+            ->add('url')
+            ->add('phone')
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse postale',
                 'label_render' => false,

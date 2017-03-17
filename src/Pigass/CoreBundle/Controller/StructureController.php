@@ -96,6 +96,37 @@ class StructureController extends Controller
     }
 
     /**
+     * Map the structures
+     *
+     * @Route("/map", name="core_structure_map")
+     * @Template()
+     */
+    public function mapAction()
+    {
+        $user = $this->getUser();
+        if (isset($user) and $user->hasRole('ROLE_ADMIN'))
+            $activated = false;
+        else
+            $activated = true;
+
+        $structures = $this->em->getRepository('PigassCoreBundle:Structure')->getAll($activated);
+
+        $areaMap = array();
+        foreach ($structures as $structure) {
+            if ($areas = $structure->getAreamap()) {
+                foreach ($areas as $area) {
+                    $areaMap[$area] = $structure;
+                }
+            }
+        }
+
+        return array(
+            'structures' => $structures,
+            'areaMap'    => $areaMap,
+        );
+    }
+
+    /**
      * Add a new structure
      *
      * @Route("/structure/new", name="core_structure_new")

@@ -189,7 +189,7 @@
                     },
                     "region-54": {
                         href: "#",
-                        {% if areaMap['vendee'] is defined %}
+                        {% if areaMap['poitoucharentes'] is defined %}
                         attrs: {
                             fill: "#00A4DB"
                         },
@@ -201,10 +201,10 @@
                                 }
                             }
                         },
-                        myPanel : "{{ areaMap['vendee'].slug }}",
-                        tooltip: {content: "<span style=\"font-weight:bold;\">Vendée : {{ areaMap['vendee'].name }}</span>"}
+                        myPanel : "{{ areaMap['poitoucharentes'].slug }}",
+                        tooltip: {content: "<span style=\"font-weight:bold;\">Poitou-Charentes : {{ areaMap['poitoucharentes'].name }}</span>"}
                         {% else %}
-                        tooltip: {content: "<span style=\"font-weight:bold;\">Vendée</span>"}
+                        tooltip: {content: "<span style=\"font-weight:bold;\">Poitou-Charentes</span>"}
                         {% endif %}
                     },
                     "region-72": {

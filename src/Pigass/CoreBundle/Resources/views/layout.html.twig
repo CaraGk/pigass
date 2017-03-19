@@ -12,6 +12,25 @@
     {% endimage %}
 {% endblock logo %}
 
+{% block head_style %}
+    {{ parent() }}
+    <style type="text/css">
+        body,
+        .container-fluid,
+        #content
+        {
+            background-image: url({{ asset('uploads/background.png') }});
+            background-repeat: repeat-x;
+            background-attachment: fixed;
+        }
+        .mapael .map {
+            background-color: #FFF;
+            border: 1px solid #AAA;
+            border-radius: 5px;
+        }
+    </style>
+{% endblock %}
+
 {% block headline %}{% endblock %}
 
 {% block action %}{% endblock %}

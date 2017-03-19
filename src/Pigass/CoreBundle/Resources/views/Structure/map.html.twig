@@ -114,25 +114,10 @@
 
             $('.structures').mapael({
                 map: {
-                    name: "france_regions"
-                },
-                defaultArea: {
-                    eventHandlers: {
-                        click: function (e, id, mapElem, textElem, elemOptions) {
-                            $('.description').hide();
-                            if (typeof elemOptions.myPanel != 'undefined') {
-                                $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                            }
-                        }
-                    }
-                },
-                areas: {
-                    "region-53": {
-                        href: "#",
-                        {% if areaMap['bretagne'] is defined %}
-                        attrs: {
-                            fill: "#00A4DB"
-                        },
+                    name: "france_regions",
+                    defaultArea: {
+                        attrs: { fill: "#AAAAAA" },
+                        attrsHover: { fill: "#EABB8E" },
                         eventHandlers: {
                             click: function (e, id, mapElem, textElem, elemOptions) {
                                 $('.description').hide();
@@ -140,6 +125,15 @@
                                     $('.structure_'+elemOptions.myPanel).fadeIn('slow');
                                 }
                             }
+                        }
+                    },
+                },
+                areas: {
+                    "region-53": {
+                        href: "#",
+                        {% if areaMap['bretagne'] is defined %}
+                        attrs: {
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['bretagne'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Bretagne : {{ areaMap['bretagne'].name }}</span>"}
@@ -151,15 +145,7 @@
                         href: "#",
                         {% if areaMap['paysdelaloire'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['paysdelaloire'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Pays-de-la-Loire : {{ areaMap['paysdelaloire'].name }}</span>"}
@@ -171,15 +157,7 @@
                         href: "#",
                         {% if areaMap['bassenormandie'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['bassenormandie'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Basse-Normandie : {{ areaMap['bassenormandie'].name }}</span>"}
@@ -191,15 +169,7 @@
                         href: "#",
                         {% if areaMap['poitoucharentes'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['poitoucharentes'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Poitou-Charentes : {{ areaMap['poitoucharentes'].name }}</span>"}
@@ -211,15 +181,7 @@
                         href: "#",
                         {% if areaMap['aquitaine'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['aquitaine'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Aquitaine : {{ areaMap['aquitaine'].name }}</span>"}
@@ -231,15 +193,7 @@
                         href: "#",
                         {% if areaMap['midipyrenees'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['midipyrenees'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Midi-Pyrénées : {{ areaMap['midipyrenees'].name }}</span>"}
@@ -251,15 +205,7 @@
                         href: "#",
                         {% if areaMap['languedocroussillon'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['languedocroussillon'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Languedoc-Roussillon : {{ areaMap['languedocroussillon'].name }}</span>"}
@@ -271,15 +217,7 @@
                         href: "#",
                         {% if areaMap['centre'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['centre'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Centre : {{ areaMap['centre'].name }}</span>"}
@@ -291,15 +229,7 @@
                         href: "#",
                         {% if areaMap['hautenormandie'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['hautenormandie'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Haute-Normandie : {{ areaMap['hautenormandie'].name }}</span>"}
@@ -311,15 +241,7 @@
                         href: "#",
                         {% if areaMap['picardie'] is defined  %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['picardie'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Picardie : {{ areaMap['picardie'].name }}</span>"}
@@ -331,15 +253,7 @@
                         href: "#",
                         {% if areaMap['iledefrance'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['iledefrance'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Île-de-France : {{ areaMap['iledefrance'].name }}</span>"}
@@ -351,15 +265,7 @@
                         href: "#",
                         {% if areaMap['limousin'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['limousin'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Limousin : {{ areaMap['limousin'].name }}</span>"}
@@ -371,15 +277,7 @@
                         href: "#",
                         {% if areaMap['auvergne'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['auvergne'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Auvergne : {{ areaMap['auvergne'].name }}</span>"}
@@ -391,15 +289,7 @@
                         href: "#",
                         {% if areaMap['rhonesalpes'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['rhonesalpes'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Rhones-Alpes : {{ areaMap['rhonesalpes'].name }}</span>"}
@@ -411,15 +301,7 @@
                         href: "#",
                         {% if areaMap['paca'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['paca'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Provence-Alpes-Côte-d'Azur : {{ areaMap['paca'].name }}</span>"}
@@ -431,15 +313,7 @@
                         href: "#",
                         {% if areaMap['bourgogne'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['bourgogne'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Bourgogne : {{ areaMap['bourgogne'].name }}</span>"}
@@ -451,15 +325,7 @@
                         href: "#",
                         {% if areaMap['champagneardennes'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['champagneardennes'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Champagne-Ardennes : {{ areaMap['champagneardennes'].name }}</span>"}
@@ -471,15 +337,7 @@
                         href: "#",
                         {% if areaMap['nordpasdecalais'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['nordpasdecalais'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Nord-Pas-de-Calais : {{ areaMap['nordpasdecalais'].name }}</span>"}
@@ -491,15 +349,7 @@
                         href: "#",
                         {% if areaMap['lorraine'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['lorraine'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Lorraine : {{ areaMap['lorraine'].name }}</span>"}
@@ -511,15 +361,7 @@
                         href: "#",
                         {% if areaMap['alsace'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['alsace'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Alsace : {{ areaMap['alsace'].name }}</span>"}
@@ -531,16 +373,8 @@
                         href: "#",
                         {% if areaMap['franchecomte'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
+                            fill: "#57C9F8"
                         },
-                        eventHandlers: {
-                            },
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
                         },
                         myPanel : "{{ areaMap['franchecomte'].slug }}",
                         tooltip: {content: "<span style=\"font-weight:bold;\">Franche-Comté : {{ areaMap['franchecomte'].name }}</span>"}
@@ -552,15 +386,7 @@
                         href: "#",
                         {% if areaMap['corse'] is defined %}
                         attrs: {
-                            fill: "#00A4DB"
-                        },
-                        eventHandlers: {
-                            click: function (e, id, mapElem, textElem, elemOptions) {
-                                $('.description').hide();
-                                if (typeof elemOptions.myPanel != 'undefined') {
-                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
-                                }
-                            }
+                            fill: "#57C9F8"
                         },
                         myPanel : "{{ areaMap['corse'].slug }}",
                         tooltip: {content: "<span style=\"font-weight: bold\">Corse : {{ areaMap['corse'].name }}</span>"}

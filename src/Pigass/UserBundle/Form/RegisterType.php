@@ -35,6 +35,7 @@ class RegisterType extends AbstractType
                     'Mme'  => 'Mme',
                     'Mlle' => 'Mlle',
                 ),
+                'horizontal_input_wrapper_class' => 'col-xs-2',
             ))
             ->add('surname', TextType::class, array(
                 'label' => 'Nom',

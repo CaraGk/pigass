@@ -27,7 +27,7 @@
 {% endblock %}
 
 {% block content %}
-    <ul class="entities receipts list-group">
+    <ul class="entities receipts list-group panel panel-default">
         {% for receipt in receipts %}
             <li class="entity receipt list-group-item row">
                 {% if is_granted('ROLE_ADMIN') %}

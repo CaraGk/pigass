@@ -6,8 +6,10 @@
 {% endblock %}
 
 {% block content %}
-    <form method="post">
-        {{ form_widget(form) }}
-        <button type="submit">Enregistrer</button>
-    </form>
+    <div class="panel panel-default">
+        <form method="post">
+            {{ form_widget(form) }}
+            <button type="submit">Enregistrer</button>
+        </form>
+    </div>
 {% endblock %}

@@ -18,11 +18,13 @@
 {% endblock %}
 
 {% block action %}
-<li class="field"><a href="{{ path('user_person_index') }}?{{ app.request.querystring }}" title="Retour à la liste des internes"><img src="{{ asset('bundles/pigasscore/images/Button_Back.png') }}" alt="Retour"></a></li>
+    <li class="field"><a href="{{ path('user_person_index') }}?{{ app.request.querystring }}" title="Retour à la liste des internes"><img src="{{ asset('bundles/pigasscore/images/Button_Back.png') }}" alt="Retour"></a></li>
 {% endblock %}
 
 {% block content %}
-{{ form(person_form) }}
+    <div class="panel panel-default">
+        {{ form(person_form) }}
+    </div>
 {% endblock %}
 
 {% block javascripts %}

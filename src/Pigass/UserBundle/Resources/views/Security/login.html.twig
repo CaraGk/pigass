@@ -14,6 +14,7 @@
 {% endblock %}
 
 {% block content %}
+    <div class="panel panel-default">
     {% if error %}
         <div class="alert alert-danger fade in">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
@@ -48,4 +49,5 @@
             </div>
         </fieldset>
     </form>
+    </div>
 {% endblock %}

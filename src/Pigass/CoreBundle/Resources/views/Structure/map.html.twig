@@ -118,6 +118,7 @@
                     defaultArea: {
                         attrs: { fill: "#AAAAAA" },
                         attrsHover: { fill: "#EABB8E" },
+                        href: "#",
                         eventHandlers: {
                             click: function (e, id, mapElem, textElem, elemOptions) {
                                 $('.description').hide();
@@ -127,6 +128,28 @@
                             }
                         }
                     },
+                    defaultPlot: {
+                        type: "image",
+                        witdh: 40,
+                        height: 40,
+                        attrs: { opacity: 1 },
+                        attrsHover: { fill: "#EABB8E" },
+                        href: "#",
+                        eventHandlers: {
+                            click: function (e, id, mapElem, textElem, elemOptions) {
+                                $('.description').hide();
+                                if (typeof elemOptions.myPanel != 'undefined') {
+                                    $('.structure_'+elemOptions.myPanel).fadeIn('slow');
+                                }
+                            },
+                            mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                                $("path[data-id='" + elemOptions.plotsOn + "']").attr("fill", "#EABB8E");
+                            },
+                            mouseout: function (e, id, mapElem, textElem, elemOptions) {
+                                $("path[data-id='" + elemOptions.plotsOn + "']").attr("fill", "#72CAE9");
+                            },
+                        }
+                    }
                 },
                 areas: {
                     "region-53": {
@@ -403,6 +426,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['bretagne'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['bretagne'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -418,6 +442,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['paysdelaloire'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['paysdelaloire'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -433,6 +458,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['bassenormandie'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['bassenormandie'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -448,6 +474,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['poitoucharentes'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['poitoucharentes'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -463,6 +490,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['aquitaine'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['aquitaine'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -478,6 +506,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['midipyrenees'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['midipyrenees'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -493,6 +522,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['languedocroussillon'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['languedocroussillon'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -508,6 +538,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['centre'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['centre'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -523,6 +554,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['hautenormandie'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['hautenormandie'].slug }}",
                             attrs: {
                                 opacity: 1
                             },
@@ -538,9 +570,7 @@
                             url: "{{ asset('uploads/' ~ areaMap['picardie'].logo) }}",
                             width: 40,
                             height: 40,
-                            attrs: {
-                                opacity: 0.9
-                            }
+                            myPanel : "{{ areaMap['picardie'].slug }}",
                         },
                     {% endif %}
                     {% if areaMap['iledefrance'] is defined %}
@@ -550,6 +580,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['iledefrance'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['iledefrance'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -562,6 +593,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['limousin'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['limousin'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -574,6 +606,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['auvergne'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['auvergne'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -586,6 +619,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['rhonesalpes'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['rhonesalpes'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -598,6 +632,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['paca'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['paca'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -610,6 +645,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['bourgogne'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['bourgogne'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -622,6 +658,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['champagneardennes'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['champagneardennes'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -634,6 +671,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['nordpasdecalais'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['nordpasdecalais'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -646,6 +684,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['lorraine'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['lorraine'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -658,6 +697,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['alsace'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['alsace'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -670,6 +710,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['franchecomte'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['franchecomte'].slug }}",
                             attrs: {
                                 opacity: 1
                             }
@@ -682,6 +723,7 @@
                             url: "{{ absolute_url(asset('uploads/' ~ areaMap['corse'].logo)) }}",
                             width: 40,
                             height: 40,
+                            myPanel : "{{ areaMap['corse'].slug }}",
                             attrs: {
                                 opacity: 1
                             }

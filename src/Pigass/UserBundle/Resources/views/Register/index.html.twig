@@ -19,6 +19,11 @@
             {{ icon('folder-open') }} Exporter (xls)
         </a>
     </li>
+    <li class="btn btn-primary">
+        <a href="{{ path('user_register_import', {'slug': slug}) }}">
+            {{ icon('open-file') }} Importer
+        </a>
+    </li>
     {% if filters['valid'] is null %}
         <li class="btn btn-default">
             <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion validée">

@@ -21,7 +21,7 @@ class UserRepository extends EntityRepository
   public function getAllEmail()
   {
       $query = $this->createQueryBuilder('u')
-          ->select('u.emailCanonical');
+          ->select('u.email');
 
       return $query->getQuery()->getArrayResult();
   }

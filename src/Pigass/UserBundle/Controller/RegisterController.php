@@ -16,11 +16,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag,
     Symfony\Component\HttpFoundation\Request,
-    Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+    Symfony\Component\Routing\Generator\UrlGeneratorInterface,
+    Symfony\Component\Validator\Constraints\File;
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Pigass\UserBundle\Entity\Membership,
-    Pigass\UserBundle\Entity\MemberQuestion;
+    Pigass\UserBundle\Entity\MemberQuestion,
+    Pigass\UserBundle\Entity\MemberInfo,
+    Pigass\UserBundle\Entity\User,
+    Pigass\UserBundle\Entity\Person;
 use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\FilterHandler,
     Pigass\UserBundle\Form\RegisterType,
@@ -32,7 +36,8 @@ use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\MemberQuestionType,
     Pigass\UserBundle\Form\MemberQuestionHandler,
     Pigass\UserBundle\Form\MembershipType,
-    Pigass\UserBundle\Form\MembershipHandler;
+    Pigass\UserBundle\Form\MembershipHandler,
+    Pigass\UserBundle\Form\ImportType;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -297,6 +302,226 @@ class RegisterController extends Controller
         $response->headers->set('Content-Disposition', $dispositionHeader);
 
         return $response;
+    }
+
+    /**
+     * Import memberships in a structure
+     *
+     * @Route("/{slug}/members/import", name="user_register_import", requirements={"slug" = "\w+"})
+     * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
+     * @Template()
+     */
+    public function importAction($slug, Request $request)
+    {
+        $error = null;
+        $listUsers = $this->em->getRepository('PigassUserBundle:User')->getAllEmail();
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
+        if (!$structure)
+            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+        $fields = array(
+            ['name' => 'title', 'label' => 'Titre', 'required' => false],
+            ['name' => 'surname', 'label' => 'Nom', 'required' => true],
+            ['name' => 'name', 'label' => 'Prénom', 'required' => true],
+            ['name' => 'email', 'label' => 'E-mail', 'required' => true],
+            ['name' => 'birthday', 'label' => 'Date de naissance', 'required' => false],
+            ['name' => 'birthplace', 'label' => 'Lieu de naissance', 'required' => false],
+            ['name' => 'phone', 'label' => 'Phone', 'required' => false],
+            ['name' => 'address_number', 'label' => 'Adresse : numéro (ou adresse complète si champ unique)', 'required' => false],
+            ['name' => 'address_type', 'label' => 'Adresse : type', 'required' => false],
+            ['name' => 'address_street', 'label' => 'Adresse : voie', 'required' => false],
+            ['name' => 'address_complement', 'label' => 'Adresse : complément', 'required' => false],
+            ['name' => 'address_code', 'label' => 'Adresse : code postal', 'required' => false],
+            ['name' => 'address_city', 'label' => 'Adresse : ville', 'required' => false],
+            ['name' => 'address_country', 'label' => 'Adresse : pays', 'required' => false],
+            ['name' => 'membership_amount', 'label' => 'Adhésion : montant', 'required' => false],
+            ['name' => 'membership_method', 'label' => 'Adhésion : moyen de paiement', 'required' => true],
+            ['name' => 'membership_date', 'label' => 'Adhésion : date', 'required' => true],
+        );
+        $member_questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
+        foreach ($member_questions as $member_question) {
+            $fields[] = ['name' => 'question_' . $member_question->getId(), 'label' => $member_question->getName(), 'required' => false];
+        }
+        $gateways = $this->em->getRepository('PigassUserBundle:Gateway')->findByStructure($structure->getId());
+        $form = $this->createForm(ImportType::class, null, ['fields' => $fields, 'gateways' => $gateways]);
+
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $fileConstraint = new File();
+            $fileConstraint->mimeTypes = array(
+                'application/vnd.oasis.opendocument.spreadsheet',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/octet-stream',
+            );
+            $errorList = $this->get('validator')->validate($form['file']->getData(), $fileConstraint);
+
+            if(count($errorList) == 0) {
+
+                $objPHPExcel = $this->get('phpexcel')->createPHPExcelObject($form['file']->getData())->setActiveSheetIndex();
+                if ($form['first_row']->getData() == true)
+                    $first_row = 2;
+                else
+                    $first_row = 1;
+                $import_count = $first_row;
+                $import_error = 0;
+                $newUsers = array();
+
+                $method = array();
+                foreach ($gateways as $gateway) {
+                    $method[$form['gateway_' . $gateway->getId()]->getData()] = $gateway;
+                }
+
+                while ($objPHPExcel->getCellByColumnAndRow($form['surname']->getData(), $import_count)->getValue()) {
+                    $email = $objPHPExcel->getCellByColumnAndRow($form['email']->getData(), $import_count)->getValue();
+                    $surname = $objPHPExcel->getCellByColumnAndRow($form['surname']->getData(), $import_count)->getValue();
+                    $name = $objPHPExcel->getCellByColumnAndRow($form['name']->getData(), $import_count)->getValue();
+
+                    if (!(in_array(["email" => $email], $listUsers) || in_array($email, $newUsers)) || $form['rewrite']->getData()) {
+                        if (in_array(["email" => $email], $listUsers) || in_array($email, $newUsers)) {
+                            $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($email);
+                            $this->session->getFlashBag()->add('notice', $name . ' ' . $surname . ' (' . $email . ') : l\'utilisateur a été mis à jour.');
+                        } else {
+                            $person = new Person();
+                            if ($form['title']->getData() != null)
+                               $person->setTitle($objPHPExcel->getCellByColumnAndRow($form['title']->getData(), $import_count)->getValue());
+                            $person->setSurname($surname);
+                            $person->setName($name);
+
+                            $user = new User();
+                            $this->um->createUser();
+                            $user->setEmail($email);
+                            $user->setUsername($user->getEmail());
+                            $user->setConfirmationToken(null);
+                            $user->setEnabled(true);
+                            $user->addRole('ROLE_person');
+                            $user->generatePassword(8);
+                            $person->setUser($user);
+
+                            $this->um->updateUser($user);
+                            $newUsers[] = $user->getEmail();
+                        }
+
+                        if ($form['birthday']->getData() != null) {
+                            $date = $objPHPExcel->getCellByColumnAndRow($form['birthday']->getData(), $import_count)->getValue();
+                            $birthday = \PHPExcel_Shared_Date::ExcelToPHPObject($date);
+                            $person->setBirthday($birthday);
+                        }
+                        if ($form['birthplace']->getData() != null)
+                            $person->setBirthplace($objPHPExcel->getCellByColumnAndRow($form['birthplace']->getData(), $import_count)->getValue());
+                        if ($form['phone']->getData() != null)
+                            $person->setPhone($objPHPExcel->getCellByColumnAndRow($form['phone']->getData(), $import_count)->getValue());
+                        if ($form['address_number']->getData() != null) {
+                            if ($form['address_type']->getData() != null) {
+                                $address['type'] = $objPHPExcel->getCellByColumnAndRow($form['address_type']->getData(), $import_count)->getValue();
+                                $address['street'] = $objPHPExcel->getCellByColumnAndRow($form['address_street']->getData(), $import_count)->getValue();
+                            } else {
+                                $address['type'] = '';
+                                $address['street'] = '';
+                            }
+                            $address['number'] = $objPHPExcel->getCellByColumnAndRow($form['address_number']->getData(), $import_count)->getValue();
+                            if ($form['address_complement']->getData())
+                                $address['complement'] = $objPHPExcel->getCellByColumnAndRow($form['address_complement']->getData(), $import_count)->getValue();
+                            else
+                                $address['complement'] = '';
+                            $address['code'] = $objPHPExcel->getCellByColumnAndRow($form['address_code']->getData(), $import_count)->getValue();
+                            $address['city'] = $objPHPExcel->getCellByColumnAndRow($form['address_city']->getData(), $import_count)->getValue();
+                            if ($form['address_country']->getData() != null)
+                                $address['country'] = $objPHPExcel->getCellByColumnAndRow($form['address_country']->getData(), $import_count)->getValue();
+                            else
+                                $address['country'] = "France";
+                            $person->setAddress($address);
+                        }
+
+                        $this->em->persist($person);
+                    } else {
+                        $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($email);
+                        $this->session->getFlashBag()->add('error', $name . ' ' . $surname . ' (' . $email . ') : l\'utilisateur existe déjà dans la base de données.');
+                    }
+
+                    if ($form['membership_date']->getData() != null) {
+                        $date = $objPHPExcel->getCellByColumnAndRow($form['membership_date']->getData(), $import_count)->getValue();
+                        $payed_on = \PHPExcel_Shared_Date::ExcelToPHPObject($date);
+                    } else {
+                        $payed_on = new \DateTime('now');
+                    }
+                    $expire = new \DateTime($this->pm->findParamByName('reg_' . $slug . '_date')->getValue());
+                    $payed_on->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
+                    while ($expire <= $payed_on) {
+                        $expire->modify($this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue());
+                    }
+                    $membership = $this->em->getRepository('PigassUserBundle:Membership')->findOneBy(['person' => $person->getId(), 'structure' => $structure->getId(), 'expiredOn' => $expire]);
+                    if (!$membership) {
+                        $membership = new Membership();
+                        $membership->setPerson($person);
+                        $membership->setMethod($method[$objPHPExcel->getCellByColumnAndRow($form['membership_method']->getData(), $import_count)->getValue()]);
+                        $membership->setStructure($structure);
+                        $membership->setPayedOn($payed_on);
+                        $membership->setExpiredOn($expire);
+                        $membership->setStatus('validated');
+
+                        if ($form['membership_amount']->getData() != null)
+                            $membership->setAmount($objPHPExcel->getCellByColumnAndRow($form['membership_amount']->getData(), $import_count)->getValue());
+                        else
+                            $membership->setAmount($this->pm->findParamByName('reg_' . $slug . '_payment')->getValue());
+
+                        $this->em->persist($membership);
+                    } else {
+                        $this->session->getFlashBag()->add('error', $name . ' ' . $surname . ' (' . $email . ') : l\'utilisateur est déjà adhérent dans la base de données.');
+                        $import_error++;
+                    }
+
+                    foreach ($member_questions as $member_question) {
+                        if ($form['question_' . $member_question->getId()]->getData() != null) {
+                            if (!$this->em->getRepository('PigassUserBundle:MemberInfo')->findOneBy(['membership' => $membership->getId(), 'question' => $member_question->getId()])) {
+                                $question_info = new MemberInfo();
+                                $question_info->setQuestion($member_question);
+                                $question_info->setMembership($membership);
+                                $question_info->setValue($objPHPExcel->getCellByColumnAndRow($form['question_' . $member_question->getId()]->getData(), $import_count)->getValue());
+                                $this->em->persist($question_info);
+                            }
+                        }
+                    }
+
+                    $import_count++;
+                }
+
+                $this->em->flush();
+
+                if ($import_count - $first_row > 1) {
+                    $message = $import_count - $first_row . " lignes ont été traitées. ";
+                } elseif ($import_count - $first_row == 1) {
+                    $message = "Une ligne a été traitée. ";
+                } else {
+                    $message = "Aucune ligne n'a été traitée.";
+                }
+                if ($import_error) {
+                    if ($import_count - $first_row - $import_error > 1) {
+                        $message .= $import_count - $first_row - $import_error . " adhérents ont été enregistrés dans la base de données. ";
+                    } elseif ($import_count - $first_row - $import_error == 1) {
+                        $message .= "Un adhérent a été enregistré dans la base de données. ";
+                    } else {
+                        $message .= "Aucun adhérent n'a été enregistré dans la base de données. ";
+                    }
+                    if ($import_error > 1) {
+                        $message .= $import_error . " doublons n'ont pas été ajoutés.";
+                    } else {
+                        $message .= "Un doublon n'a pas été ajouté.";
+                    }
+                } else {
+                    $message .= $import_count - $first_row . " adhérents ont été enregistrés dans la base de données. Il n'y a pas de doublons traités.";
+                }
+                $this->session->getFlashBag()->add('notice', $message);
+
+                return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
+            } else {
+                $error = $errorList[0]->getMessage();
+            }
+        }
+
+        return array(
+            'form'  => $form->createView(),
+            'error' => $error,
+        );
     }
 
     /**
@@ -828,7 +1053,7 @@ class RegisterController extends Controller
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
 
         if (!$person) {
-            $this->session->getFlashBag()->add('error', 'Étudiant inconnu.');
+            $this->session->getFlashBag()->add('error', 'adhérent inconnu.');
             return $this->redirect($this->generateUrl('user_register_list'));
         } else {
             return $person;

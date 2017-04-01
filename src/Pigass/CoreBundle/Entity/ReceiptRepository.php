@@ -46,8 +46,8 @@ class ReceiptRepository extends EntityRepository
     public function getOneByDate(Structure $structure, \DateTime $date)
     {
         $query = $this->getForStructureQuery($structure);
-        $query->andWhere('r.begin < :date')
-            ->andWhere('r.end > :date')
+        $query->andWhere('r.begin <= :date')
+            ->andWhere('r.end >= :date')
             ->setParameter('date', $date)
             ->setMaxResults(1)
             ;

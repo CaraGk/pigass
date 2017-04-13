@@ -1048,15 +1048,19 @@ class RegisterController extends Controller
             $user = $this->um->findUserBy(array(
                 'id' => $user_id,
             ));
+
+            if (!$user)
+                throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
         }
 
         $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
 
-        if (!$person) {
-            $this->session->getFlashBag()->add('error', 'adhérent inconnu.');
-            return $this->redirect($this->generateUrl('user_register_list'));
-        } else {
-            return $person;
+        if (!$user->hasRole('ROLE_ADMIN')) {
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $this->session->get('slug')]);
+            $membership = $this->em->getRepository('PigassUserBundle:Membership')->findOneBy(['person' => $person->getId(), 'structure' => $structure->getId()]);
+            if (!$membership)
+                throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
         }
+        return $person;
     }
 }

@@ -30,7 +30,7 @@
     <ul class="entities receipts list-group panel panel-default">
         {% for receipt in receipts %}
             <li class="entity receipt list-group-item row">
-                {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STRUCTURE') %}
                     <span class="btn-group pull-right">
                         <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                         <ul class="dropdown-menu">

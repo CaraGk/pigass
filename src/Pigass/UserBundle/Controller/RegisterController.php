@@ -1045,22 +1045,25 @@ class RegisterController extends Controller
     private function testAdminTakeOver($user, $user_id = null)
     {
         if (($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) and $user_id != null) {
-            $user = $this->um->findUserBy(array(
+            $user_took_over = $this->um->findUserBy(array(
                 'id' => $user_id,
             ));
 
-            if (!$user)
+            if (!$user_took_over)
                 throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
+
+            $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user_took_over->getUsername());
+
+            if (!$user->hasRole('ROLE_ADMIN')) {
+                $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $this->session->get('slug')]);
+                $membership = $this->em->getRepository('PigassUserBundle:Membership')->findOneBy(['person' => $person->getId(), 'structure' => $structure->getId()]);
+                if (!$membership)
+                    throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
+            }
+        } else {
+            $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
         }
 
-        $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
-
-        if (!$user->hasRole('ROLE_ADMIN')) {
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $this->session->get('slug')]);
-            $membership = $this->em->getRepository('PigassUserBundle:Membership')->findOneBy(['person' => $person->getId(), 'structure' => $structure->getId()]);
-            if (!$membership)
-                throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
-        }
         return $person;
     }
 }

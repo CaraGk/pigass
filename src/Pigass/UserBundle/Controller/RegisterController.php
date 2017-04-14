@@ -445,6 +445,7 @@ class RegisterController extends Controller
                         $payed_on = new \DateTime('now');
                     }
                     $expire = new \DateTime($this->pm->findParamByName('reg_' . $slug . '_date')->getValue());
+                    $expire->modify('- 1 day');
                     $payed_on->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
                     while ($expire <= $payed_on) {
                         $expire->modify($this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue());

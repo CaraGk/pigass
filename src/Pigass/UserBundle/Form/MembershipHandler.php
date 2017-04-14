@@ -54,6 +54,7 @@ class MembershipHandler
     public function onSuccess(Membership $membership)
     {
         $expire = new \DateTime($this->options['date']);
+        $expire->modify('- 1 day');
         $now = new \DateTime('now');
         $now->modify($this->options['anticipated']);
         while ($expire <= $now) {

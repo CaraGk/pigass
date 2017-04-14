@@ -56,6 +56,7 @@ class JoinHandler
     public function onSuccess(Membership $membership)
     {
         $expire = new \DateTime($this->date);
+        $expire->modify('- 1 day');
         $now = new \DateTime('now');
         $now->modify($this->anticipated);
         while ($expire <= $now) {

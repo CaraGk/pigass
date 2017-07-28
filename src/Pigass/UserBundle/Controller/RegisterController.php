@@ -765,7 +765,9 @@ class RegisterController extends Controller
         $infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($membership->getPerson(), $membership);
         if (count($questions) > count($infos)) {
             $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
-        }
+        } else { 
+		$form = null;
+	}
 
         $html = $this->renderView(
             'PigassUserBundle:Register:printPDF.html.twig',

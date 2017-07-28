@@ -47,7 +47,7 @@ class FeeController extends Controller
     /**
      * List the fees for fee
      *
-     * @Route("/{slug}/fees", name="core_fee_index", requirements={"slug" = "\w+"})
+     * @Route("/{slug}/fee", name="core_fee_index", requirements={"slug" = "\w+"})
      * @Security\Secure(roles="ROLE_STRUCTURE, ROLE_ADMIN")
      * @Template()
      */

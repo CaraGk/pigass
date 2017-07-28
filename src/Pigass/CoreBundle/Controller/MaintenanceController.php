@@ -19,6 +19,7 @@ use Doctrine\DBAL\Migrations\Migration,
 use JMS\DiExtraBundle\Annotation as DI,
     JMS\SecurityExtraBundle\Annotation as Security;
 use Pigass\ParameterBundle\Entity\Parameter;
+use Pigass\CoreBundle\Entity\Fee;
 
 /**
  * Maintenance controller.
@@ -53,7 +54,7 @@ class MaintenanceController extends Controller
             $this->session->getFlashBag()->add('notice', 'Toutes les mises à jour de la base de donnée ont déjà été effectuées.');
         }
 
-        return $this->redirect($this->generateUrl('core_structure_index'));
+        return $this->redirect($this->generateUrl('core_maintenance_correct_db_parameters'));
     }
 
     private function hasToMigrate($conn)
@@ -113,8 +114,37 @@ class MaintenanceController extends Controller
         }
 
         $this->em->flush();
-        $this->session->getFlashBag()->add('notice', $count . ' paramètres ajoutés pour ' . count($structures) . ' structures en base de données.');
-        return $this->redirect($this->generateUrl('core_structure_index'));
+        if ($count)
+            $this->session->getFlashBag()->add('notice', $count . ' paramètres ajoutés pour ' . count($structures) . ' structures en base de données.');
+        return $this->redirect($this->generateUrl('core_maintenance_correct_db_fees'));
     }
 
+    /**
+     * Correct missing fee from old parameters
+     *
+     * @Route("/db/fees", name="core_maintenance_correct_db_fees")
+     */
+    public function correctDBFeesAction()
+    {
+        $structures = $this->em->getRepository('PigassCoreBundle:Structure')->findAll();
+        $count = 0;
+
+        foreach ($structures as $structure) {
+            $fees = $this->em->getRepository('PigassCoreBundle:Fee')->getForStructure($structure);
+            if (!$fees) {
+                $slug = $structure->getSlug();
+                $fee = new Fee();
+                $fee->setAmount($this->pm->findParamByName('reg_' . $slug . '_payment')->getValue()*100);
+                $fee->setTitle("Normal");
+                $fee->setStructure($structure);
+                $this->em->persist($fee);
+                $count++;
+            }
+        }
+
+        $this->em->flush();
+        if ($count)
+            $this->session->getFlashBag()->add('notice', $count . ' tarifs ajoutés pour ' . count($structures) . ' structures en base de données.');
+        return $this->redirect($this->generateUrl('core_structure_index'));
+    }
 }

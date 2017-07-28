@@ -25,12 +25,11 @@ class JoinHandler
 {
     private $form, $request, $em, $um, $payment, $person, $structure;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, $payment, Person $person, Structure $structure, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year", $reg_anticipated = "+ 0 day")
+    public function __construct(Form $form, Request $request, EntityManager $em, Person $person, Structure $structure, $reg_date = "2015-09-01", $reg_periodicity = "+ 1 year", $reg_anticipated = "+ 0 day")
     {
       $this->form        = $form;
       $this->request     = $request;
       $this->em          = $em;
-      $this->payment     = $payment;
       $this->person      = $person;
       $this->date        = $reg_date;
       $this->periodicity = $reg_periodicity;

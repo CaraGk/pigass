@@ -3,9 +3,9 @@ Votre adhésion à {{ membership.structure.name }} a été enregistrée.
 L'adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d-m-Y') }} a été enregistrée.
 
 {% if membership.status == 'paid' or membership.status == 'validated' %}
-    Le paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € par {% if membership.method.label is not null %}{{ membership.method.label|lower }}{% else %}{{ membership.method.description }}{% endif %} a été bien reçu.
+    Le paiement de {{ membership.amount/100|number_format(2,',',' ') }} € par {% if membership.method.label is not null %}{{ membership.method.label|lower }}{% else %}{{ membership.method.description }}{% endif %} a été bien reçu.
 {% else %}
-    Une fois votre paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € reçu, votre adhésion pourra être validée.
+    Une fois votre paiement de {{ membership.amount/100|number_format(2,',',' ') }} € reçu, votre adhésion pourra être validée.
 {% endif %}
 
 {% if kparam('reg_' ~ membership.structure.slug ~ '_print') %}

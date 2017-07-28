@@ -24,7 +24,8 @@ use Pigass\UserBundle\Entity\Membership,
     Pigass\UserBundle\Entity\MemberQuestion,
     Pigass\UserBundle\Entity\MemberInfo,
     Pigass\UserBundle\Entity\User,
-    Pigass\UserBundle\Entity\Person;
+    Pigass\UserBundle\Entity\Person,
+    Pigass\CoreBundle\Entity\Fee;
 use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\FilterHandler,
     Pigass\UserBundle\Form\RegisterType,
@@ -689,9 +690,19 @@ class RegisterController extends Controller
      */
     public function joinAction(Request $request, $slug)
     {
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+
+        $fees = $this->em->getRepository('PigassCoreBundle:Fee')->getForStructure($structure);
+        if (!$fees) {
+            $amount = $this->pm->findParamByName('reg_' .$slug . '_payment')->getValue();
+            $fee = new Fee();
+            $fee->setAmount($amount*100);
+            $fee->setStructure($structure);
+            $fee->setTitle("Normal");
+            $fees = array($fee);
+        }
 
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') and !$this->session->get('user_register_tmp'))
             return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
@@ -718,7 +729,7 @@ class RegisterController extends Controller
         }
 
         $membership = new Membership();
-        $form = $this->createForm(JoinType::class, $membership, array('structure' => $structure));
+        $form = $this->createForm(JoinType::class, $membership, array('structure' => $structure, 'fees' => $fees));
         $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(), $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(), $reg_anticipated);
 
         if($form_handler->process()) {

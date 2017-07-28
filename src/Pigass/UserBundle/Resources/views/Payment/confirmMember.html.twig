@@ -3,7 +3,7 @@
     <div class="panel-body">
         <p>L'adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d-m-Y') }} a été enregistrée.</p>
         {% if membership.status == 'paid' or membership.status == 'validated' %}
-            <p>Le paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € par {{ membership.method.readableName }} a été bien reçu.</p>
+        <p>Le paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € par {% if membership.method.label is not null %}{{ membership.method.label|lower }}{% else %}{{ membership.method.description }}{% endif %} a été bien reçu.</p>
         {% else %}
             <p>Une fois votre paiement de {{ kparam('reg_' ~ membership.structure.slug ~ '_payment') }} € reçu, votre adhésion pourra être validée.</p>
         {% endif %}

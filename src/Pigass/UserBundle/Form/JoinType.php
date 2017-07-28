@@ -14,6 +14,7 @@ namespace Pigass\UserBundle\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityRepository;
 
@@ -22,25 +23,35 @@ use Doctrine\ORM\EntityRepository;
  */
 class JoinType extends AbstractType
 {
-    private $structure;
+    private $structure, $fees;
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->structure = $options['structure'];
+        $this->fees = $options['fees'];
 
         $builder
+            ->add('amount', ChoiceType::class, array(
+                'label'        => 'Montant',
+                'choices'      => $this->fees,
+                'choice_label' => function ($fee) {
+                    return $fee;
+                },
+                'expanded'     => true,
+                'multiple'     => false,
+              ))
             ->add('method', EntityType::class, array(
-                'class'        => 'PigassUserBundle:Gateway',
-                'choice_label' => 'label',
+                'class'         => 'PigassUserBundle:Gateway',
+                'choice_label'  => 'label',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.structure = :structure_id')
                         ->setParameter('structure_id', $this->structure->getId());
                 },
-                'required'     => true,
-                'multiple'     => false,
-                'expanded'     => true,
-                'label'        => 'Moyen de paiement'
+                'required'      => true,
+                'multiple'      => false,
+                'expanded'      => true,
+                'label'         => 'Moyen de paiement'
             ))
             ->add('Save', SubmitType::class, array(
                 'label' => 'Payer',
@@ -61,6 +72,7 @@ class JoinType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Pigass\UserBundle\Entity\Membership',
             'structure'  => null,
+            'fees'       => null,
         ));
     }
 }

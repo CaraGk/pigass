@@ -40,7 +40,7 @@ class Membership
     /**
      * @var integer
      *
-     * @ORM\Column(name="amount", type="decimal", precision=5, scale=2)
+     * @ORM\Column(name="amount", type="smallint")
      */
     private $amount;
 
@@ -142,11 +142,15 @@ class Membership
     /**
      * Get amount
      *
+     * @param boolean $humanReadable
      * @return integer
      */
-    public function getAmount()
+    public function getAmount($humanReadable = false)
     {
-        return $this->amount;
+        if ($humanReadable)
+            return number_format($this->amount / 100, 2,',',' ') . ' €';
+        else
+            return $this->amount;
     }
 
     /**

@@ -136,6 +136,13 @@ class Structure
      */
     private $receipts;
 
+    /**
+     * @ORM\OneToMany(targetEntity="\Pigass\CoreBundle\Entity\Fee", mappedBy="structure")
+     *
+     * @var EntityCollection $fees
+     */
+    private $fees;
+
     public function __construct()
     {
     }
@@ -488,6 +495,40 @@ class Structure
     public function getReceipts()
     {
         return $this->receipts;
+    }
+
+    /**
+     * Add fee
+     *
+     * @param \Pigass\CoreBundle\Entity\Fee $fee
+     *
+     * @return Structure
+     */
+    public function addFee(\Pigass\CoreBundle\Entity\Fee $fee)
+    {
+        $this->fees[] = $fee;
+
+        return $this;
+    }
+
+    /**
+     * Remove fee
+     *
+     * @param \Pigass\CoreBundle\Entity\Fee $fee
+     */
+    public function removeFee(\Pigass\CoreBundle\Entity\Fee $fee)
+    {
+        $this->fees->removeElement($fee);
+    }
+
+    /**
+     * Get fees
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFees()
+    {
+        return $this->fees;
     }
 
     /**

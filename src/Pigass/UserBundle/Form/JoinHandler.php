@@ -63,7 +63,7 @@ class JoinHandler
             $expire->modify($this->periodicity);
         }
 
-        $membership->setAmount($this->payment);
+        $membership->setAmount($membership->getAmount()->getAmount());
         $membership->setExpiredOn($expire);
         $membership->setPerson($this->person);
         $membership->setStructure($this->structure);

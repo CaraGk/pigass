@@ -58,11 +58,17 @@ class PaymentController extends Controller
 
         $storage = $this->get('payum')->getStorage('Pigass\UserBundle\Entity\Payment');
 
+        $gateway_object = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(['gatewayName' => $gateway]);
+        if ($membership->getAmount() <= 0 and $gateway_object->getFactoryName() != "offline") {
+            $gateways = $this->em->getRepository('PigassUserBundle:Gateway')->findBy(['structure' => $gateway_object->getStructure(), 'factoryName' => 'offline']);
+            $gateway = $gateways[0]->getGatewayName();
+        }
+
         $payment = $storage->create();
 
         $payment->setNumber(uniqid());
         $payment->setCurrencyCode('EUR');
-        $payment->setTotalAmount($this->pm->findParamByName('reg_' . $slug . '_payment')->getValue() * 100);
+        $payment->setTotalAmount($membership->getAmount());
         $payment->setDescription('Adhésion de ' . $user->getEmail() . ' via ' . $gateway);
         $payment->setClientId($membership->getId());
         $payment->setClientEmail($user->getEmail());
@@ -101,6 +107,7 @@ class PaymentController extends Controller
             $toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print')->getValue();
             $details = $payment->getDetails();
 
+            $address = '';
             if ($method->getFactoryName() == 'offline') {
                 $config = $method->getConfig();
                 if (isset($config['address'])) {
@@ -113,7 +120,7 @@ class PaymentController extends Controller
                 }
 
                 $this->addFlash('warning', 'L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
-                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount() . ' euros est à libeller à l\'ordre de ' . (isset($config['payableTo'])?$config['payableTo']:'non défini') . ' et à retourner à l\'adresse ' . $address . '.');
+                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount(true) . ' est à libeller à l\'ordre de ' . (isset($config['payableTo'])?$config['payableTo']:'non défini') . ' et à retourner à l\'adresse ' . $address . '.');
                 if (isset($config['iban'])) {
                     $this->addFlash('notice', 'Pour un paiement par virement bancaire : l\'IBAN du compte est ' . $config['iban'] . '. N\'oubliez pas de préciser « Adhésion ' . $membership->getPerson()->getSurname() . ' ' . $membership->getPerson()->getName() . ' » en commentaire.');
                 } else {
@@ -125,7 +132,7 @@ class PaymentController extends Controller
             } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
                 if ($details['ACK'] == 'Success') {
                     $membership->setPayedOn(new \DateTime('now'));
-                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a réussi. L\'adhésion est validée.');
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a réussi. L\'adhésion est validée.');
                     if ($toPrintParam) {
                         $membership->setStatus('paid');
                         $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
@@ -133,9 +140,9 @@ class PaymentController extends Controller
                         $membership->setStatus('validated');
                     }
                 } elseif ($details['ACK'] == 'Pending') {
-                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express est en attente d\'une confirmation. L\'adhésion sera validée dès la confirmation reçue.');
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express est en attente d\'une confirmation. L\'adhésion sera validée dès la confirmation reçue.');
                 } else {
-                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount() . ' euros par Paypal Express a échoué. Veuillez contacter l\'administrateur du site.');
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a échoué. Veuillez contacter l\'administrateur du site.');
                 }
 
                 $membership->setPayment($payment);

@@ -16,6 +16,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
     Symfony\Component\Form\Extension\Core\Type\MoneyType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
     Symfony\Component\Form\Extension\Core\Type\TextareaType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityRepository;
@@ -42,6 +43,10 @@ class FeeType extends AbstractType
             ))
             ->add('help', TextareaType::class, array(
                 'label' => 'Description',
+            ))
+            ->add('default', CheckboxType::class, array(
+                'label' => 'Montant par défaut',
+                'required' => false,
             ))
             ->add('Enregistrer', SubmitType::class)
         ;

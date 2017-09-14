@@ -30,8 +30,6 @@ use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\FilterHandler,
     Pigass\UserBundle\Form\RegisterType,
     Pigass\UserBundle\Form\RegisterHandler,
-    Pigass\UserBundle\Form\JoinType,
-    Pigass\UserBundle\Form\JoinHandler,
     Pigass\UserBundle\Form\QuestionType,
     Pigass\UserBundle\Form\QuestionHandler,
     Pigass\UserBundle\Form\MemberQuestionType,
@@ -694,16 +692,6 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $fees = $this->em->getRepository('PigassCoreBundle:Fee')->getForStructure($structure);
-        if (!$fees) {
-            $amount = $this->pm->findParamByName('reg_' .$slug . '_payment')->getValue();
-            $fee = new Fee();
-            $fee->setAmount($amount*100);
-            $fee->setStructure($structure);
-            $fee->setTitle("Normal");
-            $fees = array($fee);
-        }
-
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') and !$this->session->get('user_register_tmp'))
             return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
 
@@ -729,8 +717,14 @@ class RegisterController extends Controller
         }
 
         $membership = new Membership();
-        $form = $this->createForm(JoinType::class, $membership, array('structure' => $structure, 'fees' => $fees));
-        $form_handler = new JoinHandler($form, $request, $this->em, $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(), $person, $structure, $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(), $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(), $reg_anticipated);
+        $options = array(
+            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
+            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
+            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
+            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
+        );
+        $form = $this->createForm(MembershipType::class, $membership, array('structure' => $structure));
+        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, $person);
 
         if($form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
@@ -765,7 +759,7 @@ class RegisterController extends Controller
         $infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($membership->getPerson(), $membership);
         if (count($questions) > count($infos)) {
             $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
-        } else { 
+        } else {
 		$form = null;
 	}
 
@@ -977,6 +971,56 @@ class RegisterController extends Controller
     }
 
     /**
+     * Edit membership's payment
+     *
+     * @Route("/member/{id}/edit", name="user_register_edit", requirements={"id" = "\d+"})
+     * @Template("PigassUserBundle:Register:join.html.twig")
+     * @Security\Secure(roles="ROLE_STRUCTURE")
+     */
+    public function editMembershipAction(Membership $membership, Request $request)
+    {
+        if (!$membership) {
+            $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
+            return $this->redirect($this->generateUrl('user_register_list'));
+        }
+
+        $user = $this->getUser();
+        $userid = $request->query->get('userid');
+        $person = $this->testAdminTakeOver($user, $userid);
+        $structure = $membership->getStructure();
+        $slug = $structure->getSlug();
+
+        $options = array(
+            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
+            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
+            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
+            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
+        );
+        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => false]);
+        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options);
+
+        if($form_handler->process()) {
+            $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $membership->getPerson() . '.');
+
+            $filter = $this->session->get('user_register_filter', array());
+            $filter['user'] = $membership->getPerson()->getUser()->getId();
+            $this->session->set('user_register_filter', $filter);
+            $this->session->set('user_register_register', true);
+
+            return $this->redirect($this->generateUrl('user_register_list', [
+                'gateway' => $membership->getMethod()->getGatewayName(),
+                'memberid' => $membership->getId(),
+            ]));
+        }
+
+        return array(
+            'form'      => $form->createView(),
+            'structure' => $structure,
+            'person'    => $person,
+        );
+    }
+
+    /**
      * Show MemberInfo action
      *
      * @Route("/member/{id}/infos/", name="user_register_infos", requirements={"id" = "\d+"})
@@ -1006,7 +1050,7 @@ class RegisterController extends Controller
     /**
      * Add membership and person
      *
-     * @Route("/{slug}/new", name="user_register_membership_new")
+     * @Route("/{slug}/member/new", name="user_register_membership_new")
      * @Template("PigassUserBundle:Register:join.html.twig")
      * @Security\Secure(roles="ROLE_ADMIN, ROLE_STRUCTURE")
      */
@@ -1028,7 +1072,7 @@ class RegisterController extends Controller
             'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
             'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
         );
-        $form = $this->createForm(MembershipType::class, $membership, array('structure' => $structure));
+        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true]);
         $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options);
 
         if($form_handler->process()) {

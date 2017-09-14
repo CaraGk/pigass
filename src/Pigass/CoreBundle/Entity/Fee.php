@@ -64,6 +64,13 @@ class Fee
      */
     private $help;
 
+    /**
+     * @ORM\Column(name="is_default", type="boolean")
+     *
+     * @var boolean $default
+     */
+    private $default;
+
     public function __toString()
     {
         return $this->title . ' - ' . number_format($this->amount / 100, 2,',',' ') . ' €';
@@ -178,5 +185,29 @@ class Fee
     public function getStructure()
     {
         return $this->structure;
+    }
+
+    /**
+     * Set default
+     *
+     * @param boolean $default
+     *
+     * @return Fee
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
+
+        return $this;
+    }
+
+    /**
+     * Is default
+     *
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->default;
     }
 }

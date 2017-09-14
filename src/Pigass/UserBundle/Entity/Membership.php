@@ -45,6 +45,12 @@ class Membership
     private $amount;
 
     /**
+     * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Fee")
+     * @ORM\JoinColumn(name="fee_id", referencedColumnName="id")
+     */
+    private $fee;
+
+    /**
      * @var string
      *
      * @ORM\ManyToOne(targetEntity="Gateway", cascade={"persist"})
@@ -318,5 +324,29 @@ class Membership
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * Set fee
+     *
+     * @param \Pigass\CoreBundle\Entity\Fee $fee
+     *
+     * @return Membership
+     */
+    public function setFee(\Pigass\CoreBundle\Entity\Fee $fee = null)
+    {
+        $this->fee = $fee;
+
+        return $this;
+    }
+
+    /**
+     * Get fee
+     *
+     * @return \Pigass\CoreBundle\Entity\Fee
+     */
+    public function getFee()
+    {
+        return $this->fee;
     }
 }

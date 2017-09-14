@@ -97,6 +97,13 @@
                                 {{ icon('piggy-bank') }} Reçu fiscal
                             </a>
                         </li>
+                        {% if is_granted('ROLE_STRUCTURE') %}
+                            <li>
+                                <a href="{{ path('user_register_edit', {'id': membership.id, 'userid': userid, 'slug': slug}) }}" title="Modifier l'adhésion">
+                                    {{ icon('pencil') }} Modifier
+                                </a>
+                            </li>
+                        {% endif %}
                         {% if membership.status == 'registered' or membership.payedOn is null %}
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li>

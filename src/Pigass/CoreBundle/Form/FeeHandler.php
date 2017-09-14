@@ -50,6 +50,13 @@ class FeeHandler
     public function onSuccess(Fee $fee)
     {
         $fee->setStructure($this->structure);
+        if ($fee->isDefault()) {
+            $other_fees = $this->em->getRepository('PigassCoreBundle:Fee')->findBy(['default' => true, 'structure' => $this->structure]);
+            foreach ($other_fees as $other_fee) {
+                $other_fee->setDefault(false);
+                $this->em->persist($other_fee);
+            }
+        }
         $this->em->persist($fee);
         $this->em->flush();
     }

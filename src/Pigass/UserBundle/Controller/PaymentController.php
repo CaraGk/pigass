@@ -97,7 +97,7 @@ class PaymentController extends Controller
         $gateway->execute($status = new GetHumanStatus($token));
         $payment = $status->getFirstModel();
 
-        if ($status->isCaptured()) {
+        if ($status->getValue() == "captured" OR $status->getValue() == "pending") {
             if ($this->session->get('user_register_tmp'))
                 $this->session->remove('user_register_tmp');
 
@@ -131,22 +131,38 @@ class PaymentController extends Controller
                 }
             } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
                 if ($details['ACK'] == 'Success') {
-                    $membership->setPayedOn(new \DateTime('now'));
-                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a réussi. L\'adhésion est validée.');
+                    if ($status->getValue() == "pending") {
+                        $this->addFlash('warning', 'L\'adhésion ne pourra être validée qu\'une fois le paiement reçu par Paypal et validé par un administrateur.');
+                    } else {
+                        $membership->setPayedOn(new \DateTime('now'));
+                        $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a réussi. L\'adhésion est validée.');
+                    }
+
+                    $fee = $this->em->getRepository('PigassCoreBundle:Fee')->findOneBy(['amount' => $membership->getAmount(), 'structure' => $membership->getStructure()]);
                     if ($toPrintParam) {
-                        $membership->setStatus('paid');
+                        if (!$fee->isDefault()) {
+                            $membership->setStatus('registered');
+                            $this->addFlash('warning', 'Rappel : pour que votre adhésion à tarif réduit soit validée, il faut que vous transmettiez les pièces justificatives de votre statut à ' . $structure->getEmail() . '.');
+                        } else {
+                            $membership->setStatus('paid');
+                        }
                         $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
                     } else {
-                        $membership->setStatus('validated');
+                        if (!$fee->isDefault()) {
+                            $membership->setStatus('registered');
+                            $this->addFlash('warning', 'Rappel : pour que votre adhésion à tarif réduit soit validée, il faut que vous transmettiez les pièces justificatives de votre statut à ' . $structure->getEmail() . '.');
+                        } else {
+                            $membership->setStatus('validated');
+                        }
                     }
                 } elseif ($details['ACK'] == 'Pending') {
                     $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express est en attente d\'une confirmation. L\'adhésion sera validée dès la confirmation reçue.');
                 } else {
-                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a échoué. Veuillez contacter l\'administrateur du site.');
+                    $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a échoué. Veuillez contacter l\'administrateur du site. ('.$details['ACK'].')');
                 }
 
-                $membership->setPayment($payment);
             }
+            $membership->setPayment($payment);
             $membership->setMethod($method);
 
             $this->em->persist($membership);

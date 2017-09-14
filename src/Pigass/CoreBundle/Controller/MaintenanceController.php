@@ -145,6 +145,31 @@ class MaintenanceController extends Controller
         $this->em->flush();
         if ($count)
             $this->session->getFlashBag()->add('notice', $count . ' tarifs ajoutés pour ' . count($structures) . ' structures en base de données.');
+        return $this->redirect($this->generateUrl('core_maintenance_correct_db_amounts'));
+    }
+
+    /**
+     * Correct missing fee_id for memberships with amounts
+     *
+     * @Route("/db/amount", name="core_maintenance_correct_db_amounts")
+     */
+    public function correctDBAmountsAction()
+    {
+        $fees = $this->em->getRepository('PigassCoreBundle:Fee')->getAllWithStructure();
+        foreach ($fees as $fee) {
+            $fees_table[$fee->getStructure()->getId()] = [$fee->getAmount() => $fee];
+        }
+
+        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getAll();
+        foreach ($memberships as $membership) {
+            if (isset($fees_table[$membership->getStructure()->getId()][$membership->getAmount()])) {
+                $membership->setFee($fees_table[$membership->getStructure()->getId()][$membership->getAmount()]);
+var_dump($membership->getAmount());
+                $this->em->persist($membership);
+            }
+        }
+        $this->em->flush();
+
         return $this->redirect($this->generateUrl('core_structure_index'));
     }
 }

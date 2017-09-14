@@ -23,10 +23,12 @@ class FeeRepository extends EntityRepository
     {
         return $this->createQueryBuilder('f')
             ->orderBy('f.amount', 'desc')
+            ->join('f.structure', 's')
+            ->addSelect('s')
         ;
     }
 
-    private function getForStructureQuery(Structure $structure)
+    public function getForStructureQuery(Structure $structure)
     {
         $query = $this->getBaseQuery();
 
@@ -38,6 +40,14 @@ class FeeRepository extends EntityRepository
     public function getForStructure(Structure $structure)
     {
         return $this->getForStructureQuery($structure)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getAllWithStructure()
+    {
+        return $this->getBaseQuery()
             ->getQuery()
             ->getResult()
         ;

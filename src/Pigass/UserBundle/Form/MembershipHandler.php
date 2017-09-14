@@ -24,9 +24,9 @@ use Pigass\UserBundle\Entity\Membership,
  */
 class MembershipHandler
 {
-    private $form, $request, $em, $um, $options, $structure;
+    private $form, $request, $em, $um, $options, $structure, $person;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um, Structure $structure, $options = array('payment' => '60', 'date' => "2015-09-01", 'periodicity' => "+ 1 year", 'anticipated' => "+ 0 day"))
+    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um, Structure $structure, $options = ['payment' => '60', 'date' => "2015-09-01", 'periodicity' => "+ 1 year", 'anticipated' => "+ 0 day"], $person = null)
     {
       $this->form        = $form;
       $this->request     = $request;
@@ -34,6 +34,7 @@ class MembershipHandler
       $this->um          = $um;
       $this->options     = $options;
       $this->structure   = $structure;
+      $this->person      = $person;
     }
 
     public function process()
@@ -61,13 +62,17 @@ class MembershipHandler
             $expire->modify($this->options['periodicity']);
         }
 
-        $membership->setAmount($this->options['payment']);
+        $membership->setAmount($membership->getFee()->getAmount());
         $membership->setExpiredOn($expire);
         $membership->setStructure($this->structure);
         $membership->setStatus('registered');
 
-        $this->updateUser($membership->getPerson()->getUser());
-        $membership->getPerson()->setAnonymous(false);
+        if ($this->person) {
+            $membership->setPerson($this->person);
+        } else {
+            $this->updateUser($membership->getPerson()->getUser());
+            $membership->getPerson()->setAnonymous(false);
+        }
 
         $this->em->persist($membership);
         $this->em->flush();

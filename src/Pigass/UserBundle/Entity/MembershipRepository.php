@@ -133,4 +133,16 @@ class MembershipRepository extends EntityRepository
                      ->getArrayResult()
         ;
     }
+
+    public function getAll()
+    {
+        $query = $this->createQueryBuilder('m')
+            ->join('m.structure', 's')
+            ->addSelect('s')
+        ;
+
+        return $query->getQuery()
+            ->getResult()
+        ;
+    }
 }

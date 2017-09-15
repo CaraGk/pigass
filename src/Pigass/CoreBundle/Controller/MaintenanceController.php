@@ -137,6 +137,7 @@ class MaintenanceController extends Controller
                 $fee->setAmount($this->pm->findParamByName('reg_' . $slug . '_payment')->getValue()*100);
                 $fee->setTitle("Normal");
                 $fee->setStructure($structure);
+                $fee->setDefault(true);
                 $this->em->persist($fee);
                 $count++;
             }

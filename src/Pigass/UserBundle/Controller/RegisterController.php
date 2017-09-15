@@ -935,14 +935,14 @@ class RegisterController extends Controller
         $register = $this->session->get('user_register_register', false);
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
-        $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+        $last_membership = $this->em->getRepository('PigassUserBundle:Membership')->getLastForPerson($person);
         $reJoinable = false;
 
-        if (($userid == null or $register == true) and $current_membership) {
+        if (($userid == null or $register == true) and $last_membership) {
             $structure = $current_membership->getStructure();
             $slug = $structure->getSlug();
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
-            $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $current_membership);
+            $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $last_membership);
             if (count($member_infos) < count($questions)) {
                 return $this->redirect($this->generateUrl('user_register_question'));
             } elseif ($register) {
@@ -950,12 +950,12 @@ class RegisterController extends Controller
             }
             $now = new \DateTime('now');
             $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
-            if ($current_membership->getExpiredOn() <= $now) {
+            if ($last_membership->getExpiredOn() <= $now) {
                 $reJoinable = true;
             }
         } else {
             $slug = $request->get('slug', null);
-            if (!$current_membership)
+            if (!$last_membership)
                 $reJoinable = true;
         }
 

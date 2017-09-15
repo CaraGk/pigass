@@ -164,7 +164,6 @@ class MaintenanceController extends Controller
         foreach ($memberships as $membership) {
             if (isset($fees_table[$membership->getStructure()->getId()][$membership->getAmount()])) {
                 $membership->setFee($fees_table[$membership->getStructure()->getId()][$membership->getAmount()]);
-var_dump($membership->getAmount());
                 $this->em->persist($membership);
             }
         }

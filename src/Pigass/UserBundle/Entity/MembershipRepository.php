@@ -19,15 +19,12 @@ use Pigass\UserBundle\Entity\Person;
  */
 class MembershipRepository extends EntityRepository
 {
-    public function getLastByUsername($username)
+    public function getLastForPerson(Person $person)
     {
         $query = $this->createQueryBuilder('m');
-        $query->join('m.person', 's')
-            ->join('s.user', 'u')
-            ->addSelect('s')
-            ->addSelect('u')
-            ->where('u.username = :username')
-            ->setParameter('username', $username)
+        $query->join('m.person', 'p')
+            ->where('p.id = :person')
+            ->setParameter(':person', $person->getId())
             ->orderBy('m.id', 'desc')
             ->setMaxResults(1)
         ;

@@ -92,17 +92,20 @@
                                 {{ icon('question-sign') }} Questions complémentaires
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ path('core_receipt_build', {'id': membership.id}) }}" title="Télécharger le reçu fiscal">
-                                {{ icon('piggy-bank') }} Reçu fiscal
-                            </a>
-                        </li>
-                        {% if is_granted('ROLE_STRUCTURE') %}
+                        {% if membership.status == 'validated' %}
                             <li>
-                                <a href="{{ path('user_register_edit', {'id': membership.id, 'userid': userid, 'slug': slug}) }}" title="Modifier l'adhésion">
-                                    {{ icon('pencil') }} Modifier
+                                <a href="{{ path('core_receipt_build', {'id': membership.id}) }}" title="Télécharger le reçu fiscal">
+                                    {{ icon('piggy-bank') }} Reçu fiscal
                                 </a>
                             </li>
+                        {% else %}
+                            {% if is_granted('ROLE_STRUCTURE') %}
+                                <li>
+                                    <a href="{{ path('user_register_edit', {'id': membership.id, 'userid': userid, 'slug': slug}) }}" title="Modifier l'adhésion">
+                                        {{ icon('pencil') }} Modifier
+                                    </a>
+                                </li>
+                            {% endif %}
                         {% endif %}
                         {% if membership.status == 'registered' or membership.payedOn is null %}
                             {% if is_granted('ROLE_ADMIN') %}

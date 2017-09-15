@@ -984,6 +984,10 @@ class RegisterController extends Controller
             return $this->redirect($this->generateUrl('user_register_list'));
         }
 
+        if ($membership->getStatus() == "validated") {
+                throw $this->createNotFoundException('L\'adhésion a déjà été validée. Vous ne pouvez plus la modifier.');
+        }
+
         $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);

@@ -939,7 +939,7 @@ class RegisterController extends Controller
         $reJoinable = false;
 
         if (($userid == null or $register == true) and $last_membership) {
-            $structure = $current_membership->getStructure();
+            $structure = $last_membership->getStructure();
             $slug = $structure->getSlug();
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
             $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $last_membership);

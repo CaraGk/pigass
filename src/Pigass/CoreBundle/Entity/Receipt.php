@@ -66,7 +66,7 @@ class Receipt
     private $position;
 
     /**
-     * @Vich\UploadableField(mapping="receipt_sign", fieldNameProperty="imageName")
+     * @Vich\UploadableField(mapping="receipt_sign", fileNameProperty="imageName")
      *
      * @var File $image
      */

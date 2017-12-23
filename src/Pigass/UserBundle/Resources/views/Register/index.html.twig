@@ -117,7 +117,11 @@
                     <span stype="color:red;" title="Adhésion incomplète : manque la fiche signée">{{ icon('list-alt') }}</span>
                 {% endif %}
                 {% if membership.expiredOn|date('Ymd') < "now"|date_modify(kparam('reg_'~slug~'_anticipated'))|date('Ymd') %}
-                    <span style="color:orange;" title="Fin de période d'adhésion proche">{{ icon('hourglass') }}</span>
+                    <span style="color:orange;" title="Fin de période d'adhésion proche">
+                        <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Fin de la période d'adhésion proche" style="color:orange; text-decoration:none;">
+                        {{ icon('hourglass') }}
+                        </a>
+                    </span>
                 {% endif %}
                 {{ membership.person }}
             </div>

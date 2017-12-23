@@ -57,9 +57,13 @@ class StructureController extends Controller
             } elseif ($user->hasRole('ROLE_STRUCTURE')) {
                 $person = $this->em->getRepository('PigassUserBundle:Person')->getByUsername($user->getUsername());
                 $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
-                $slug = $membership->getStructure()->getSlug();
-                $this->session->set('slug', $slug);
-                return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+                if (!$membership) {
+                    return $this->redirect($this->generateUrl('core_structure_map'));
+                } else {
+                    $slug = $membership->getStructure()->getSlug();
+                    $this->session->set('slug', $slug);
+                    return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+                }
             }
 
             if ($user->hasRole('ROLE_ADMIN')) {

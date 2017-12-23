@@ -43,6 +43,25 @@
             </a>
         </li>
     {% endif %}
+    {% if filters['ending'] is null %}
+        <li class="btn btn-default">
+            <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion se terminant bientôt">
+                Péromption prochaine ?
+            </a>
+        </li>
+    {% elseif filters['ending'] == true %}
+        <li class="btn btn-success">
+            <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
+                Adhésion arrivant à terme
+            </a>
+        </li>
+    {% elseif filters['ending'] == false %}
+        <li class="btn btn-danger">
+            <a href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
+                Adhésion n'arrivant pas à terme
+            </a>
+        </li>
+    {% endif %}
     {% for question in questions %}
         <li class="btn btn-sm btn-default">
             <div class="title">{{ question.name }}</div>

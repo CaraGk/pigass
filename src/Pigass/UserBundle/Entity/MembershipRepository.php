@@ -53,7 +53,7 @@ class MembershipRepository extends EntityRepository
         ;
     }
 
-    public function getCurrentByStructure($slug, $filter = null)
+    public function getCurrentByStructure($slug, $filter = null, $anticipated = null)
     {
         $query = $this->createQueryBuilder('m')
             ->join('m.person', 's')
@@ -73,6 +73,18 @@ class MembershipRepository extends EntityRepository
                 $query->andWhere('m.payedOn is not NULL');
             elseif ($filter['valid'] != null)
                 $query->andWhere('m.payedOn is NULL');
+        }
+
+        if (isset($filter['ending']) and $anticipated) {
+            if ($filter['ending'] == true) {
+                $query->andWhere('m.expiredOn < :anticipated')
+                    ->setParameter('anticipated', $anticipated)
+                ;
+            } elseif($filter['ending'] == false) {
+                $query->andWhere('m.expiredOn > :anticipated')
+                    ->setParameter('anticipated', $anticipated)
+                ;
+            }
         }
 
         if (isset($filter['questions']) and $filter['questions']) {

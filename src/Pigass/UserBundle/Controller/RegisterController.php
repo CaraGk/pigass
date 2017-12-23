@@ -82,22 +82,24 @@ class RegisterController extends Controller
 
         $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
+            'ending'    => null,
             'questions' => null,
         ));
 
-        if (!isset($filters['valid'])) {
+        if (!isset($filters['valid']))
             $filters['valid'] = null;
-        }
-
-        if (!isset($filters['questions'])) {
+        if (!isset($filters['ending']))
+            $filters['ending'] = null;
+        if (!isset($filters['questions']))
             $filters['questions'] = null;
-        }
-
         if (isset($filters['user']))
             $filters['user'] = null;
         $this->session->set('user_register_filter', $filters);
+        $reg_anticipated = $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue();
+        $now = new \DateTime('now');
+        $anticipated = $now->modify($reg_anticipated);
 
-        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters);
+        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters, $anticipated);
         $count = count($memberships);
 
         return array(
@@ -538,14 +540,14 @@ class RegisterController extends Controller
 
         $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
+            'ending'    => null,
             'questions' => null,
         ));
 
-        if ($type == "valid") {
-            $filters['valid'] = $value;
-        } else {
+        if ($type == "valid" or $type == "ending")
+            $filters[$type] = $value;
+        else
             $filters[$type][$id] = $value;
-        }
 
         $this->session->set('user_register_filter', $filters);
 
@@ -566,11 +568,12 @@ class RegisterController extends Controller
 
         $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
+            'ending'    => null,
             'questions' => null,
         ));
 
-        if ($type == "valid") {
-            $filters['valid'] = null;
+        if ($type == "valid" or $type == "ending") {
+            $filters[$type] = null;
         } else {
             if ($filters[$type][$id] != null) {
                 unset($filters[$type][$id]);

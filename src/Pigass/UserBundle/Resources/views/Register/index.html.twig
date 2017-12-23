@@ -91,7 +91,17 @@
                 </ul>
             </span>
 
-            <div class="field title">{{ membership.person }}</div>
+            <div class="field title">
+                {% if membership.status == 'registered' %}
+                    <span style="color:red;" title="Adhésion incomplète : manque le paiement">{{ icon('euro') }}</span>
+                {% elseif membership.status == 'paid' %}
+                    <span stype="color:red;" title="Adhésion incomplète : manque la fiche signée">{{ icon('list-alt') }}</span>
+                {% endif %}
+                {% if membership.expiredOn|date('Ymd') < "now"|date_modify(kparam('reg_'~slug~'_anticipated'))|date('Ymd') %}
+                    <span style="color:orange;" title="Fin de période d'adhésion proche">{{ icon('hourglass') }}</span>
+                {% endif %}
+                {{ membership.person }}
+            </div>
             <div class="field">({{ membership.person.birthday|date('d/m/y') }})</div>
             {% if membership.payedOn is not null %}
                 <div class="">Adhésion par {{ membership.method.label|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>

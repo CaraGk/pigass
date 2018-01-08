@@ -73,6 +73,10 @@ class RegisterController extends Controller
             $actualUser = $this->get('security.token_storage')->getToken()->getUser();
             $actualPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($actualUser);
             $actualMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($actualPerson, true);
+            if (!$actualMembership) {
+                $this->session->getFlashBag()->add('notice', 'Adhésion périmée. Veuillez réadhérer pour accéder aux fonctionnalités d\'administration.');
+                return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
+            }
             $slug = $actualMembership->getStructure()->getSlug();
             $this->session->set('slug', $slug);
         }

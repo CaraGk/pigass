@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "be5fe48420092a73a5c4dde89903d497",
+    "content-hash": "9a572ffc0e5847cf10fce4bdaf783e7b",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -4822,16 +4822,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v3.4.3",
+            "version": "v3.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "21abeae69baf64d689b04ca33663b4354be1a226"
+                "reference": "29961b693fa2157a3f349d1a801f9f8742be4e03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/21abeae69baf64d689b04ca33663b4354be1a226",
-                "reference": "21abeae69baf64d689b04ca33663b4354be1a226",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/29961b693fa2157a3f349d1a801f9f8742be4e03",
+                "reference": "29961b693fa2157a3f349d1a801f9f8742be4e03",
                 "shasum": ""
             },
             "require": {
@@ -4973,7 +4973,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2018-01-05T08:33:31+00:00"
+            "time": "2017-12-15T02:05:35+00:00"
         },
         {
             "name": "twbs/bootstrap",

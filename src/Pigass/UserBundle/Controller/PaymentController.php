@@ -176,6 +176,7 @@ class PaymentController extends Controller
             $sendmail = \Swift_Message::newInstance()
                 ->setSubject('PIGASS - Demande d\'adhésion enregistré')
                 ->setFrom($this->container->getParameter('mailer_mail'))
+                ->setReplyTo($structure->getEmail())
                 ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
                 ->setBody($this->renderView('PigassUserBundle:Payment:confirmMember.html.twig', $params, 'text/html'))
                 ->addPart($this->renderView('PigassUserBundle:Payment:confirmMember.txt.twig', $params, 'text/plain'))

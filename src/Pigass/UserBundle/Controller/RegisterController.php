@@ -192,6 +192,10 @@ class RegisterController extends Controller
         $actualUser = $this->get('security.token_storage')->getToken()->getUser();
         $actualPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($actualUser);
         $actualMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($actualPerson, true);
+        if (!$actualMembership) {
+            $this->session->getFlashBag()->add('notice', 'Adhésion périmée. Veuillez réadhérer pour accéder aux fonctionnalités d\'administration.');
+            return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
+	}
 
         if ($membership->getPerson()->getId() != $actualPerson->getId()) {
             if (!($security->isGranted('ROLE_ADMIN')) and
@@ -809,7 +813,13 @@ class RegisterController extends Controller
         $filter = $this->session->get('user_register_filter', null);
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
-        $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+	$membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+	if (!$membership) {
+		$membership = $this->em->getRepository('PigassUserBundle:Membership')->getLastForPerson($person);
+		if (!$membership) {
+			return $this->redirect($this->generateUrl('user_register_register'));
+		}
+	}
         $structure = $membership->getStructure();
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
         $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);

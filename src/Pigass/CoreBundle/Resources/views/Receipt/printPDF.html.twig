@@ -51,7 +51,7 @@
                     <div class="col-xs-2 title">à :</div>
                     <div class="col-xs-4 value">{{ membership.person.birthplace }}</div>
                     <div class="col-xs-12 blank">&nbsp;</div>
-                    <div class="col-xs-12">Je, soussigné {{ receipt.person }}, {{ receipt.position }} de {{ receipt.structure.name }}{% if receipt.structure.fullname is not null %}, {{ receipt.structure.fullname }}{% endif %}, certifie que {{ membership.person.title }} {{ membership.person }} a bien adhéré au syndicat {{ membership.structure.name }} pour {{ period }} en payant la somme de {{ (membership.amount/100)|number_format(2,',',' ') }} €.</div>
+                    <div class="col-xs-12">Je, soussigné {{ receipt.person }}, {{ receipt.position }} de {{ receipt.structure.name }}{% if receipt.structure.fullname is not null %}, {{ receipt.structure.fullname }}{% endif %}, certifie que {{ membership.person.title }} {{ membership.person }} a bien adhéré au syndicat {{ membership.structure.name }} pour {{ period }} en payant la somme de {{ (membership.amount/100)|number_format(2,',',' ') }}&#8239;€.</div>
                     <div class="col-xs-12 blank">&nbsp;</div>
                     <div class="col-xs-12">
 

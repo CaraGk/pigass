@@ -199,7 +199,7 @@ class ReceiptController extends Controller
                 'membership' => $membership,
             ]
         );
-        $filename = "Recu_" . $membership->getStructure()->getSlug() . "_" . $membership->getPerson()->getName() . "_" . $membership->getExpiredOn()->format('Y');
+        $filename = "Recu_" . $membership->getStructure()->getSlug() . "_" . $membership->getPerson()->getName() . "_" . $membership->getExpiredOn()->format('Y') . ".pdf";
 
         return new Response(
             $this->get('knp_snappy.pdf')->getOutputFromHtml($html),

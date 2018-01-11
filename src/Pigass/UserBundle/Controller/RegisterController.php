@@ -789,7 +789,7 @@ class RegisterController extends Controller
                 'infos'      => $infos,
                 'iban'       => (isset($config['iban'])?$config['iban']:null),
         ));
-        $filename = "Adhesion_" . $membership->getPerson()->getName() . "_" . $membership->getExpiredOn()->format('Y');
+        $filename = "Adhesion_" . $membership->getPerson()->getSurname() . "_" . $membership->getExpiredOn()->format('Y') . ".pdf";
 
         return new Response(
             $this->get('knp_snappy.pdf')->getOutputFromHtml($html),

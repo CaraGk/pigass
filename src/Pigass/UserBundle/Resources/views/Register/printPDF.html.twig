@@ -16,6 +16,8 @@
             .jumbotron { width: 100%; margin: 0; }
             .centered { text-align: center; }
             .row { padding: 0; margin: 0; }
+            .info { padding: 3px 0; margin: 0; }
+            .panel-body { margin: 5px 0; }
         </style>
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -47,8 +49,8 @@
                     {% else %}
                         {% for info in infos %}
                             <div class="row">
-                                <div class="col-xs-8">{{ info.question.name }}</div>
-                                <div class="col-xs-4">
+                                <div class="col-xs-8 info">{{ info.question.name }}</div>
+                                <div class="col-xs-4 info">
                                     {% if info.question.type == 7 %}
                                         {{ info.value|date('d/m/Y') }}
                                     {% else %}

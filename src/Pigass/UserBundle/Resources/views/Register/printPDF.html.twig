@@ -15,6 +15,7 @@
             .value { font-weight: bold; }
             .jumbotron { width: 100%; margin: 0; }
             .centered { text-align: center; }
+            .row { padding: 0; margin: 0; }
         </style>
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -37,8 +38,8 @@
                     <div class="col-xs-4 value">{{ membership.person.birthday|date('d/m/Y') }}</div>
                     <div class="col-xs-2 title">à :</div>
                     <div class="col-xs-4 value">{{ membership.person.birthplace }}</div>
-                    <div class="col-xs-2 title">Adresse email :</div>
-                    <div class="col-xs-10 value">{{ membership.person.user.email }}</div>
+                    <div class="col-xs-3 title">Adresse email :</div>
+                    <div class="col-xs-9 value">{{ membership.person.user.email }}</div>
                     <div class="col-xs-4 title">Adresse professionnelle :</div>
                     <div class="col-xs-8 value">{{ membership.person.PrintableAddress(false) }}</div>
                     {% if form %}

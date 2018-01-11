@@ -46,7 +46,13 @@
                     {% else %}
                         {% for info in infos %}
                             <div class="col-xs-6">{{ info.question.name }}</div>
-                            <div class="col-xs-6">{{ info.value }}</div>
+                            <div class="col-xs-6">
+                                {% if info.question.type == 7 %}
+                                    {{ info.value|date('d/m/Y') }}
+                                {% else %}
+                                    {{ info.value }}
+                                {% endif %}
+                            </div>
                         {% endfor %}
                     {% endif %}
                     <div class="col-xs-12">Je désire adhérer à {{ membership.structure.name }} du {{ membership.payedOn|date('d/m/Y') }} au {{ membership.expiredOn|date('d/m/Y') }}.</div>

@@ -106,6 +106,13 @@
                                     </a>
                                 </li>
                             {% endif %}
+                            {% if kparam('reg_' ~ slug ~ '_print') %}
+                                <li>
+                                    <a href="{{ path('user_register_print', {'id': membership.id, 'userid': userid, 'slug': slug}) }}" title="Fiche d'adhésion à retourner signée">
+                                        {{ icon('list-alt') }} Fiche d'adhésion
+                                    </a>
+                                </li>
+                            {% endif %}
                         {% endif %}
                         {% if membership.status == 'registered' or membership.payedOn is null %}
                             {% if is_granted('ROLE_ADMIN') %}

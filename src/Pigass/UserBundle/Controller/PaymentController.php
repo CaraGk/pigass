@@ -12,7 +12,8 @@
 namespace Pigass\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller,
-    Symfony\Component\HttpFoundation\Request;
+    Symfony\Component\HttpFoundation\Request,
+    Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use JMS\DiExtraBundle\Annotation as DI,
@@ -98,9 +99,6 @@ class PaymentController extends Controller
         $payment = $status->getFirstModel();
 
         if ($status->getValue() == "captured" OR $status->getValue() == "pending") {
-            if ($this->session->get('user_register_tmp'))
-                $this->session->remove('user_register_tmp');
-
             $method = $this->em->getRepository('PigassUserBundle:Gateway')->findOneBy(array('gatewayName' => $token->getGatewayName()));
             $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($payment->getClientId());
             $structure = $membership->getStructure();
@@ -167,6 +165,13 @@ class PaymentController extends Controller
 
             $this->em->persist($membership);
             $this->em->flush();
+
+            if ($this->session->get('user_register_tmp')) {
+                $this->session->remove('user_register_tmp');
+                $user = $membership->getPerson()->getUser();
+                $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+                $this->container->get('security.token_storage')->setToken($token);
+            }
 
             $params = array(
                 'membership'  => $membership,

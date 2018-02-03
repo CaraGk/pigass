@@ -3,9 +3,17 @@
 {% block headline %}Adhésion - enregistrement{% endblock %}
 
 {% block action %}
+    <li class="btn">
+        <div class="progress">
+            <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="60" aria-ValueMin = "0"  aria-ValueMax = "100" style="width: 75%;">
+                Adhésion
+            </div>
+        </div>
+    </li>
     <li class="panel panel-danger">
         <div class="panel-heading">
-            Vous vous apprêtez à adhérer à {{ structure }} en réglant la cotisation.
+            <p>Vous vous apprêtez à adhérer à {{ structure }} en réglant la cotisation.</p>
+            <p>Si plusieurs tarifs d'adhésion sont proposés, vous devrez fournir les éventuelles pièces justificatives du tarif demandé avant validation de votre adhésion.</p>
         </div>
     </li>
 {% endblock %}

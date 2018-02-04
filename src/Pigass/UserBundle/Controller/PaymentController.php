@@ -129,8 +129,12 @@ class PaymentController extends Controller
                 }
             } elseif ($method->getFactoryName() == 'paypal_express_checkout') {
                 if ($details['ACK'] == 'Success') {
-                    if ($status->getValue() == "pending") {
-                        $this->addFlash('warning', 'L\'adhésion ne pourra être validée qu\'une fois le paiement reçu par Paypal et validé par un administrateur.');
+                    if ($details['CHECKOUTSTATUS'] == 'PaymentActionNotInitiated') {
+                        $this->addFlash('error', 'Le paiement a été annulé. Veuillez reconsidérer vos moyens de paiement.');
+                        return $this->redirect($this->generateUrl('user_register_join', ['slug' => $structure->getSlug(), 'userid' => $membership->getPerson()->getUser()->getId()]));
+                    } elseif ($details['CHECKOUTSTATUS'] == 'PaymentActionFailed') {
+                        $this->addFlash('error', 'Le paiement est indiqué en erreur par Paypal. Veuillez reconsidérer vos moyens de paiement.');
+                        return $this->redirect($this->generateUrl('user_register_join', ['slug' => $structure->getSlug(), 'userid' => $membership->getPerson()->getUser()->getId()]));
                     } else {
                         $membership->setPayedOn(new \DateTime('now'));
                         $this->addFlash('notice', 'Le paiement de ' . $membership->getAmount(true) . ' par Paypal Express a réussi. L\'adhésion est validée.');

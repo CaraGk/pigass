@@ -721,7 +721,7 @@ class RegisterController extends Controller
         $reg_anticipated = $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue();
         $anticipated = $now->modify($reg_anticipated);
 
-        if (null !== $current_membership and $current_membership->getExpiredOn() > $anticipated) {
+        if (null !== $current_membership and ($current_membership->getExpiredOn() > $anticipated and $current_membership->getStatus() != 'registered')) {
             $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
 
             if ($userid and $user->hasRole('ROLE_ADMIN'))
@@ -730,7 +730,10 @@ class RegisterController extends Controller
                 return $this->redirect($this->generateUrl('user_register_list'));
         }
 
-        $membership = new Membership();
+        if ($current_membership->getStatus() == 'registered')
+            $membership = $current_membership;
+        else
+            $membership = new Membership();
         $options = array(
             'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
             'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
@@ -813,13 +816,13 @@ class RegisterController extends Controller
         $filter = $this->session->get('user_register_filter', null);
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
-	$membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
-	if (!$membership) {
-		$membership = $this->em->getRepository('PigassUserBundle:Membership')->getLastForPerson($person);
-		if (!$membership) {
-			return $this->redirect($this->generateUrl('user_register_register'));
-		}
-	}
+        $membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+        if (!$membership) {
+            $membership = $this->em->getRepository('PigassUserBundle:Membership')->getLastForPerson($person);
+            if (!$membership) {
+                return $this->redirect($this->generateUrl('user_register_register'));
+            }
+        }
         $structure = $membership->getStructure();
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
         $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);
@@ -961,17 +964,22 @@ class RegisterController extends Controller
         if (($userid == null or $register == true) and $last_membership) {
             $structure = $last_membership->getStructure();
             $slug = $structure->getSlug();
+
+            $now = new \DateTime('now');
+            $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
+            if ($last_membership->getExpiredOn() <= $now) {
+                $reJoinable = true;
+            } elseif ($last_membership->getStatus() == 'registered' and strpos($last_membership->getMethod()->getGatewayName(), 'paypal_express_checkout')) {
+                $this->session->getFlashBag()->add('error', 'Il y a eu un souci lors du dernier enregistrement de votre adhésion. Veuillez la renouveler ou contacter un administrateur.');
+                return $this->redirect($this->generateUrl('user_register_join', ['slug' => $slug, 'userid' => $userid]));
+            }
+
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
             $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $last_membership);
             if (count($member_infos) < count($questions)) {
                 return $this->redirect($this->generateUrl('user_register_question'));
             } elseif ($register) {
                 $this->session->remove('user_register_register');
-            }
-            $now = new \DateTime('now');
-            $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
-            if ($last_membership->getExpiredOn() <= $now) {
-                $reJoinable = true;
             }
         } else {
             $slug = $request->get('slug', null);

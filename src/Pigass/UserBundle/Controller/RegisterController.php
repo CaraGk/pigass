@@ -158,7 +158,6 @@ class RegisterController extends Controller
                     $membership->setStatus('validated');
                     $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. L\'adhésion est validée.');
                 }
-                $membership->setPayedOn(new \DateTime('now'));
 
                 $params = array(
                     'membership' => $membership,

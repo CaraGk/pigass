@@ -45,6 +45,7 @@ class PersonUserType extends AbstractType
             ->add('birthday', BirthdayType::class, array(
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
+                'html5'  => false,
                 'horizontal_input_wrapper_class' => 'col-lg-4',
                 'datepicker'   => true,
             ))

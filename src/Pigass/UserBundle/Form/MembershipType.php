@@ -14,9 +14,9 @@ namespace Pigass\UserBundle\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
-    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\DateType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Pigass\UserBundle\Form\PersonUserType;
 use Doctrine\ORM\EntityRepository;
 use Pigass\CoreBundle\Entity\FeeRepository;
@@ -32,6 +32,7 @@ class MembershipType extends AbstractType
     {
         $this->structure = $options['structure'];
         $this->withPerson = $options['withPerson'];
+        $this->withPayment = $options['withPayment'];
 
         if ($this->withPerson) {
             $builder
@@ -67,6 +68,24 @@ class MembershipType extends AbstractType
                 'expanded'      => true,
                 'label'         => 'Moyen de paiement',
             ])
+        ;
+
+        if ($this->withPayment) {
+            $builder
+                ->add('payedOn', DateType::class, [
+                    'label' => 'Date d\'encaissement ou de réception',
+                    'widget' => 'single_text',
+                    'html5'  => false,
+                    'horizontal_input_wrapper_class' => 'col-lg-4',
+                    'datepicker'   => true,
+                ])
+                ->add('ref', TextType::class, [
+                    'label' => 'Référence du paiement',
+                ])
+            ;
+        }
+
+        $builder
             ->add('Save', SubmitType::class, [
                 'label' => 'Payer',
                 'attr'  => [
@@ -79,9 +98,10 @@ class MembershipType extends AbstractType
     public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Pigass\UserBundle\Entity\Membership',
-            'structure'  => null,
-            'withPerson' => null,
+            'data_class'  => 'Pigass\UserBundle\Entity\Membership',
+            'structure'   => null,
+            'withPerson'  => null,
+            'withPayment' => null,
         ]);
     }
 }

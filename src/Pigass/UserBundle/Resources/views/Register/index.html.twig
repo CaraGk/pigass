@@ -118,6 +118,12 @@
                                 {{ icon('ok') }} Valider la fiche
                             </a>
                         </li>
+                    {% elseif membership.status == 'validated' %}
+                        <li>
+                            <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Modifier le paiement de cette adhésion">
+                                {{ icon('pencil') }} Modifier le paiement
+                            </a>
+                        </li>
                     {% endif %}
                     <li>
                         <a href="{{ path('user_register_list', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">

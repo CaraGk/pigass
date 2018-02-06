@@ -94,6 +94,13 @@ class Membership
     private $status;
 
     /**
+     * @var string $ref
+     *
+     * @ORM\Column(name="ref", type="string", length=50, nullable=true)
+     */
+    private $ref;
+
+    /**
      * @ORM\OneToMany(targetEntity="MemberInfo", mappedBy="membership", cascade={"remove", "persist"}, orphanRemoval=true)
      */
     private $infos;
@@ -348,5 +355,29 @@ class Membership
     public function getFee()
     {
         return $this->fee;
+    }
+
+    /**
+     * Set ref
+     *
+     * @param string $ref
+     *
+     * @return Membership
+     */
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
+
+        return $this;
+    }
+
+    /**
+     * Get ref
+     *
+     * @return string
+     */
+    public function getRef()
+    {
+        return $this->ref;
     }
 }

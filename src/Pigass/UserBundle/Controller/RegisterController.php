@@ -839,6 +839,7 @@ class RegisterController extends Controller
         $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
         $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
         if($form_handler->process()) {
+            $this->session->remove('user_register_filter');
             $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
 
             return $this->redirect($this->generateUrl('user_register_list'));
@@ -846,6 +847,7 @@ class RegisterController extends Controller
 
         return array(
             'form' => $form->createView(),
+            'ato'  => $filter?true:false,
         );
     }
 
@@ -964,6 +966,12 @@ class RegisterController extends Controller
         if (($userid == null or $register == true) and $last_membership) {
             $structure = $last_membership->getStructure();
             $slug = $structure->getSlug();
+
+            $skipFilter = $request->query->get('skip', null);
+            if ($skipFilter) {
+                $this->session->remove('user_register_filter');
+                return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
+            }
 
             $now = new \DateTime('now');
             $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
@@ -1089,13 +1097,15 @@ class RegisterController extends Controller
     public function newMembershipAction($slug, Request $request)
     {
         $adminUser = $this->getUser();
-        $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
-        $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
-        if (!$structure)
-            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
-        if (!$adminUser->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
-            throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
+        if ($adminUser) {
+            $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
+            $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
+            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+            if (!$structure)
+                throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
+            if (!$adminUser->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
+                throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
+        }
 
         $membership = new Membership();
         $options = array(
@@ -1110,15 +1120,17 @@ class RegisterController extends Controller
         if($form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $membership->getPerson() . '.');
 
-            $filter = $this->session->get('user_register_filter', array());
-            $filter['user'] = $membership->getPerson()->getUser()->getId();
-            $this->session->set('user_register_filter', $filter);
-            $this->session->set('user_register_register', true);
+            if ($adminUser) {
+                $filter = $this->session->get('user_register_filter', array());
+                $filter['user'] = $membership->getPerson()->getUser()->getId();
+                $this->session->set('user_register_filter', $filter);
+                $this->session->set('user_register_register', true);
+            }
 
-            return $this->redirect($this->generateUrl('user_payment_prepare', array(
+            return $this->redirect($this->generateUrl('user_payment_prepare', [
                 'gateway' => $membership->getMethod()->getGatewayName(),
-                'memberid' => $membership->getId()
-            )));
+                'memberid' => $membership->getId(),
+            ]));
         }
 
         return array(

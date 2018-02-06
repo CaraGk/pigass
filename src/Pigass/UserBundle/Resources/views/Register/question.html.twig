@@ -4,6 +4,16 @@
 
 {% block headline %}Questions complémentaires{% endblock %}
 
+{% block action %}
+    {% if ato == true %}
+        <li class="btn btn-primary">
+            <a href="{{ path('user_register_list', {'skip': true}) }}" title="Passer cette étape">
+                {{ icon('fast-forward') }} Passer
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="panel panel-default">
         {{ form(form) }}

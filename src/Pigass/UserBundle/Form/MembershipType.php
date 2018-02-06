@@ -73,11 +73,10 @@ class MembershipType extends AbstractType
         if ($this->withPayment) {
             $builder
                 ->add('payedOn', DateType::class, [
-                    'label' => 'Date d\'encaissement ou de réception',
+                    'label'  => 'Date d\'encaissement ou de réception',
                     'widget' => 'single_text',
-                    'html5'  => false,
+                    'html5'  => true,
                     'horizontal_input_wrapper_class' => 'col-lg-4',
-                    'datepicker'   => true,
                 ])
                 ->add('ref', TextType::class, [
                     'label' => 'Référence du paiement',

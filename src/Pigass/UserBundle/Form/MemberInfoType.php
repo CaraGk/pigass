@@ -85,8 +85,8 @@ class MemberInfoType extends AbstractType
                 $builder->add('value', DateType::class, array(
                     'input'        => 'string',
                     'widget'       => 'single_text',
+                    'html5'        => true,
                     'horizontal_input_wrapper_class' => 'col-lg-4',
-                    'datepicker'   => true,
                     'required' => $question->isRequired()?true:false,
                     'label'        => $question->getName(),
                 ));

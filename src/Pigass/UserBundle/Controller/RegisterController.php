@@ -756,7 +756,7 @@ class RegisterController extends Controller
                 return $this->redirect($this->generateUrl('user_register_list'));
         }
 
-        if ($current_membership->getStatus() == 'registered')
+        if (null !== $current_membership and $current_membership->getStatus() == 'registered')
             $membership = $current_membership;
         else
             $membership = new Membership();

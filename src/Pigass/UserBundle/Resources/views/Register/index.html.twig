@@ -15,19 +15,28 @@
         {% endif %}
     </li>
     <li class="btn btn-primary">
-        <a href="{{ path('user_register_export', {'slug': slug}) }}">
+        <a href="{{ path('user_register_export', {'slug': slug}) }}" title="Exporter la liste des adhérents à jour de cotisation">
             {{ icon('folder-open') }} Exporter (xls)
         </a>
     </li>
     <li class="btn btn-primary">
-        <a href="{{ path('user_register_import', {'slug': slug}) }}">
+        <a href="{{ path('user_register_import', {'slug': slug}) }}" title="Importer une liste d'adhérents">
             {{ icon('open-file') }} Importer
         </a>
     </li>
     <li class="btn btn-primary">
-        <a href="{{ path('user_register_membership_new', {'slug': slug}) }}">
+        <a href="{{ path('user_register_membership_new', {'slug': slug}) }}" title ="Ajouter un adhérent">
             {{ icon('plus') }} Ajouter
         </a>
+    </li>
+    <li class="btn">
+        <form>
+            {{ icon('search') }}
+            <input type="text" id="search" name="search" value="{{ filters['search'] }}" />
+            <a href="{{ path('user_register_index', {'slug': slug, 'skipsearch': true}) }}" title="Supprimer la recherche">
+                {{ icon('trash') }}
+            </a>
+        </form>
     </li>
     {% if filters['valid'] is null %}
         <li class="btn btn-default">
@@ -83,8 +92,11 @@
 {% endblock %}
 
 {% block content %}
+    {% set cur = 0 %}
     <ul class="entities list-group">
     {% for membership in memberships %}
+        {% if not filters['search'] or membership.person.id != cur %}
+        {% set cur = membership.person.id %}
         <li class="entity person list-group-item row">
             <span class="btn-group pull-right">
                 <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
@@ -135,6 +147,7 @@
                 <div class="">Adhésion par {{ membership.method.label|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>
             {% endif %}
         </li>
+        {% endif %}
     {% else %}
         <li class="list-group-item">Aucune adhésion enregistrée.</li>
     {% endfor %}

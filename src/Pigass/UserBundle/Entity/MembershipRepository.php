@@ -56,7 +56,7 @@ class MembershipRepository extends EntityRepository
         ;
     }
 
-    public function getCurrentByStructure($slug, $filter = null, $anticipated = null)
+    public function getAllByStructureQuery($slug, $filter = null, $anticipated = null)
     {
         $query = $this->createQueryBuilder('m')
             ->join('m.person', 's')
@@ -65,9 +65,7 @@ class MembershipRepository extends EntityRepository
             ->addSelect('u')
             ->join('m.structure', 't')
             ->addSelect('t')
-            ->where('m.expiredOn > :now')
-            ->setParameter('now', new \DateTime('now'))
-            ->andWhere('t.slug = :slug')
+            ->where('t.slug = :slug')
             ->setParameter('slug', $slug)
             ->orderBy('s.name', 'asc');
 
@@ -102,7 +100,39 @@ class MembershipRepository extends EntityRepository
             }
         }
 
-        return $query->getQuery()->getResult();
+        if (isset($filter['search']) and $filter['search']) {
+            $query
+                ->andWhere('s.surname like :search OR s.name like :search OR u.email like :search')
+                ->setParameter('search', '%' . $filter['search'] . '%')
+                ->addOrderBy('m.expiredOn', 'desc')
+            ;
+        }
+
+        return $query;
+    }
+
+    public function getAllByStructure($slug, $filter = null, $anticipated = null)
+    {
+        $query = $this->getAllByStructureQuery($slug, $filter, $anticipated);
+
+        return $query
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getCurrentByStructure($slug, $filter = null, $anticipated = null)
+    {
+        $query = $this->getAllByStructureQuery($slug, $filter, $anticipated);
+        $query
+            ->andWhere('m.expiredOn > :now')
+            ->setParameter('now', new \DateTime('now'))
+        ;
+
+        return $query
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
     public function getCurrentByStructureWithInfos($slug)

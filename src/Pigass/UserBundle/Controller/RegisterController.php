@@ -88,8 +88,13 @@ class RegisterController extends Controller
             'valid'     => null,
             'ending'    => null,
             'questions' => null,
+            'search'    => null,
         ));
 
+        if ($search = $request->query->get('search', null))
+            $filters['search'] = $search;
+        elseif ($request->query->get('skipsearch', false))
+            $filters['search'] = null;
         if (!isset($filters['valid']))
             $filters['valid'] = null;
         if (!isset($filters['ending']))
@@ -103,7 +108,10 @@ class RegisterController extends Controller
         $now = new \DateTime('now');
         $anticipated = $now->modify($reg_anticipated);
 
-        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters, $anticipated);
+        if ($filters['search'])
+            $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getAllByStructure($slug, $filters, $anticipated);
+        else
+            $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters, $anticipated);
         $count = count($memberships);
 
         return array(

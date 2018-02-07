@@ -861,8 +861,14 @@ class RegisterController extends Controller
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure, $exclude);
         }
 
-        $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
-        $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
+        if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) {
+            $form = $this->createForm(QuestionType::class, null, ['questions' => $questions, 'admin' => true]);
+            $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions, true);
+        } else {
+            $form = $this->createForm(QuestionType::class, null, ['questions' => $questions]);
+            $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
+        }
+
         if($form_handler->process()) {
             $this->session->remove('user_register_filter');
             $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');

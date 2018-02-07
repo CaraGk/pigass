@@ -24,13 +24,14 @@ class QuestionHandler
 {
     private $form, $request, $em, $membership, $questions;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, Membership $membership, $questions)
+    public function __construct(Form $form, Request $request, EntityManager $em, Membership $membership, $questions, $admin = false)
     {
       $this->form       = $form;
       $this->request    = $request;
       $this->em         = $em;
       $this->membership = $membership;
       $this->questions  = $questions;
+      $this->admin      = $admin;
     }
 
     public function process()
@@ -77,6 +78,7 @@ class QuestionHandler
         $member_info->setValue($value);
         $member_info->setQuestion($question);
 
-        $this->em->persist($member_info);
+        if (!$this->admin or $member_info->getValue())
+            $this->em->persist($member_info);
     }
 }

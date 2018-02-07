@@ -31,6 +31,7 @@ class MemberQuestionType extends AbstractType
         $builder
             ->add('rank')
             ->add('name')
+            ->add('short')
             ->add('type', ChoiceType::class, array(
               'choices' => array(
                 'Choix unique non pondéré' => 5,

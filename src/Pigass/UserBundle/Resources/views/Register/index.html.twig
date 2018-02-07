@@ -78,12 +78,20 @@
     {% endif %}
     {% for question in questions %}
         <li class="btn btn-sm btn-default">
-            <div class="title">{{ question.name }}</div>
+            <div class="title">{{ question.short }}</div>
             {% if filters['questions'][question.id] is defined %}
-                <div class="item"><a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">{{ filters['questions'][question.id] }}</a></div>
+                <div class="item">
+                    <a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">
+                        {{ filters['questions'][question.id] }}
+                    </a>
+                </div>
             {% else %}
                 {% for answer in question.more %}
-                    <div class="item"><a href="{{ path('user_register_filter_add', {'type': 'questions', 'id': question.id, 'value': answer, 'slug': slug}) }}" title="Filtrer par {{ question.name }} : {{ answer }}">{{ answer }}</a></div>
+                    <div class="item">
+                        <a href="{{ path('user_register_filter_add', {'type': 'questions', 'id': question.id, 'value': answer, 'slug': slug}) }}" title="Filtrer par {{ question.name }} : {{ answer }}">
+                            {{ answer }}
+                        </a>
+                    </div>
                 {% endfor %}
             {% endif %}
         </li>

@@ -72,6 +72,13 @@ class MemberQuestion
     private $required;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="short", type="string", length=40)
+     */
+    private $short;
+
+    /**
      * @var Structure
      *
      * @ORM\ManyToOne(targetEntity="\Pigass\CoreBundle\Entity\Structure")
@@ -311,5 +318,29 @@ class MemberQuestion
     public function getRequired()
     {
         return $this->required;
+    }
+
+    /**
+     * Set short
+     *
+     * @param string $short
+     *
+     * @return MemberQuestion
+     */
+    public function setShort($short)
+    {
+        $this->short = $short;
+
+        return $this;
+    }
+
+    /**
+     * Get short
+     *
+     * @return string
+     */
+    public function getShort()
+    {
+        return $this->short;
     }
 }

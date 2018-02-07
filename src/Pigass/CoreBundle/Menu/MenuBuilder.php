@@ -44,7 +44,6 @@ class MenuBuilder
             $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site')));
         } else {
             if ($security->isGranted('ROLE_MEMBER')) {
-                $menu->addChild('My identity', array('route' => 'user_person_edit_me', 'label' => 'Mon profil', 'attributes' => array('title' => 'Mon profil sur le site')));
                 $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
             }
             if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {

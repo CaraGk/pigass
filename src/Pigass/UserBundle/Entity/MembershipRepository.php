@@ -88,6 +88,12 @@ class MembershipRepository extends EntityRepository
             }
         }
 
+        if (isset($filter['fee']) and $filter['fee']) {
+            $query->andWhere('m.fee = :fee')
+                ->setParameter('fee', $filter['fee'])
+            ;
+        }
+
         if (isset($filter['questions']) and $filter['questions']) {
             foreach ($filter['questions'] as $question_id => $value) {
                 $query->join('m.infos', 'i')

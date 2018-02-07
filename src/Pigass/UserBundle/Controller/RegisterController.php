@@ -83,10 +83,12 @@ class RegisterController extends Controller
         $limit = $request->query->get('limit', null);
         $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneby(array('slug' => $slug));
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
+        $fees = $this->em->getRepository('PigassCoreBundle:Fee')->getForStructure($structure);
 
         $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'ending'    => null,
+            'fee'      => null,
             'questions' => null,
             'search'    => null,
         ));
@@ -101,8 +103,10 @@ class RegisterController extends Controller
             $filters['ending'] = null;
         if (!isset($filters['questions']))
             $filters['questions'] = null;
-        if (isset($filters['user']))
+        if (!isset($filters['user']))
             $filters['user'] = null;
+        if (!isset($filters['fee']))
+            $filters['fee'] = null;
         $this->session->set('user_register_filter', $filters);
         $reg_anticipated = $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue();
         $now = new \DateTime('now');
@@ -120,6 +124,7 @@ class RegisterController extends Controller
             'count'       => $count,
             'questions'   => $questions,
             'slug'        => $slug,
+            'fees'        => count($fees)>1?$fees:null,
         );
     }
 
@@ -577,9 +582,12 @@ class RegisterController extends Controller
             'valid'     => null,
             'ending'    => null,
             'questions' => null,
-        ));
+            'user'      => null,
+            'search'    => null,
+            'fee'       => null,
+         ));
 
-        if ($type == "valid" or $type == "ending")
+        if ($type == "valid" or $type == "ending" or $type == "fee")
             $filters[$type] = $value;
         else
             $filters[$type][$id] = $value;
@@ -605,9 +613,12 @@ class RegisterController extends Controller
             'valid'     => null,
             'ending'    => null,
             'questions' => null,
+            'user'      => null,
+            'search'    => null,
+            'fee'       => null,
         ));
 
-        if ($type == "valid" or $type == "ending") {
+        if ($type == "valid" or $type == "ending" or $type == "fee") {
             $filters[$type] = null;
         } else {
             if ($filters[$type][$id] != null) {

@@ -76,6 +76,26 @@
             </a>
         </li>
     {% endif %}
+    {% if fees is not null %}
+        <li class="btn btn-default">
+            <div class="title">Type d'adhésion</div>
+            {% for fee in fees %}
+                {% if filters['fee'] == fee.id %}
+                    <div class="item">
+                        <a href="{{ path('user_register_filter_remove', {'type': 'fee', 'id': 0, 'slug': slug}) }}" title="Suprimer le filtre d'adhésion : {{ fee.title }}">
+                            {{ fee.title }}
+                        </a>
+                    </div>
+                {% elseif filters['fee'] is null %}
+                    <div class="item">
+                        <a href="{{ path('user_register_filter_add', {'type': 'fee', 'id': 0, 'value': fee.id, 'slug': slug}) }}" title="Filtrer par type d'adhésion : {{ fee.title }}">
+                            {{ fee.title }}
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </li>
+    {% endif %}
     {% for question in questions %}
         <li class="btn btn-sm btn-default">
             <div class="title">{{ question.short }}</div>

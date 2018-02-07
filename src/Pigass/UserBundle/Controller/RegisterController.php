@@ -873,7 +873,10 @@ class RegisterController extends Controller
             $this->session->remove('user_register_filter');
             $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
 
-            return $this->redirect($this->generateUrl('user_register_list'));
+            if ($userid)
+                return $this->redirect($this->generateUrl('user_register_index', ['slug' => $structure->getSlug()]));
+            else
+                return $this->redirect($this->generateUrl('user_register_list'));
         }
 
         return array(

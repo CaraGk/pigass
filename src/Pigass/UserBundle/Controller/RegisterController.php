@@ -145,39 +145,8 @@ class RegisterController extends Controller
 
         $structure = $membership->getStructure();
         $slug = $structure->getSlug();
-        $options = [
-            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
-            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
-            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
-            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
-        ];
-        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPayment' => true]);
-        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, $membership->getPerson());
 
-        if($form_handler->process()) {
-            if ($membership->getStatus() == 'registered') {
-                if ($toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print')->getValue()) {
-                    $membership->setStatus('paid');
-                    $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. La fiche d\'adhésion doit encore être validée.');
-                } else {
-                    $membership->setStatus('validated');
-                    $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. L\'adhésion est validée.');
-                }
-
-                $params = array(
-                    'membership' => $membership,
-                    'print'      => $toPrintParam,
-                );
-                $sendmail = \Swift_Message::newInstance()
-                    ->setSubject('PIGASS - Paiement reçu')
-                    ->setFrom($this->container->getParameter('mailer_mail'))
-                    ->setReplyTo($structure->getEmail())
-                    ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
-                    ->setBody($this->renderView('PigassUserBundle:Payment:confirmPayment.html.twig', $params, 'text/html'))
-                    ->addPart($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
-                ;
-                $this->get('mailer')->send($sendmail);
-            } elseif ($membership->getStatus() == 'paid') {
+        if ($membership->getStatus() == 'paid') {
                 $membership->setStatus('validated');
                 $this->session->getFlashBag()->add('notice', 'La fiche d\'adhésion a été validée.');
                 $sendmail = \Swift_Message::newInstance()
@@ -189,19 +158,60 @@ class RegisterController extends Controller
                     ->addPart($this->renderView('PigassUserBundle:Payment:confirmPrint.txt.twig', array('membership' => $membership), 'text/plain'))
                 ;
                 $this->get('mailer')->send($sendmail);
-            } elseif ($membership->getStatus() == 'validated') {
-                $this->session->getFlashBag()->add('warning', 'L\'adhésion a déjà été mise à jour.');
-            } else {
-                $this->session->getFlashBag()->add('error', 'Le statut de l\'adhésion est inconnu.');
+                $this->em->persist($membership);
+                $this->em->flush();
+
+                if ($view == 'index')
+                    return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+                else
+                    return $this->redirect($this->generateUrl('user_register_list', array('slug' => $slug, 'userid' => $userid)));
+        } else {
+            $options = [
+                'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
+                'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
+                'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
+                'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
+            ];
+            $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPayment' => true]);
+            $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, $membership->getPerson());
+
+            if($form_handler->process()) {
+                if ($membership->getStatus() == 'registered') {
+                    if ($toPrintParam = $this->pm->findParamByName('reg_' . $structure->getSlug() . '_print')->getValue()) {
+                        $membership->setStatus('paid');
+                        $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. La fiche d\'adhésion doit encore être validée.');
+                    } else {
+                        $membership->setStatus('validated');
+                        $this->session->getFlashBag()->add('notice', 'Le paiement a été validé. L\'adhésion est validée.');
+                    }
+
+                    $params = array(
+                        'membership' => $membership,
+                        'print'      => $toPrintParam,
+                    );
+                    $sendmail = \Swift_Message::newInstance()
+                        ->setSubject('PIGASS - Paiement reçu')
+                        ->setFrom($this->container->getParameter('mailer_mail'))
+                        ->setReplyTo($structure->getEmail())
+                        ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
+                        ->setBody($this->renderView('PigassUserBundle:Payment:confirmPayment.html.twig', $params, 'text/html'))
+                        ->addPart($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
+                    ;
+                    $this->get('mailer')->send($sendmail);
+                } elseif ($membership->getStatus() == 'validated') {
+                    $this->session->getFlashBag()->add('warning', 'L\'adhésion a déjà été mise à jour.');
+                } else {
+                    $this->session->getFlashBag()->add('error', 'Le statut de l\'adhésion est inconnu.');
+                }
+
+                $this->em->persist($membership);
+                $this->em->flush();
+
+                if ($view == 'index')
+                    return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+                else
+                    return $this->redirect($this->generateUrl('user_register_list', array('slug' => $slug, 'userid' => $userid)));
             }
-
-            $this->em->persist($membership);
-            $this->em->flush();
-
-            if ($view == 'index')
-                return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
-            else
-                return $this->redirect($this->generateUrl('user_register_list', array('slug' => $slug, 'userid' => $userid)));
         }
 
         return array(

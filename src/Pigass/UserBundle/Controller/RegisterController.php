@@ -112,7 +112,7 @@ class RegisterController extends Controller
         $now = new \DateTime('now');
         $anticipated = $now->modify($reg_anticipated);
 
-        if ($filters['search'])
+        if (isset($filters['search']) and $filters['search'])
             $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getAllByStructure($slug, $filters, $anticipated);
         else
             $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters, $anticipated);

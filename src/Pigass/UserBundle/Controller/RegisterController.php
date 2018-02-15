@@ -88,7 +88,7 @@ class RegisterController extends Controller
         $filters = $this->session->get('user_register_filter', array(
             'valid'     => null,
             'ending'    => null,
-            'fee'      => null,
+            'fee'       => null,
             'questions' => null,
             'search'    => null,
         ));
@@ -107,12 +107,14 @@ class RegisterController extends Controller
             $filters['user'] = null;
         if (!isset($filters['fee']))
             $filters['fee'] = null;
+        if (!isset($filters['search']))
+            $filters['search'] = null;
         $this->session->set('user_register_filter', $filters);
         $reg_anticipated = $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue();
         $now = new \DateTime('now');
         $anticipated = $now->modify($reg_anticipated);
 
-        if (isset($filters['search']) and $filters['search'])
+        if ($filters['search'])
             $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getAllByStructure($slug, $filters, $anticipated);
         else
             $memberships = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentByStructure($slug, $filters, $anticipated);
@@ -588,14 +590,14 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $filters = $this->session->get('user_register_filter', array(
+        $filters = $this->session->get('user_register_filter', [
             'valid'     => null,
             'ending'    => null,
             'questions' => null,
             'user'      => null,
             'search'    => null,
             'fee'       => null,
-         ));
+        ]);
 
         if ($type == "valid" or $type == "ending" or $type == "fee")
             $filters[$type] = $value;
@@ -619,14 +621,14 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $filters = $this->session->get('user_register_filter', array(
+        $filters = $this->session->get('user_register_filter', [
             'valid'     => null,
             'ending'    => null,
             'questions' => null,
             'user'      => null,
             'search'    => null,
             'fee'       => null,
-        ));
+        ]);
 
         if ($type == "valid" or $type == "ending" or $type == "fee") {
             $filters[$type] = null;

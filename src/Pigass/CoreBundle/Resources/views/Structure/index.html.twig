@@ -34,17 +34,17 @@
                         <ul class="dropdown-menu">
                             <li class="action">
                                 <a href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de la structure '{{ structure.name }}'" class="index">
-                                    {{ icon('user') }} Adhérents
+                                    {{ icon('group') }} Adhérents
                                 </a>
                             </li>
                             <li class="action">
                                 <a href="{{ path('user_register_membership_new', {'slug': structure.slug}) }}" title="Ajouter un adhérent à la structure '{{ structure.name }}'" class="">
-                                    {{ icon('user') }} Ajouter
+                                    {{ icon('user-plus') }} Ajouter
                                 </a>
                             </li>
                             <li class="action">
                                 <a href="{{ path('parameter_admin_index', {'slug': structure.slug}) }}" title="Afficher les paramètres du site pour la structure '{{ structure.name }}'" class="index">
-                                    {{ icon('cog') }} Paramètres
+                                    {{ icon('cogs') }} Paramètres
                                 </a>
                             </li>
                         </ul>

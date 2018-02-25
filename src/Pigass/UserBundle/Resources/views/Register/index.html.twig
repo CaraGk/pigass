@@ -16,17 +16,17 @@
     </li>
     <li class="btn btn-primary">
         <a href="{{ path('user_register_export', {'slug': slug}) }}" title="Exporter la liste des adhérents à jour de cotisation">
-            {{ icon('folder-open') }} Exporter (xls)
+            {{ icon('download') }} Exporter (xls)
         </a>
     </li>
     <li class="btn btn-primary">
         <a href="{{ path('user_register_import', {'slug': slug}) }}" title="Importer une liste d'adhérents">
-            {{ icon('open-file') }} Importer
+            {{ icon('upload') }} Importer
         </a>
     </li>
     <li class="btn btn-primary">
         <a href="{{ path('user_register_membership_new', {'slug': slug}) }}" title ="Ajouter un adhérent">
-            {{ icon('plus') }} Ajouter
+            {{ icon('user-plus') }} Ajouter
         </a>
     </li>
     <li class="btn">
@@ -170,7 +170,7 @@
                 {% if membership.expiredOn|date('Ymd') < "now"|date_modify(kparam('reg_'~slug~'_anticipated'))|date('Ymd') %}
                     <span style="color:orange;" title="Fin de période d'adhésion proche">
                         <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Fin de la période d'adhésion proche" style="color:orange; text-decoration:none;">
-                        {{ icon('hourglass') }}
+                        {{ icon('hourglass-end') }}
                         </a>
                     </span>
                 {% endif %}

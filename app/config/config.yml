@@ -81,6 +81,10 @@ assetic:
     # java: /usr/bin/java
     filters:
         cssrewrite: ~
+        less:
+            node: /usr/bin/node
+            node-paths: [/usr/lib/nodejs]
+            apply_to: ".less$"
 
 # User control configuration
 fos_user:
@@ -138,6 +142,9 @@ mopa_bootstrap:
             author_name: "Pierre-François Angrand"
             nofollow: false
             noindex: false
+    icons:
+        icon_set: fontawesome
+        shortcut: icon
 
 payum:
     storages:

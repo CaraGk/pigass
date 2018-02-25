@@ -40,24 +40,24 @@ class MenuBuilder
         $session = $requestStack->getCurrentRequest()->getSession();
 
         if (!$security->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $menu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure')));
-            $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site')));
+            $menu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure'), 'icon' => 'handshake-o'));
+            $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site'), 'icon' => 'sign-in'));
         } else {
             if ($security->isGranted('ROLE_MEMBER')) {
-                $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure')));
+                $menu->addChild('My memberships', array('route' => 'user_register_list', 'label' => 'Mes adhésions', 'attributes' => array('title' => 'Mes adhésions à la structure'), 'icon' => 'id-card'));
             }
             if ($security->isGranted('ROLE_STRUCTURE') and $session->has('slug')) {
                 $slug = $session->get('slug');
-                $strMenu = $menu->addChild('Structure', array('label' => $slug, 'dropdown' => true, 'caret' => true, 'icon' => 'king'));
-                $strMenu->addChild('Memberships', array('route' => 'user_register_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'user'));
-                $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cog'));
+                $strMenu = $menu->addChild('Structure', array('label' => $slug, 'dropdown' => true, 'caret' => true, 'icon' => 'star-half-o'));
+                $strMenu->addChild('Memberships', array('route' => 'user_register_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Adhérents', 'attributes' => array('title' => 'Gérer les adhérents'), 'icon' => 'users'));
+                $strMenu->addChild('Parameters', array('route' => 'parameter_admin_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Paramètres', 'attributes' => array('title' => 'Gérer les paramètres du site'), 'icon' => 'cogs'));
             }
             if ($security->isGranted('ROLE_ADMIN')) {
-                $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer', 'dropdown' => true, 'caret' => true, 'icon' => 'king'));
-                $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'home'));
-                $adminMenu->addChild('Questions', array('route' => 'user_register_question_index', 'routeParameters' => ['slug' => 'all'], 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-sign'));
+                $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer', 'dropdown' => true, 'caret' => true, 'icon' => 'star'));
+                $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'sitemap'));
+                $adminMenu->addChild('Questions', array('route' => 'user_register_question_index', 'routeParameters' => ['slug' => 'all'], 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-circle'));
             }
-            $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site'), 'icon' => 'log-out'));
+            $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site'), 'icon' => 'sign-out'));
         }
 
         return $menu;
@@ -82,10 +82,10 @@ class MenuBuilder
 
         $menu->addChild('Edit', array('route' => 'core_structure_edit', 'routeParameters' => array('slug' => $slug), 'label' => 'Modifier la structure', 'attributes' => array('title' => 'Modifier la structure', 'class' => 'btn btn-primary'), 'icon' => 'pencil'));
         $menu->addChild('Parameters', array('route' => 'parameter_admin_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Paramètres du site', 'attributes' => array('title' => 'Gérer les paramètres du site', 'class' => 'btn btn-primary'), 'icon' => 'cog'));
-        $menu->addChild('Gateways', array('route' => 'user_payment_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Moyens de paiement', 'attributes' => array('title' => 'Gérer les moyens de paiement', 'class' => 'btn btn-primary'), 'icon' => 'piggy-bank'));
+        $menu->addChild('Gateways', array('route' => 'user_payment_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Moyens de paiement', 'attributes' => array('title' => 'Gérer les moyens de paiement', 'class' => 'btn btn-primary'), 'icon' => 'credit-card'));
         $menu->addChild('Fees', array('route' => 'core_fee_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Tarifs', 'attributes' => array('title' => 'Gérer les tarifs d\'adhésion', 'class' => 'btn btn-primary'), 'icon' => 'eur'));
-        $menu->addChild('Receipts', array('route' => 'core_receipt_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Reçus fiscaux', 'attributes' => array('title' => 'Gérer les signataires de reçus fiscaux', 'class' => 'btn btn-primary'), 'icon' => 'pencil'));
-        $menu->addChild('Questions', array('route' => 'user_register_question_index', 'routeParameters' => ['slug' => $slug], 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires', 'class' => 'btn btn-primary'), 'icon' => 'question-sign'));
+        $menu->addChild('Receipts', array('route' => 'core_receipt_index', 'routeParameters' => array('slug' => $slug), 'label' => 'Reçus fiscaux', 'attributes' => array('title' => 'Gérer les signataires de reçus fiscaux', 'class' => 'btn btn-primary'), 'icon' => 'edit'));
+        $menu->addChild('Questions', array('route' => 'user_register_question_index', 'routeParameters' => ['slug' => $slug], 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires', 'class' => 'btn btn-primary'), 'icon' => 'question-circle'));
 
         if ($security->isGranted('ROLE_ADMIN')) {
             $menu->addChild('Delete', array('route' => 'core_structure_delete', 'routeParameters' => array('slug' => $slug), 'label' => 'Supprimer la structure', 'attributes' => array('title' => 'Supprimer la structure', 'class' => 'btn btn-primary delete'), 'icon' => 'trash'));

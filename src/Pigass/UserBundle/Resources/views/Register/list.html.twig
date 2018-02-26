@@ -62,7 +62,7 @@
         <li class="list-group-item">
             <span class="btn btn-primary pull-right">
                 <a href="{{ path('user_person_edit_me') }}?{{ app.request.queryString }}" title="Modifier">
-                    {{ icon('edit') }} Modifier
+                    {{ icon('pencil') }} Modifier
                 </a>
             </span>
             <div class="title">État civil</div>
@@ -72,13 +72,13 @@
         <li class="list-group-item">
             <span class="btn btn-primary pull-right">
                 <a href="{{ path('fos_user_change_password') }}?{{ app.request.queryString }}" title="Modifier le mot de passe">
-                    {{ icon('edit') }} Mot de passe
+                    {{ icon('lock') }} Mot de passe
                 </a>
             </span>
             <div class="title">Contact</div>
-            <div class="">Téléphone : {{ person.phone }}</div>
-            <div class="">Adresse : {% for item in person.address %} {{ item }} {% endfor %}</div>
-            <div class="">E-mail : {{ person.user.email }}</div>
+            <div class="">{{ icon('phone') }} {{ person.phone }}</div>
+            <div class="">{{ icon('home') }} {% for item in person.address %} {{ item }} {% endfor %}</div>
+            <div class="">{{ icon('envelope') }} {{ person.user.email }}</div>
         </li>
     </ul>
     <ul class="entities list-group">
@@ -89,13 +89,13 @@
                     <ul class="dropdown-menu">
                         <li>
                             <a href="{{ path('user_register_infos', {'id': membership.id, 'userid': userid}) }}" title="Afficher les réponses aux questions complémentaires">
-                                {{ icon('question-sign') }} Questions complémentaires
+                                {{ icon('question-circle') }} Questions complémentaires
                             </a>
                         </li>
                         {% if membership.status == 'validated' %}
                             <li>
                                 <a href="{{ path('core_receipt_build', {'id': membership.id}) }}" title="Télécharger le reçu fiscal">
-                                    {{ icon('piggy-bank') }} Reçu fiscal
+                                    {{ icon('edit') }} Reçu fiscal
                                 </a>
                             </li>
                         {% else %}
@@ -118,19 +118,19 @@
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li>
                                     <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">
-                                    {{ icon('ok-circle') }} Valider
+                                    {{ icon('check-circle') }} Valider
                                     </a>
                                 </li>
                             {% endif %}
                             <li>
                                 <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': userid}) }}" title="Supprimer cette adhésion">
-                                    {{ icon('remove-circle') }} Supprimer
+                                    {{ icon('times-circle') }} Supprimer
                                 </a>
                             </li>
                         {% elseif membership.status == 'paid' %}
                             <li>
                                 <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception de la fiche signée pour cette adhésion">
-                                    {{ icon('ok') }} Valider la fiche
+                                    {{ icon('check-circle') }} Valider la fiche
                                 </a>
                             </li>
                         {% endif %}

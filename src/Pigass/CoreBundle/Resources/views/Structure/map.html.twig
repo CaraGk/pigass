@@ -36,7 +36,7 @@
                 {% endif %}
                 {% if structure.phone is not null %}
                     <div>
-                        <a href="tel:{{ structure.phone }}" title="{{ structure.phone }}">{{ icon('phone-alt') }}</a>
+                        <a href="tel:{{ structure.phone }}" title="{{ structure.phone }}">{{ icon('phone') }}</a>
                     </div>
                 {% endif %}
                 {% if structure.url is not null %}
@@ -76,7 +76,7 @@
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="btn btn-primary">
                         <a href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de la structure '{{ structure.name }}'" class="index">
-                            {{ icon('user') }} Adhérents
+                            {{ icon('group') }} Adhérents
                         </a>
                     </li>
                     <li class="btn btn-primary">
@@ -86,7 +86,7 @@
                     </li>
                     <li class="btn btn-primary">
                         <a href="{{ path('parameter_admin_index', {'slug': structure.slug}) }}" title="Afficher les paramètres du site pour la structure '{{ structure.name }}'" class="index">
-                            {{ icon('cog') }} Paramètres
+                            {{ icon('cogs') }} Paramètres
                         </a>
                     </li>
                 {% endif %}

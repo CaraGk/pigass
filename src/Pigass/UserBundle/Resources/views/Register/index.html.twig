@@ -39,45 +39,45 @@
         </form>
     </li>
     {% if filters['valid'] is null %}
-        <li class="btn btn-default">
+        <li class="btn btn-sm btn-default">
             <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion validée">
                 Validation ?
             </a>
         </li>
     {% elseif filters['valid'] == true %}
-        <li class="btn btn-success">
+        <li class="btn btn-sm btn-success">
             <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
                 Validation : Oui
             </a>
         </li>
     {% elseif filters['valid'] == false %}
-        <li class="btn btn-danger">
+        <li class="btn btn-sm btn-danger">
             <a href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
                 Validation : Non
             </a>
         </li>
     {% endif %}
     {% if filters['ending'] is null %}
-        <li class="btn btn-default">
+        <li class="btn btn-sm btn-default">
             <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion se terminant bientôt">
                 Péremption prochaine ?
             </a>
         </li>
     {% elseif filters['ending'] == true %}
-        <li class="btn btn-success">
+        <li class="btn btn-sm btn-success">
             <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
                 Adhésion arrivant à terme
             </a>
         </li>
     {% elseif filters['ending'] == false %}
-        <li class="btn btn-danger">
+        <li class="btn btn-sm btn-danger">
             <a href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
                 Adhésion n'arrivant pas à terme
             </a>
         </li>
     {% endif %}
     {% if fees is not null %}
-        <li class="btn btn-default">
+        <li class="btn btn-sm btn-default">
             <div class="title">Type d'adhésion</div>
             {% for fee in fees %}
                 {% if filters['fee'] == fee.id %}
@@ -132,7 +132,7 @@
                     {% if membership.status == 'registered' %}
                         <li>
                             <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception du paiement pour cette adhésion">
-                                {{ icon('ok') }} Valider le paiement
+                                {{ icon('check-circle') }} Valider le paiement
                             </a>
                         </li>
                         <li>
@@ -143,7 +143,7 @@
                     {% elseif membership.status == 'paid' %}
                         <li>
                             <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception de la fiche signée pour cette adhésion">
-                                {{ icon('ok') }} Valider la fiche
+                                {{ icon('check-circle') }} Valider la fiche
                             </a>
                         </li>
                     {% elseif membership.status == 'validated' %}

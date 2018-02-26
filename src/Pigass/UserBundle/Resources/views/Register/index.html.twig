@@ -174,10 +174,10 @@
                         </a>
                     </span>
                 {% endif %}
+                {{ membership.person }}
                 {% if 'ROLE_STRUCTURE' in membership.person.user.roles %}
                     <span style="color:yellow;" title="Administrateur local">{{ icon('star') }}</span>
                 {% endif %}
-                {{ membership.person }}
             </div>
             <div class="field">({{ membership.person.birthday|date('d/m/Y') }})</div>
             {% if membership.payedOn is not null %}

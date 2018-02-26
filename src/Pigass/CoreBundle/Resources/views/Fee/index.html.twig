@@ -23,8 +23,8 @@
         {% for fee in fees %}
             <li class="entity fee list-group-item row">
                 {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STRUCTURE') %}
-                    <span class="btn-group pull-right">
-                        <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                    <span class="pull-right">
+                        <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">{{ icon('bars') }} <span class="caret"></span></button>
                         <ul class="dropdown-menu">
                             <li class="action">
                                 <a href="{{ path('core_fee_edit', {'slug': structure.slug, 'id': fee.id}) }}" title="Modifier la tarification '{{ fee }}'" class="edit">

@@ -32,8 +32,8 @@
     <ul class="entities list-group">
         {% for person in persons %}
             <li class="entity person list-group-item">
-                <span class="btn-group pull-right">
-                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                <span class="pull-right">
+                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">{{ icon('bars') }} <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li class="action">
                             <a href="{{ path('user_person_edit', {'id': person.id}) }}?{{ app.request.queryString }}#person_{{ person.id }}" title="Modifier l'étudiant '{{ person }}'" class="edit">

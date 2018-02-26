@@ -19,8 +19,8 @@
         {% for question in questions %}
             <li class="entity list-group-item row">
                 {% if is_granted("ROLE_ADMIN") or (question.structure is not null and (is_granted("ROLE_STRUCTURE") and question.structure.slug == slug)) %}
-                <span class="btn-group pull-right">
-                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                <span class="pull-right">
+                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">{{ icon('bars') }} <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li>
                             <a href="{{ path('user_register_question_edit', {'id': question.id, 'slug': slug}) }}" title="Modifier la question complémentaire" class="edit">

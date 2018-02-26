@@ -104,13 +104,24 @@ class Person
      */
     private $memberships;
 
-  public function __toString()
-  {
-    if ($this->isAnonymous())
-      return "*** anonyme ***";
-    else
-      return $this->name . ' ' . $this->surname;
-  }
+    private function upperFirst($data)
+    {
+        return preg_replace_callback(
+            '#([- ]?)(\p{L}*)([- ]?)#u',
+            function ($data) {
+                return in_array($data[0], array('d', 'de', 'des', 'du', 'en', 'l', 'la', 'le')) ? $data[0] : ucfirst($data[0]);
+            },
+            strtolower($data)
+        );
+    }
+
+    public function __toString()
+    {
+        if ($this->isAnonymous())
+            return "*** anonyme ***";
+        else
+            return $this->upperFirst($this->name) . ' ' . $this->upperFirst($this->surname);
+    }
 
     /**
      * Constructor
@@ -127,7 +138,9 @@ class Person
      */
     public function setSurname($surname)
     {
-        $this->surname = $surname;
+        $this->surname = $this->upperFirst($surname);
+
+        return $this;
     }
 
     /**
@@ -137,7 +150,7 @@ class Person
      */
     public function getSurname()
     {
-        return $this->surname;
+        return $this->upperFirst($this->surname);
     }
 
     /**
@@ -159,7 +172,9 @@ class Person
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->name = $this->upperFirst($name);
+
+        return $this;
     }
 
     /**
@@ -169,7 +184,7 @@ class Person
      */
     public function getName()
     {
-        return $this->name;
+        return $this->upperFirst($this->name);
     }
 
     /**
@@ -203,6 +218,8 @@ class Person
     public function setPhone($phone)
     {
         $this->phone = $phone;
+
+        return $this;
     }
 
     /**
@@ -223,6 +240,8 @@ class Person
     public function setUser(\Pigass\UserBundle\Entity\User $user)
     {
         $this->user = $user;
+
+        return $this;
     }
 
     /**
@@ -361,7 +380,7 @@ class Person
      */
     public function setBirthplace($birthplace)
     {
-        $this->birthplace = $birthplace;
+        $this->birthplace = $this->upperFirst($birthplace);
 
         return $this;
     }
@@ -373,7 +392,7 @@ class Person
      */
     public function getBirthplace()
     {
-        return $this->birthplace;
+        return $this->upperFirst($this->birthplace);
     }
 
 }

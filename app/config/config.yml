@@ -138,12 +138,15 @@ mopa_bootstrap:
     navbar: ~
     initializr: 
         meta: 
-            keywords: "choix de stage, simulation, interne, internat, évalutations de stage"
+            keywords: "adhésion, intersyndicale, pigass"
             author_name: "Pierre-François Angrand"
             nofollow: false
             noindex: false
+        diagnostic_mode: false
+        dns_prefetch:
+            - '//ajax.googleapis.com'
     icons:
-        icon_set: fontawesome
+        icon_set: fontawesome4
         shortcut: icon
 
 payum:

@@ -80,7 +80,6 @@
     {{ parent() }}
     {% block javascripts %}
         {% javascripts
-            '@MopaBootstrapBundle/Resources/public/bootstrap/js/*.js'
             '@PigassCoreBundle/Resources/public/js/*.js'
         %}
         <script type="text/javascript" src="{{ asset_url }}"></script>

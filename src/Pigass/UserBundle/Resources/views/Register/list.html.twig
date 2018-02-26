@@ -147,7 +147,13 @@
                     {% if membership.payedOn is not null %}
                         le {{ membership.payedOn|date('d/m/Y') }}.
                     {% else %}
-                        ; la transaction n'a pas été validée.
+                        ; la transaction na pas été validée.
+                        {% if membership.method.config['address']['city'] is defined and not null %}
+                            <span title="Chèque à l'ordre de {{ membership.method.config['payableTo'] }} ; {{ membership.method.config['address']['number'] }} {{ membership.method.config['address']['type'] }} {{ membership.method.config['address']['street'] }}, {{ membership.method.config['address']['complement'] }}, {{ membership.method.config['address']['code'] }} {{ membership.method.config['address']['city'] }}, {{ membership.method.config['address']['country'] }}">{{ icon('globe') }}</span>
+                        {% endif %}
+                        {% if membership.method.config['iban'] is defined and not null %}
+                            <span title="IBAN : {{ membership.method.config['iban'] }}">{{ icon('comment') }}</span>
+                        {% endif %}
                     {% endif %}
                     </p>
                 </div>

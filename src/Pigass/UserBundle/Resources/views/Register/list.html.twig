@@ -83,9 +83,9 @@
     </ul>
     <ul class="entities list-group">
         {% for membership in memberships %}
-            <li class="list-group-item row">
+            <li class="list-group-item row col-lg-4 col-md-6 col-sm-12">
                 <span class="btn-group pull-right">
-                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">{{ icon('bars') }} <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li>
                             <a href="{{ path('user_register_infos', {'id': membership.id, 'userid': userid}) }}" title="Afficher les réponses aux questions complémentaires">
@@ -136,13 +136,20 @@
                         {% endif %}
                     </ul>
                 </span>
-                <div>
-                    Adhésion à {{ membership.structure.name }} jusqu'au {{ membership.expiredOn|date('d/m/Y') }} payée ({{ membership.amount/100|number_format(2,',',' ') }} €) par {{ membership.method.label|lower }}
+                <div class="col-xs-2">
+                    {% if membership.structure.logo is not null %}
+                        <img src="{{ asset('uploads/' ~ membership.structure.logo) }}" alt="{{ membership.structure.logo }}" class="logo"/>
+                    {% endif %}
+                </div>
+                <div class="col-xs-8">
+                    <p>Adhésion jusqu'au {{ membership.expiredOn|date('d/m/Y') }}</p>
+                    <p>Paiement : {{ membership.amount/100|number_format(2,',',' ') }} € par {{ membership.method.label|lower }}
                     {% if membership.payedOn is not null %}
                         le {{ membership.payedOn|date('d/m/Y') }}.
                     {% else %}
                         ; la transaction n'a pas été validée.
                     {% endif %}
+                    </p>
                 </div>
             </li>
         {% else %}

@@ -126,8 +126,8 @@
         {% if not filters['search'] or membership.person.id != cur %}
         {% set cur = membership.person.id %}
         <li class="entity person list-group-item row">
-            <span class="btn-group pull-right">
-                <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+            <span class="pull-right">
+                <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">{{ icon('bars') }} <span class="caret"></span></button>
                 <ul class="dropdown-menu">
                     {% if membership.status == 'registered' %}
                         <li>
@@ -170,13 +170,16 @@
                 {% if membership.expiredOn|date('Ymd') < "now"|date_modify(kparam('reg_'~slug~'_anticipated'))|date('Ymd') %}
                     <span style="color:orange;" title="Fin de période d'adhésion proche">
                         <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Fin de la période d'adhésion proche" style="color:orange; text-decoration:none;">
-                        {{ icon('hourglass-end') }}
+                            {{ icon('hourglass-end') }}
                         </a>
                     </span>
                 {% endif %}
+                {% if 'ROLE_STRUCTURE' in membership.person.user.roles %}
+                    <span style="color:yellow;" title="Administrateur local">{{ icon('star') }}</span>
+                {% endif %}
                 {{ membership.person }}
             </div>
-            <div class="field">({{ membership.person.birthday|date('d/m/y') }})</div>
+            <div class="field">({{ membership.person.birthday|date('d/m/Y') }})</div>
             {% if membership.payedOn is not null %}
                 <div class="">Adhésion par {{ membership.method.label|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>
             {% endif %}

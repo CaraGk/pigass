@@ -33,6 +33,7 @@
 /web/js/
 /web/images/
 /web/css/
+/web/fonts/
 
 # Assets managed by Bower
 /web/assets/vendor/

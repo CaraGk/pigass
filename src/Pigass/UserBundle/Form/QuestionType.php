@@ -40,6 +40,7 @@ class QuestionType extends AbstractType
                     'multiple' => false,
                     'expanded' => true,
                     'label'    => $question->getName(),
+                    'widget_type' => 'inline',
                  ));
             } elseif($question->getType() == 2) {
                 $builder->add('question_' . $question->getId(), TextareaType::class, array(
@@ -56,6 +57,7 @@ class QuestionType extends AbstractType
                     'multiple' => true,
                     'expanded' => true,
                     'label'    => $question->getName(),
+                    'widget_type' => 'inline',
                 ));
             } elseif ($question->getType() == 4) {
                 $builder->add('question_' . $question->getId(), IntegerType::class, array(
@@ -71,6 +73,7 @@ class QuestionType extends AbstractType
                     'multiple' => false,
                     'expanded' => true,
                     'label'    => $question->getName(),
+                    'widget_type' => 'inline',
                 ));
             } elseif ($question->getType() == 6) {
                 $builder->add('question_' . $question->getId(), TimeType::class, array(
@@ -87,9 +90,9 @@ class QuestionType extends AbstractType
                     'input'        => 'string',
                     'widget'       => 'single_text',
                     'html5'        => true,
-                    'horizontal_input_wrapper_class' => 'col-lg-4',
                     'required' => $this->admin?false:($question->isRequired()?true:false),
                     'label'        => $question->getName(),
+                    'help_block'   => 'En cas de souci lié à l\'utilisation de Safari ou d\'un navigateur ancien, indiquez la date au format "AAAA-MM-JJ"',
                 ));
             } elseif ($question->getType() == 8) {
                 $builder->add('question_' . $question->getId(), ChoiceType::class, array(

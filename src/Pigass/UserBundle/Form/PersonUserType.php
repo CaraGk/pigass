@@ -60,12 +60,6 @@ class PersonUserType extends AbstractType
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse professionnelle :'
             ))
-            ->add('Save', SubmitType::class, array(
-                'label' => 'Continuer',
-                'attr'  => array(
-                    'class' => 'btn btn-primary pull-right',
-                ),
-            ))
         ;
   }
 

@@ -43,9 +43,7 @@ class MembershipHandler
             $this->form->handleRequest($this->request);
 
             if($this->form->isValid()) {
-                $this->onSuccess($this->form->getData());
-
-                return $this->form->getData();
+                return $this->onSuccess($this->form->getData());
             }
         }
 
@@ -70,24 +68,38 @@ class MembershipHandler
         if ($this->person) {
             $membership->setPerson($this->person);
         } else {
-            $this->updateUser($membership->getPerson()->getUser());
-            $membership->getPerson()->setAnonymous(false);
+            $user = $membership->getPerson()->getUser();
+            if (!$db_user = $this->em->getRepository('PigassUserBundle:User')->findOneBy(['username' => $user->getUsername()])) {
+                $this->updateUser($user);
+                $membership->getPerson()->setAnonymous(false);
+            } else {
+                var_dump($db_user->getUsername());
+                if ($db_user->isEnabled())
+                    return 'exists';
+                else
+                    return 'disabled';
+            }
         }
 
         $this->em->persist($membership);
         $this->em->flush();
+
+        return true;
     }
 
     private function updateUser($user)
     {
         if (null == $user->getId()) {
             $this->um->createUser();
-            if (!$user->getPlainPassword()) {
+            if (!$user->getPlainPassword())
                 $user->setPlainPassword($this->generatePwd(8));
-            }
-            $user->setConfirmationToken(null);
-            $user->setEnabled(true);
             $user->addRole('ROLE_MEMBER');
+            if (isset($this->options['token']) and $this->options['token']) {
+                $user->setConfirmationToken($this->options['token']);
+            } else {
+                $user->setConfirmationToken(null);
+                $user->setEnabled(true);
+            }
         }
         $user->setUsername($user->getEmail());
 

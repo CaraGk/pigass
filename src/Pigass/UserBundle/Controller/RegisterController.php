@@ -651,43 +651,57 @@ class RegisterController extends Controller
      */
     public function registerAction(Request $request, $slug)
     {
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $this->session->getFlashBag()->add('error', 'Utilisateur déjà enregistré');
-            return $this->redirect($this->generateUrl('user_register_join', array('slug' => $slug)));
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+            $token = $tokenGenerator->generateToken();
+        } else {
+            $token = null;
+            if ($adminUser = $this->getUser()) {
+                $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
+                $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
+                if (!$adminUser->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
+                    throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
+            }
         }
 
-        $tokenGenerator = $this->container->get('fos_user.util.token_generator');
-        $token = $tokenGenerator->generateToken();
-
-        $form = $this->createForm(RegisterType::class);
-        $form_handler = new RegisterHandler($form, $request, $this->em, $this->um, $token);
+        $membership = new Membership();
+        $options = array(
+            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
+            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
+            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
+            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
+            'token'       => $token,
+        );
+        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true]);
+        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options);
 
         if($result = $form_handler->process()) {
+            var_dump($result);
             /* If User is allready in db (former registration error) */
-            if (!$result['error']) {
-                $this->session->set('user_register_tmp', 1);
-                $this->session->getFlashBag()->add('notice', 'Utilisateur ' . $result['user']->getUsername() . ' créé.');
-
-                return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $result['user']->getUsername(), 'slug' => $slug)));
+            if ($result === 'exists') {
+                $this->session->getFlashBag()->add('error', 'L\'utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' existe déjà en base de données. Vous devez vous connecter pour accéder à votre compte.');
+                return $this->redirect($this->generateUrl('fos_user_security_login'));
+            } elseif ($result === 'disabled') {
+                $this->session->getFlashBag()->add('error', 'L\'utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' existe mais n\'a jamais été activé. Renvoi du mail d\'activation en cours.');
+                return $this->redirect($this->generateUrl('user_register_confirmation_send', ['email' => $membership->getPerson()->getUser()->getUsername(), 'slug' => $slug]));
             } else {
-                $this->session->getFlashBag()->add('error', 'L\'utilisateur ' . $result['user']->getUsername() . ' existe déjà en base de données.');
-
-                /* If User has never been activated, act as new */
-                if (!$result['user']->isEnabled()) {
-                    $this->session->set('user_register_tmp', 1);
-                    $this->session->getFlashBag()->add('error', 'L\'utilisateur n\'a jamais été activé. Renvoi du mail d\'activation en cours.');
-
-                    return $this->redirect($this->generateUrl('user_register_confirmation_send', array('email' => $result['user']->getUsername(), 'slug' => $slug)));
-                } else {
-                    $this->session->getFlashBag()->add('error', 'Veuillez vous connecter pour adhérer. En cas de perte du mot de passe, réinitialisez-le ci-dessous.');
-
-                    return $this->redirect($this->generateUrl('fos_user_resetting_request'));
-                }
+                $this->session->set('user_register_tmp', 1);
+                $this->session->getFlashBag()->add('success', 'Utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' créé et adhésion enregistrée pour ' . $membership->getPerson() . '. Envoi du mail d\'activation en cours.');
             }
+            if (isset($adminMembership)) {
+                $filter = $this->session->get('user_register_filter', array());
+                $filter['user'] = $membership->getPerson()->getUser()->getId();
+                $this->session->set('user_register_filter', $filter);
+                $this->session->set('user_register_register', true);
+            }
+            return $this->redirect($this->generateUrl('user_payment_prepare', [
+                'gateway' => $membership->getMethod()->getGatewayName(),
+                'memberid' => $membership->getId(),
+            ]));
         }
 
         return array(
@@ -700,26 +714,24 @@ class RegisterController extends Controller
      * Send confirmation email
      *
      * @Route("/{slug}/register/send/{email}", name="user_register_confirmation_send", requirements={"email" = ".+\@.+\.\w+", "slug" = "\w+" })
-     * @Template()
      */
     public function sendConfirmationAction($email, Request $request, $slug)
     {
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
         $user = $this->um->findUserByUsername($email);
         if(!$user)
             throw $this->createNotFoundException('Aucun utilisateur lié à cette adresse mail.');
-        $person = $this->em->getRepository('PigassUserBundle:Person')->findOneBy(array('user' => $user));
+        $person = $this->em->getRepository('PigassUserBundle:Person')->findOneBy(['user' => $user]);
 
-        if(!$user->getConfirmationToken())
-            throw $this->createNotFoundException('Cet utilisateur n\'a pas de jeton de confirmation défini. Est-il déjà validé ? Contactez un administrateur.');
+        if(!$user->getConfirmationToken()) {
+            $this->session->getFlashBag()->add('error', 'Cet utilisateur n\'a pas de jeton de confirmation défini. Est-il déjà validé ? Contactez un administrateur si nécessaire.');
+            return $this->redirect($this->generateUrl('user_register_list'));
+        }
 
-        if ($this->session->get('user_register_tmp'))
-            $this->session->set('user_register_tmp', $email);
-
-        $url = $this->generateUrl('fos_user_registration_confirm', array('token' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->generateUrl('fos_user_registration_confirm', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
         $params = array(
             'user'      => $user,
             'url'       => $url,
@@ -736,10 +748,8 @@ class RegisterController extends Controller
         ;
         $this->get('mailer')->send($sendmail);
 
-        return array(
-            'email' => $user->getEmailCanonical(),
-            'slug'  => $slug,
-        );
+        $this->session->getFlashBag()->add('success', 'E-mail d\'activation envoyé.');
+        return $this->redirect($this->generateUrl('user_register_list'));
     }
 
     /**
@@ -1141,58 +1151,6 @@ class RegisterController extends Controller
             'infos'   => $memberinfos,
             'userid'  => $userid,
             'person'  => $person,
-        );
-    }
-
-    /**
-     * Add membership and person
-     *
-     * @Route("/{slug}/member/new", name="user_register_membership_new")
-     * @Template("PigassUserBundle:Register:join.html.twig")
-     * @Security\Secure(roles="ROLE_ADMIN, ROLE_STRUCTURE")
-     */
-    public function newMembershipAction($slug, Request $request)
-    {
-        $adminUser = $this->getUser();
-        if ($adminUser) {
-            $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
-            $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
-            $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(array('slug' => $slug));
-            if (!$structure)
-                throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
-            if (!$adminUser->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
-                throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
-        }
-
-        $membership = new Membership();
-        $options = array(
-            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
-            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
-            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
-            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
-        );
-        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true]);
-        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options);
-
-        if($form_handler->process()) {
-            $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $membership->getPerson() . '.');
-
-            if ($adminUser) {
-                $filter = $this->session->get('user_register_filter', array());
-                $filter['user'] = $membership->getPerson()->getUser()->getId();
-                $this->session->set('user_register_filter', $filter);
-                $this->session->set('user_register_register', true);
-            }
-
-            return $this->redirect($this->generateUrl('user_payment_prepare', [
-                'gateway' => $membership->getMethod()->getGatewayName(),
-                'memberid' => $membership->getId(),
-            ]));
-        }
-
-        return array(
-            'form'      => $form->createView(),
-            'structure' => $structure,
         );
     }
 

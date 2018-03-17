@@ -170,20 +170,13 @@ class PaymentController extends Controller
             $this->em->persist($membership);
             $this->em->flush();
 
-            if ($this->session->get('user_register_tmp')) {
-                $this->session->remove('user_register_tmp');
-                $user = $membership->getPerson()->getUser();
-                $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-                $this->container->get('security.token_storage')->setToken($token);
-            }
-
             $params = array(
                 'membership'  => $membership,
                 'print'       => $toPrintParam,
                 'pay_address' => ($address?$address:null),
             );
             $sendmail = \Swift_Message::newInstance()
-                ->setSubject('PIGASS - Demande d\'adhésion enregistré')
+                ->setSubject('PIGASS - Demande d\'adhésion enregistrée')
                 ->setFrom($this->container->getParameter('mailer_mail'))
                 ->setReplyTo($structure->getEmail())
                 ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
@@ -191,6 +184,13 @@ class PaymentController extends Controller
                 ->addPart($this->renderView('PigassUserBundle:Payment:confirmMember.txt.twig', $params, 'text/plain'))
             ;
             $this->get('mailer')->send($sendmail);
+
+            if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+                $user = $membership->getPerson()->getUser();
+                $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+                $this->container->get('security.token_storage')->setToken($token);
+                return $this->redirect($this->generateUrl('user_register_confirmation_send', ['email' => $user->getUsername(), 'slug' => $structure->getSlug()]));
+            }
         } else {
              $this->addFlash('error', 'Le paiement a échoué ou a été annulé. En cas de problème, veuillez contacter l\'administrateur du site.');
         }

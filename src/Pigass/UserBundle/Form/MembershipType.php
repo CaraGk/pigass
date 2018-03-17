@@ -86,7 +86,7 @@ class MembershipType extends AbstractType
 
         $builder
             ->add('Save', SubmitType::class, [
-                'label' => 'Payer',
+                'label' => 'Continuer',
                 'attr'  => [
                     'class' => 'btn btn-primary pull-right',
                 ],

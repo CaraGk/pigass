@@ -154,7 +154,7 @@ class RegisterController extends Controller
                     ->setFrom($this->container->getParameter('mailer_mail'))
                     ->setReplyTo($structure->getEmail())
                     ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
-                    ->addBody($this->renderView('PigassUserBundle:Payment:confirmPrint.txt.twig', array('membership' => $membership), 'text/plain'))
+                    ->setBody($this->renderView('PigassUserBundle:Payment:confirmPrint.txt.twig', array('membership' => $membership), 'text/plain'))
                 ;
                 $this->get('mailer')->send($sendmail);
                 $this->em->persist($membership);
@@ -193,7 +193,7 @@ class RegisterController extends Controller
                         ->setFrom($this->container->getParameter('mailer_mail'))
                         ->setReplyTo($structure->getEmail())
                         ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
-                        ->addBody($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
+                        ->setBody($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
                     ;
                     $this->get('mailer')->send($sendmail);
                 } elseif ($membership->getStatus() == 'validated') {
@@ -772,7 +772,7 @@ class RegisterController extends Controller
                 ->setFrom($this->container->getParameter('mailer_mail'))
                 ->setReplyTo($structure->getEmail())
                 ->setTo($user->getEmailCanonical())
-                ->addBody($this->renderView('PigassUserBundle:Register:confirmation.txt.twig', $params, 'text/plain'))
+                ->setBody($this->renderView('PigassUserBundle:Register:confirmation.txt.twig', $params, 'text/plain'))
         ;
         $this->get('mailer')->send($sendmail);
 

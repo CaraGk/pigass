@@ -41,18 +41,20 @@ class PaymentController extends Controller
      * Prepare action
      *
      * @Route("/member/{memberid}/payment/{gateway}", name="user_payment_prepare", requirements={"memberid" = "\d+", "gateway" = "\w+"})
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.get('session').get('user_register_tmp')")
      */
     public function prepareAction($gateway, $memberid)
     {
         $membership = $this->em->getRepository('PigassUserBundle:Membership')->find($memberid);
-        if ($this->session->get('user_register_tmp', false)) {
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $membership->getPerson()->getUser();
         } else {
-            $user = $this->um->findUserByUsername($this->get('security.token_storage')->getToken()->getUsername());
+            $user = $this->getUser();
         }
 
-        if (!$membership or ($membership->getPerson()->getUser() !== $user and !($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE')))))
+        if (!$membership or ($membership->getPerson()->getUser() !== $user
+            and !($user->hasRole('ROLE_ADMIN')
+                or ($user->hasRole('ROLE_STRUCTURE')
+        ))))
             throw $this->createNotFoundException('Impossible d\'effectuer la transaction. Contactez un administrateur.');
 
         $slug = $membership->getStructure()->getSlug();
@@ -89,7 +91,6 @@ class PaymentController extends Controller
      * Done transaction action
      *
      * @Route("/member/payment/valid", name="user_payment_done")
-     * @Security\PreAuthorize("hasRole('ROLE_MEMBER') or container.get('session').get('user_register_tmp')")
      */
     public function doneAction(Request $request)
     {

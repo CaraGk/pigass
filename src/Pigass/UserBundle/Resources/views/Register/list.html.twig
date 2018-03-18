@@ -19,7 +19,7 @@
     {% if slug is not null %}
         {% if reJoinable == true %}
             <li class="btn btn-primary">
-                <a href="{{ path('user_person_edit_me', {'slug': slug, 'redirect': 'user_register_join'}) }}&{{ app.request.queryString }}">
+                <a href="{{ path('user_register_register', {'slug': slug, 'rejoin': true}) }}&{{ app.request.queryString }}">
                     {{ icon('euro') }} Ré-adhérer
                 </a>
             </li>
@@ -114,7 +114,7 @@
                                 </li>
                             {% endif %}
                         {% endif %}
-                        {% if membership.status == 'registered' or membership.payedOn is null %}
+                        {% if membership.payedOn is null %}
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li>
                                     <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">

@@ -73,7 +73,6 @@ class MembershipHandler
                 $this->updateUser($user);
                 $membership->getPerson()->setAnonymous(false);
             } else {
-                var_dump($db_user->getUsername());
                 if ($db_user->isEnabled())
                     return 'exists';
                 else

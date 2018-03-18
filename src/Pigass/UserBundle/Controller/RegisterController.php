@@ -655,41 +655,67 @@ class RegisterController extends Controller
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $tokenGenerator = $this->container->get('fos_user.util.token_generator');
-            $token = $tokenGenerator->generateToken();
-        } else {
-            $token = null;
-            if ($adminUser = $this->getUser()) {
-                $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
-                $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
-                if (!$adminUser->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
-                    throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
-            }
-        }
-
-        $membership = new Membership();
         $options = array(
             'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
             'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
             'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
             'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
-            'token'       => $token,
         );
+
+        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+            $options['token'] = $tokenGenerator->generateToken();
+        } else {
+            $options['token'] = null;
+            $user = $this->getUser();
+            $rejoin = $request->query->get('rejoin', false);
+            /* if person's account exists and is about to rejoin */
+            if ($rejoin) {
+                $userid = $request->query->get('userid', null);
+                $person = $this->testAdminTakeOver($user, $userid);
+                $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
+                /* test if person can rejoin at this time */
+                $now = new \DateTime('now');
+                $anticipated = $now->modify($options['anticipated']);
+                if (null !== $current_membership and ($current_membership->getExpiredOn() > $options['anticipated'] and $current_membership->getStatus() != 'registered')) {
+                    $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
+                    return $this->redirect($this->generateUrl('user_register_list', ["userid" => $userid]));
+                }
+            } else {
+                if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) {
+                    $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($user);
+                    $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
+                    if (!$user->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
+                        throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
+                } else {
+                    $this->session->getFlashBag()->add('error', 'Opération interdite.');
+                    return $this->redirect($this->generateUrl('user_register_list'));
+                }
+            }
+        }
+
+        if (isset($current_membership) and $current_membership->getStatus() == 'registered')
+            $membership = $current_membership;
+        else
+            $membership = new Membership();
+
+        if (isset($person))
+            $membership->setPerson($person);
+
         $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true]);
-        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options);
+        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, isset($person)?$person:null);
 
         if($result = $form_handler->process()) {
-            var_dump($result);
-            /* If User is allready in db (former registration error) */
-            if ($result === 'exists') {
+            /* If User is allready in db and action is not to rejoin */
+            if ($result === 'exists' and !isset($rejoin)) {
                 $this->session->getFlashBag()->add('error', 'L\'utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' existe déjà en base de données. Vous devez vous connecter pour accéder à votre compte.');
                 return $this->redirect($this->generateUrl('fos_user_security_login'));
             } elseif ($result === 'disabled') {
                 $this->session->getFlashBag()->add('error', 'L\'utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' existe mais n\'a jamais été activé. Renvoi du mail d\'activation en cours.');
                 return $this->redirect($this->generateUrl('user_register_confirmation_send', ['email' => $membership->getPerson()->getUser()->getUsername(), 'slug' => $slug]));
+            } elseif (isset($rejoin)) {
+                $this->session->getFlashBag()->add('success', 'Adhésion enregistrée pour ' . $membership->getPerson() . '.');
             } else {
-                $this->session->set('user_register_tmp', 1);
                 $this->session->getFlashBag()->add('success', 'Utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' créé et adhésion enregistrée pour ' . $membership->getPerson() . '. Envoi du mail d\'activation en cours.');
             }
             if (isset($adminMembership)) {
@@ -699,7 +725,7 @@ class RegisterController extends Controller
                 $this->session->set('user_register_register', true);
             }
             return $this->redirect($this->generateUrl('user_payment_prepare', [
-                'gateway' => $membership->getMethod()->getGatewayName(),
+                'gateway'  => $membership->getMethod()->getGatewayName(),
                 'memberid' => $membership->getId(),
             ]));
         }
@@ -1044,9 +1070,6 @@ class RegisterController extends Controller
             $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
             if ($last_membership->getExpiredOn() <= $now) {
                 $reJoinable = true;
-            } elseif ($last_membership->getStatus() == 'registered' and strpos($last_membership->getMethod()->getGatewayName(), 'paypal_express_checkout')) {
-                $this->session->getFlashBag()->add('error', 'Il y a eu un souci lors du dernier enregistrement de votre adhésion. Veuillez la renouveler ou contacter un administrateur.');
-                return $this->redirect($this->generateUrl('user_register_join', ['slug' => $slug, 'userid' => $userid]));
             }
 
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);

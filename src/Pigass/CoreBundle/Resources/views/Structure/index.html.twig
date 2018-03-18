@@ -59,17 +59,12 @@
                 <div class="col-sm-10">
                     <div class="col-sm-12 title">
                         {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
+                            <a href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de {{ structure.name }}">
                                 {% if structure.area is not null %}{{ structure.area }} :{% endif %}
                                 {{ structure.name }}
                                 ({{ structure.slug }})
                             </a>
-                        {% elseif not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                            <a href="{{ path('user_register_register', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
-                                {% if structure.area is not null %}{{ structure.area }} :{% endif %}
-                                {{ structure.name }}
-                            </a>
-                        {% elseif is_granted('ROLE_MEMBER') %}
+                        {% else %}
                             <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
                                 {% if structure.area is not null %}{{ structure.area }} :{% endif %}
                                 {{ structure.name }}

@@ -60,19 +60,17 @@
                 {% endif %}
             </div>
             <ul class="panel-footer btn-group-vertical">
-                {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                    <li class="btn btn-primary">
-                        <a href="{{ path('user_register_register', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
+                <li class="btn btn-primary">
+                        {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
                             {{ icon('edit') }} Adhérer
                         </a>
-                    </li>
-                {% elseif is_granted('ROLE_MEMBER') %}
-                    <li class="btn btn-primary">
-                        <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
+                    {% elseif is_granted('ROLE_MEMBER') %}
+                        <a href="{{ path('user_register_join', {'slug': structure.slug, 'rejoin': true}) }}" title="Ré-dhérer à la structure {{ structure.name }}">
                             {{ icon('edit') }} Ré-adhérer
                         </a>
-                    </li>
-                {% endif %}
+                    {% endif %}
+                </li>
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="btn btn-primary">
                         <a href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de la structure '{{ structure.name }}'" class="index">

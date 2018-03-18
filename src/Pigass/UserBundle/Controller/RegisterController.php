@@ -675,10 +675,10 @@ class RegisterController extends Controller
                 $now = new \DateTime('now');
                 $anticipated = $now->modify($options['anticipated']);
                 if (null !== $current_membership and ($current_membership->getExpiredOn() > $options['anticipated'] and $current_membership->getStatus() != 'registered')) {
+                    $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
                     if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE') and $current_membership->getStructure()->getSlug() == $slug)) {
                         return $this->redirect($this->generateUrl('user_register_index', ["slug" => $slug]));
                     } else {
-                        $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
                         return $this->redirect($this->generateUrl('user_register_list', ["userid" => $userid]));
                     }
                 }
@@ -686,11 +686,13 @@ class RegisterController extends Controller
                 if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) {
                     $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($user);
                     $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
-                    if (!$user->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug)
-                        throw $this->createNotFoundException('Vous n\'avez pas les droits pour accéder à cette structure.');
+                    if (!$user->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug) {
+                        $this->session->getFlashBag()->add('error', 'Vous n\'avez pas les droits pour accéder à cette structure.');
+                        return $this->redirect($this->generateUrl('user_register_join', ["slug" => $slug, "rejoin" => true]));
+                    }
                 } else {
                     $this->session->getFlashBag()->add('error', 'Opération interdite.');
-                    return $this->redirect($this->generateUrl('user_register_list'));
+                    return $this->redirect($this->generateUrl('user_register_join', ["slug" => $slug, "rejoin" => true]));
                 }
             }
         }

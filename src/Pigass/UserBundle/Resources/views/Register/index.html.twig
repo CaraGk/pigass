@@ -29,6 +29,11 @@
             {{ icon('user-plus') }} Ajouter
         </a>
     </li>
+    <li class="btn btn-primary">
+        <a href="{{ path('user_person_export', {'slug': slug}) }}" title="Afficher la liste des e-mails">
+            {{ icon('envelope') }} Liste des e-mails
+        </a>
+    </li>
     <li class="btn">
         <form>
             {{ icon('search') }}

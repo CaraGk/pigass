@@ -35,6 +35,9 @@ class PersonController extends Controller
     /** @DI\Inject */
     private $router;
 
+    /** @DI\Inject */
+    private $session;
+
     /** @DI\Inject("doctrine.orm.entity_manager") */
     private $em;
 
@@ -182,7 +185,7 @@ class PersonController extends Controller
     }
 
     /**
-     * Export mail by structure
+     * Export filtered mails by structure
      *
      * @Route("/export/{slug}/mail", name="user_person_export", requirements={"slug" = "\w+"})
      * @Template()
@@ -190,8 +193,28 @@ class PersonController extends Controller
      */
     public function exportMailAction($slug)
     {
-        $mails = $this->em->getRepository('PigassUserBundle:Person')->getMailsByStructure($structure_id);
-        $structure = $this->em->getRepository('PigassUserBundle:Structure')->findBy(array('slug' => $slug));
+        $session_slug = $this->session->get('slug', null);
+        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
+        $adminUser = $this->getUser();
+        $adminPerson = $this->em->getRepository('PigassUserBundle:Person')->getByUser($adminUser);
+        $adminMembership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($adminPerson, true);
+        if (!$adminMembership) {
+            $this->session->getFlashBag()->add('warning', 'Adhésion périmée. Veuillez réadhérer pour accéder aux fonctionnalités d\'administration.');
+            return $this->redirect($this->generateUrl('user_register_join', array('slug' => $slug)));
+        }
+        if (!$adminUser->hasRole('ROLE_ADMIN') and $session_slug != $slug) {
+            $slug = $actualMembership->getStructure()->getSlug();
+            $this->session->set('slug', $slug);
+        }
+        $filters = $this->session->get('user_register_filter', [
+            'valid'     => null,
+            'ending'    => null,
+            'fee'       => null,
+            'questions' => null,
+            'search'    => null,
+        ]);
+        $mails = $this->em->getRepository('PigassUserBundle:Membership')->getMailsByStructure($slug, $filters);
+
 
         return array(
             'mails'     => $mails,

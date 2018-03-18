@@ -3,15 +3,28 @@
 {% block title %}{{ parent() }} - Adresses mails ({{ structure }}){% endblock %}
 {% block headline %}{{ structure }} : adresses mails{% endblock %}
 
-{% block content %}
-    <div class="panel panel-primary">Séparateur :
+{% block action %}
+    <li class="btn btn-primary">
+        <a href="{{ path('user_register_index', {'slug': structure.slug}) }}">
+            {{ icon('arrow-left') }} Retour
+        </a>
+    </li>
+    <li class="btn btn-info">
+        Séparateur :
         <select id="separator" class="">
             <option value=", " selected>,</option>
             <option value=" ; ">;</option>
             <option value="retour">À la ligne</option>
         </select>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-primary">
+        <div class="panel-body">
+            <textarea id="showlist" class="export">{{ mails }}</textarea>
+        </div>
     </div>
-    <div><textarea id="showlist" class="export">{{ mails }}</textarea></div>
 {% endblock %}
 
 {% block javascripts %}

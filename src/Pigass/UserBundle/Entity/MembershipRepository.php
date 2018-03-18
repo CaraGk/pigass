@@ -102,9 +102,12 @@ class MembershipRepository extends EntityRepository
         }
 
         if (isset($filter['questions']) and $filter['questions']) {
+            $query
+                ->join('m.infos', 'i')
+                ->join('i.question', 'q')
+            ;
             foreach ($filter['questions'] as $question_id => $value) {
-                $query->join('m.infos', 'i')
-                    ->join('i.question', 'q')
+                $query
                     ->andWhere('q.id = :question_id')
                     ->setParameter('question_id', $question_id)
                     ->andWhere('i.value = :info_value')

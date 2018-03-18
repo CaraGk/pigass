@@ -678,10 +678,10 @@ class RegisterController extends Controller
                 $now = new \DateTime('now');
                 $anticipated = $now->modify($options['anticipated']);
                 if (null !== $current_membership and ($current_membership->getExpiredOn() > $options['anticipated'] and $current_membership->getStatus() != 'registered')) {
-                    $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
                     if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE') and $current_membership->getStructure()->getSlug() == $slug)) {
                         return $this->redirect($this->generateUrl('user_register_index', ["slug" => $slug]));
                     } else {
+                        $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
                         return $this->redirect($this->generateUrl('user_register_list', ["userid" => $userid]));
                     }
                 }

@@ -22,9 +22,7 @@ use Pigass\UserBundle\Entity\Person,
     Pigass\UserBundle\Entity\User;
 use Pigass\UserBundle\Form\PersonType,
     Pigass\UserBundle\Form\PersonUserType,
-    Pigass\UserBundle\Form\PersonHandler,
-    Pigass\UserBundle\Form\UserAdminType,
-    Pigass\UserBundle\Form\UserHandler;
+    Pigass\UserBundle\Form\PersonHandler;
 
 
 /**
@@ -238,32 +236,6 @@ class PersonController extends Controller
         return array(
             'form'   => $form->createView(),
             'userid' => $userid,
-        );
-    }
-
-    /**
-     * Install first user
-     *
-     * @Route("/firstuser", name="user_person_install")
-     * @Template()
-     */
-    public function installAction(Request $request)
-    {
-        if ($em->getRepository('PigassUserBundle:User')->findAll()) {
-            return $this->redirect($this->generateUrl('homepage'));
-        }
-
-        $user = $this->um->createUser();
-        $form = $this->createForm(UserAdminType::class, $user);
-        $formHandler = new UserHandler($form, $request, $this->um);
-
-        if ( $formHandler->process() ) {
-            $this->get('session')->getFlashBag()->add('notice', 'Administrateur "' . $user->getUsername() . '" enregistré. Vous pouvez maintenant vous identifier.');
-            return $this->redirect($this->generateUrl('fos_user_security_login'));
-        }
-
-        return array(
-            'form' => $form->createView(),
         );
     }
 

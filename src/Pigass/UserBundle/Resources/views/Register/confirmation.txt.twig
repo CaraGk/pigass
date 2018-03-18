@@ -1,4 +1,4 @@
-Bienvenue {{ person.title }} {{ person.surname }} {{ person.name }} !
+Bienvenue {{ person.surname }} {{ person.name }} !
 
 Votre inscription sur le site des adhésions de {{ structure.name }} s'est correctement déroulée.
 
@@ -6,9 +6,7 @@ Votre identifiant de connexion : {{ user.emailCanonical }}
 
 Si vous ne retrouvez plus votre mot de passe, demandez à le réinitialiser : {{ url('fos_user_resetting_request') }}
 
-Il reste une dernière étape pour valider votre inscription sur le site : confirmer votre email en cliquant sur le lien suivant :
+Il reste encore à confirmer votre adresse e-mail pour valider votre inscription sur le site en cliquant sur le lien suivant :
 {{ url }}
 
-Enfin, si vous ne l'avez déjà fait, vous pourrez adhérer à {{ structure.name }} en réglant votre cotisation : {{ url('user_register_join', {'slug': structure.slug}) }}
-
-Ce message a été généré automatiquement par le portail d'adhésions.
+Ce message a été généré automatiquement par le portail d'adhésions en ligne, merci de ne pas y répondre.

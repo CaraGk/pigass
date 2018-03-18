@@ -181,8 +181,7 @@ class PaymentController extends Controller
                 ->setFrom($this->container->getParameter('mailer_mail'))
                 ->setReplyTo($structure->getEmail())
                 ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
-                ->setBody($this->renderView('PigassUserBundle:Payment:confirmMember.html.twig', $params, 'text/html'))
-                ->addPart($this->renderView('PigassUserBundle:Payment:confirmMember.txt.twig', $params, 'text/plain'))
+                ->addBody($this->renderView('PigassUserBundle:Payment:confirmMember.txt.twig', $params, 'text/plain'))
             ;
             $this->get('mailer')->send($sendmail);
 

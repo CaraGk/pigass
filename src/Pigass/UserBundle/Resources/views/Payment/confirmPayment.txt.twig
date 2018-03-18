@@ -2,7 +2,6 @@ Votre paiement à {{ membership.structure.name }} a été reçu.
 
 {% if print %}
     Pour finaliser votre adhésion il faut encore que vous renvoyiez la fiche d'adhésion préremplie signée à :
-
     {{ membership.structure.name }}
     {{ membership.structure.PrintableAddress(true) }}
 
@@ -11,4 +10,4 @@ Pour récupérer la fiche d'adhésion : {{ absolute_url(path('user_register_prin
 L'adhésion a été complètement validée le {{ membership.payedOn|date('d-m-Y') }}.
 {% endif %}
 
-Ce message a été généré automatiquement par le portail d'adhésions.
+Ce message a été généré automatiquement par le portail d'adhésions. Merci de ne pas y répondre.

@@ -28,8 +28,6 @@ use Pigass\UserBundle\Entity\Membership,
     Pigass\CoreBundle\Entity\Fee;
 use Pigass\UserBundle\Form\FilterType,
     Pigass\UserBundle\Form\FilterHandler,
-    Pigass\UserBundle\Form\RegisterType,
-    Pigass\UserBundle\Form\RegisterHandler,
     Pigass\UserBundle\Form\QuestionType,
     Pigass\UserBundle\Form\QuestionHandler,
     Pigass\UserBundle\Form\MemberQuestionType,
@@ -156,8 +154,7 @@ class RegisterController extends Controller
                     ->setFrom($this->container->getParameter('mailer_mail'))
                     ->setReplyTo($structure->getEmail())
                     ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
-                    ->setBody($this->renderView('PigassUserBundle:Payment:confirmPrint.html.twig', array('membership' => $membership), 'text/html'))
-                    ->addPart($this->renderView('PigassUserBundle:Payment:confirmPrint.txt.twig', array('membership' => $membership), 'text/plain'))
+                    ->addBody($this->renderView('PigassUserBundle:Payment:confirmPrint.txt.twig', array('membership' => $membership), 'text/plain'))
                 ;
                 $this->get('mailer')->send($sendmail);
                 $this->em->persist($membership);
@@ -196,8 +193,7 @@ class RegisterController extends Controller
                         ->setFrom($this->container->getParameter('mailer_mail'))
                         ->setReplyTo($structure->getEmail())
                         ->setTo($membership->getPerson()->getUser()->getEmailCanonical())
-                        ->setBody($this->renderView('PigassUserBundle:Payment:confirmPayment.html.twig', $params, 'text/html'))
-                        ->addPart($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
+                        ->addBody($this->renderView('PigassUserBundle:Payment:confirmPayment.txt.twig', $params, 'text/plain'))
                     ;
                     $this->get('mailer')->send($sendmail);
                 } elseif ($membership->getStatus() == 'validated') {
@@ -217,8 +213,8 @@ class RegisterController extends Controller
         }
 
         return array(
-            'form'      => $form->createView(),
-            'structure' => $structure,
+            'form'       => $form->createView(),
+            'membership' => $membership,
         );
     }
 
@@ -647,6 +643,7 @@ class RegisterController extends Controller
      * Register Person and create Membership
      *
      * @Route("/{slug}/register/", name="user_register_register", requirements={"slug" = "\w+"})
+     * @Route("/{slug}/member/join", name="user_register_join", requirements={"slug" = "\w+"})
      * @Template()
      */
     public function registerAction(Request $request, $slug)
@@ -773,75 +770,12 @@ class RegisterController extends Controller
                 ->setFrom($this->container->getParameter('mailer_mail'))
                 ->setReplyTo($structure->getEmail())
                 ->setTo($user->getEmailCanonical())
-                ->setBody($this->renderView('PigassUserBundle:Register:confirmation.html.twig', $params, 'text/html'))
-                ->addPart($this->renderView('PigassUserBundle:Register:confirmation.txt.twig', $params, 'text/plain'))
+                ->addBody($this->renderView('PigassUserBundle:Register:confirmation.txt.twig', $params, 'text/plain'))
         ;
         $this->get('mailer')->send($sendmail);
 
         $this->session->getFlashBag()->add('success', 'E-mail d\'activation envoyé.');
         return $this->redirect($this->generateUrl('user_register_list'));
-    }
-
-    /**
-     * Join action
-     *
-     * @Route("/{slug}/member/join", name="user_register_join", requirements={"slug" = "\w+"})
-     * @Template()
-     */
-    public function joinAction(Request $request, $slug)
-    {
-        $structure = $this->em->getRepository('PigassCoreBundle:Structure')->findOneBy(['slug' => $slug]);
-        if (!$structure)
-            throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
-
-        if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED') and !$this->session->get('user_register_tmp'))
-            return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
-
-        if ($username = $this->session->get('user_register_tmp'))
-            $user = $this->um->findUserByUsername($username);
-        else
-            $user = $this->getUser();
-
-        $userid = $request->query->get('userid');
-        $person = $this->testAdminTakeOver($user, $userid);
-        $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
-        $now = new \DateTime('now');
-        $reg_anticipated = $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue();
-        $anticipated = $now->modify($reg_anticipated);
-
-        if (null !== $current_membership and ($current_membership->getExpiredOn() > $anticipated and $current_membership->getStatus() != 'registered')) {
-            $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
-
-            if ($userid and $user->hasRole('ROLE_ADMIN'))
-                return $this->redirect($this->generateUrl('user_register_list', array("userid" => $userid)));
-            else
-                return $this->redirect($this->generateUrl('user_register_list'));
-        }
-
-        if (null !== $current_membership and $current_membership->getStatus() == 'registered')
-            $membership = $current_membership;
-        else
-            $membership = new Membership();
-        $options = array(
-            'payment'     => $this->pm->findParamByName('reg_' . $slug . '_payment')->getValue(),
-            'date'        => $this->pm->findParamByName('reg_' . $slug . '_date')->getValue(),
-            'periodicity' => $this->pm->findParamByName('reg_' . $slug . '_periodicity')->getValue(),
-            'anticipated' => $this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue(),
-        );
-        $form = $this->createForm(MembershipType::class, $membership, array('structure' => $structure));
-        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, $person);
-
-        if($form_handler->process()) {
-            $this->session->getFlashBag()->add('notice', 'Adhésion enregistrée pour ' . $person . '.');
-
-            return $this->redirect($this->generateUrl('user_payment_prepare', array('gateway' => $membership->getMethod()->getGatewayName(), 'memberid' => $membership->getId())));
-        }
-
-        return array(
-            'form'      => $form->createView(),
-            'structure' => $structure,
-        );
-
     }
 
     /**
@@ -1104,10 +1038,10 @@ class RegisterController extends Controller
      * Edit membership's payment
      *
      * @Route("/member/{id}/edit", name="user_register_edit", requirements={"id" = "\d+"})
-     * @Template("PigassUserBundle:Register:join.html.twig")
+     * @Template("PigassUserBundle:Register:validate.html.twig")
      * @Security\Secure(roles="ROLE_STRUCTURE")
      */
-    public function editMembershipAction(Membership $membership, Request $request)
+    public function editAction(Membership $membership, Request $request)
     {
         if (!$membership) {
             $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
@@ -1148,9 +1082,8 @@ class RegisterController extends Controller
         }
 
         return array(
-            'form'      => $form->createView(),
-            'structure' => $structure,
-            'person'    => $person,
+            'form'       => $form->createView(),
+            'membership' => $membership,
         );
     }
 

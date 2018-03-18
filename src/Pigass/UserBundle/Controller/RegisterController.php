@@ -777,7 +777,11 @@ class RegisterController extends Controller
         $this->get('mailer')->send($sendmail);
 
         $this->session->getFlashBag()->add('success', 'E-mail d\'activation envoyé.');
-        return $this->redirect($this->generateUrl('user_register_list'));
+
+        if ($adminUser = $this->getUser() and ($adminUser->hasRole('ROLE_ADMIN') or $adminUser->hasRole('ROLE_STRUCTURE')))
+            return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
+        else
+            return $this->redirect($this->generateUrl('user_register_list'));
     }
 
     /**

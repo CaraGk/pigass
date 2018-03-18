@@ -158,6 +158,13 @@
                             {{ icon('user') }} Informations
                         </a>
                     </li>
+                    {% if membership.person.user.enabled == false %}
+                        <li>
+                            <a href="{{ path('user_register_confirmation_send', {'email': membership.person.user.email, 'slug': slug}) }}" title="Compte non activé : renvoyer l'email d'activation à l'adhérent">
+                                {{ icon('envelope') }} Mail d'activation
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </span>
 

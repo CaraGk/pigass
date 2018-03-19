@@ -22,12 +22,12 @@ class MembershipRepository extends EntityRepository
     private function getBaseQuery()
     {
         return $this->createQueryBuilder('m')
-            ->join('m.person', 's')
-            ->addSelect('s')
-            ->join('s.user', 'u')
+            ->join('m.person', 'p')
+            ->addSelect('p')
+            ->join('p.user', 'u')
             ->addSelect('u')
-            ->join('m.structure', 't')
-            ->addSelect('t')
+            ->join('m.structure', 's')
+            ->addSelect('s')
         ;
     }
 
@@ -71,9 +71,9 @@ class MembershipRepository extends EntityRepository
     {
         $query = $this->getBaseQuery();
         $query
-            ->where('t.slug = :slug')
+            ->where('s.slug = :slug')
             ->setParameter('slug', $slug)
-            ->orderBy('s.name', 'asc')
+            ->orderBy('p.name', 'asc')
         ;
 
         if (isset($filter['valid'])) {
@@ -118,7 +118,7 @@ class MembershipRepository extends EntityRepository
 
         if (isset($filter['search']) and $filter['search']) {
             $query
-                ->andWhere('s.surname like :search OR s.name like :search OR u.email like :search')
+                ->andWhere('p.surname like :search OR p.name like :search OR u.email like :search')
                 ->setParameter('search', '%' . $filter['search'] . '%')
                 ->addOrderBy('m.expiredOn', 'desc')
             ;
@@ -159,13 +159,13 @@ class MembershipRepository extends EntityRepository
     {
         $query = $this->getBaseQuery();
         $query
-            ->where('t.slug = :slug')
+            ->where('s.slug = :slug')
             ->setParameter('slug', $slug)
             ->andWhere('m.expiredOn > :now')
             ->setParameter('now', new \DateTime('now'))
             ->andWhere('m.payedOn is not NULL')
-            ->addOrderBy('s.surname', 'asc')
-            ->addOrderBy('s.name', 'asc')
+            ->addOrderBy('p.surname', 'asc')
+            ->addOrderBy('p.name', 'asc')
         ;
 
         return $query
@@ -180,8 +180,8 @@ class MembershipRepository extends EntityRepository
                       ->where('m.expiredOn > :now')
                       ->setParameter('now', new \DateTime('now'))
                       ->andWhere('m.payedOn is not NULL')
-                      ->groupBy('s.id')
-                      ->select('s.id')
+                      ->groupBy('p.id')
+                      ->select('p.id')
         ;
 
         return $query->getQuery()

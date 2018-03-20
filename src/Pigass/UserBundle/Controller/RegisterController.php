@@ -725,7 +725,6 @@ class RegisterController extends Controller
                 $filter = $this->session->get('user_register_filter', array());
                 $filter['user'] = $membership->getPerson()->getUser()->getId();
                 $this->session->set('user_register_filter', $filter);
-                $this->session->set('user_register_register', true);
             }
             return $this->redirect($this->generateUrl('user_payment_prepare', [
                 'gateway'  => $membership->getMethod()->getGatewayName(),
@@ -994,50 +993,56 @@ class RegisterController extends Controller
     {
         $user = $this->getUser();
         $filter = $this->session->get('user_register_filter', null);
-        $register = $this->session->get('user_register_register', false);
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
-        $last_membership = $this->em->getRepository('PigassUserBundle:Membership')->getLastForPerson($person);
+        $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
         $reJoinable = false;
 
-        if (($userid == null or $register == true) and $last_membership) {
-            $structure = $last_membership->getStructure();
-            $slug = $structure->getSlug();
-
-            $skipFilter = $request->query->get('skip', null);
-            if ($skipFilter) {
-                $this->session->remove('user_register_filter');
-                return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
-            }
-
-            $now = new \DateTime('now');
-            $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
-            if ($last_membership->getExpiredOn() <= $now) {
-                $reJoinable = true;
-            }
-
-            $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
-            $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $last_membership);
-            if (count($member_infos) < count($questions)) {
-                return $this->redirect($this->generateUrl('user_register_question'));
-            } elseif ($register) {
-                $this->session->remove('user_register_register');
-            }
-        } else {
-            $slug = $request->get('slug', null);
-            if (!$last_membership)
-                $reJoinable = true;
+        /* Skip if admin's skipFilter after register */
+        $skipFilter = $request->query->get('skip', null);
+        if ($skipFilter) {
+            $this->session->remove('user_register_filter');
+            return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
         }
 
-        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(array('person' => $person));
+        /* Test memberships and rejoinability */
+        if ($current_membership) {
+            $membership = $current_membership;
+            $slug = $membership->getStructure()->getSlug();
+            $now = new \DateTime('now');
+            $now->modify($this->pm->findParamByName('reg_' . $slug . '_anticipated')->getValue());
+            if ($current_membership->getExpiredOn() <= $now) {
+                $reJoinable = true;
+            }
+        } else {
+            $last_membership = $this->em->getRepository('PigassUserBundle:Membership')->getLastForPerson($person);
+            if ($last_membership) {
+                $membership = $last_membership;
+                $slug = $membership->getStructure()->getSlug();
+            } else {
+                $slug = $request->get('slug', null);
+            }
+            $reJoinable = true;
+        }
 
-        return array(
+        /* Tests if all memberQuestions have allready been answered */
+        if (isset($membership)) {
+            $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($membership->getStructure());
+            $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);
+            if (count($member_infos) < count($questions)) {
+                return $this->redirect($this->generateUrl('user_register_question'));
+            }
+        }
+
+        $memberships = $this->em->getRepository('PigassUserBundle:Membership')->findBy(['person' => $person]);
+
+        return [
             'memberships' => $memberships,
             'userid'      => $userid,
             'person'      => $person,
             'slug'        => $slug,
             'reJoinable'  => $reJoinable,
-        );
+        ];
     }
 
     /**
@@ -1079,7 +1084,6 @@ class RegisterController extends Controller
             $filter = $this->session->get('user_register_filter', array());
             $filter['user'] = $membership->getPerson()->getUser()->getId();
             $this->session->set('user_register_filter', $filter);
-            $this->session->set('user_register_register', true);
 
             return $this->redirect($this->generateUrl('user_register_list', [
                 'gateway' => $membership->getMethod()->getGatewayName(),

@@ -83,14 +83,15 @@ class RegisterController extends Controller
         $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($structure);
         $fees = $this->em->getRepository('PigassCoreBundle:Fee')->getForStructure($structure);
 
-        $filters = $this->session->get('user_register_filter', array(
+        $filters = $this->session->get('user_register_filter', [
             'valid'     => null,
             'ending'    => null,
             'fee'       => null,
             'questions' => null,
             'search'    => null,
-        ));
+        ]);
 
+        $filters['user'] = null;
         if ($search = $request->query->get('search', null))
             $filters['search'] = $search;
         elseif ($request->query->get('skipsearch', false))
@@ -101,8 +102,6 @@ class RegisterController extends Controller
             $filters['ending'] = null;
         if (!isset($filters['questions']))
             $filters['questions'] = null;
-        if (!isset($filters['user']))
-            $filters['user'] = null;
         if (!isset($filters['fee']))
             $filters['fee'] = null;
         if (!isset($filters['search']))
@@ -721,8 +720,10 @@ class RegisterController extends Controller
             } else {
                 $this->session->getFlashBag()->add('success', 'Utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' créé et adhésion enregistrée pour ' . $membership->getPerson() . '. Envoi du mail d\'activation en cours.');
             }
-            if (isset($adminMembership)) {
-                $filter = $this->session->get('user_register_filter', array());
+
+            /* if user is admin and has taken over an account */
+            if (isset($adminMembership) or ($userid)) {
+                $filter = $this->session->get('user_register_filter', []);
                 $filter['user'] = $membership->getPerson()->getUser()->getId();
                 $this->session->set('user_register_filter', $filter);
             }
@@ -872,13 +873,9 @@ class RegisterController extends Controller
         }
 
         if($form_handler->process()) {
-            $this->session->remove('user_register_filter');
             $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
 
-            if ($userid)
-                return $this->redirect($this->generateUrl('user_register_index', ['slug' => $structure->getSlug()]));
-            else
-                return $this->redirect($this->generateUrl('user_register_list'));
+            return $this->redirect($this->generateUrl('user_register_list'));
         }
 
         return array(
@@ -998,13 +995,6 @@ class RegisterController extends Controller
         $current_membership = $this->em->getRepository('PigassUserBundle:Membership')->getCurrentForPerson($person);
         $reJoinable = false;
 
-        /* Skip if admin's skipFilter after register */
-        $skipFilter = $request->query->get('skip', null);
-        if ($skipFilter) {
-            $this->session->remove('user_register_filter');
-            return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
-        }
-
         /* Test memberships and rejoinability */
         if ($current_membership) {
             $membership = $current_membership;
@@ -1026,7 +1016,8 @@ class RegisterController extends Controller
         }
 
         /* Tests if all memberQuestions have allready been answered */
-        if (isset($membership)) {
+        $skipFilter = $request->query->get('skip', null);
+        if (isset($membership) and !$skipFilter) {
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($membership->getStructure());
             $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);
             if (count($member_infos) < count($questions)) {

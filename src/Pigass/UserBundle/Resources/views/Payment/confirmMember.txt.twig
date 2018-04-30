@@ -8,7 +8,7 @@ Une fois votre paiement de {{ membership.amount/100|number_format(2,',',' ') }} 
 
 {% if membership.method.config['iban'] is not null %}L'IBAN de {{ membership.structure.name }} : {{ membership.method.config['iban'] }}.{% endif %}
 {% if membership.method.config['payableTo'] is not null %}Le chèque est à libeller à l'ordre de {{ membership.method.config['payableTo'] }} et à envoyer à l'adresse :
-    {{ adress }}
+    {{ pay_address }}
 {% endif %}
 {% endif %}
 

@@ -879,8 +879,9 @@ class RegisterController extends Controller
         }
 
         return array(
-            'form' => $form->createView(),
-            'ato'  => $filter?true:false,
+            'form'   => $form->createView(),
+            'ato'    => $filter?true:false,
+            'person' => $person,
         );
     }
 
@@ -1021,7 +1022,7 @@ class RegisterController extends Controller
             $questions = $this->em->getRepository('PigassUserBundle:MemberQuestion')->getAll($membership->getStructure());
             $member_infos = $this->em->getRepository('PigassUserBundle:MemberInfo')->getByMembership($person, $membership);
             if (count($member_infos) < count($questions)) {
-                return $this->redirect($this->generateUrl('user_register_question'));
+                return $this->redirect($this->generateUrl('user_register_question', ['userid' => $person->getId()]));
             }
         }
 

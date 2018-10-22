@@ -1,89 +1,93 @@
 {
-    "name": "symfony/framework-standard-edition",
-    "license": "MIT",
     "type": "project",
-    "description": "The \"Symfony Standard Edition\" distribution",
-    "autoload": {
-        "psr-4": { "": "src/" },
-        "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
-    },
-    "autoload-dev": {
-        "psr-4": { "Tests\\": "tests/" }
-    },
+    "license": "proprietary",
     "require": {
-        "php": ">=5.5.9",
-        "symfony/symfony": "3.4.2",
-        "doctrine/orm": "^2.5",
-        "doctrine/doctrine-bundle": "^1.6",
-        "doctrine/doctrine-cache-bundle": "^1.2",
-        "symfony/swiftmailer-bundle": "^2.3",
-        "symfony/monolog-bundle": "^2.8",
-        "symfony/polyfill-apcu": "^1.0",
-        "sensio/distribution-bundle": "^5.0",
-        "sensio/framework-extra-bundle": "^3.0.2",
-        "incenteev/composer-parameter-handler": "^2.0",
-        "friendsofsymfony/user-bundle": "2.0.2",
-        "knplabs/knp-menu-bundle": "^2.0",
-        "knplabs/knp-paginator-bundle": "^2.7",
-        "doctrine/migrations": "^1.5",
+        "php": "^7.1.3",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
         "doctrine/doctrine-migrations-bundle": "^1.0",
-        "caragk/kdb-parameters-bundle": "dev-master",
-        "jms/di-extra-bundle": "1.9.*",
-        "jms/security-extra-bundle": "1.6.*",
+        "friendsofsymfony/user-bundle": "~2.0",
+        "h4cc/wkhtmltopdf-amd64": "0.12.x",
+        "knplabs/knp-menu-bundle": "^2.0",
+        "knplabs/knp-snappy": "^1.0",
+        "knplabs/knp-snappy-bundle": "^1.5",
         "mopa/bootstrap-bundle": "^3.2",
-        "twbs/bootstrap": "^3.3",
+        "payum/offline": "^1.5",
+        "payum/paypal-express-checkout-nvp": "^1.5",
+        "payum/payum-bundle": "^2.3",
         "php-http/guzzle6-adapter": "^1.1",
-        "payum/payum-bundle": "^2.1",
-        "payum/paypal-express-checkout-nvp": "^1.3",
-        "payum/offline": "^1.3",
-        "symfony/assetic-bundle": "^2.8",
-        "knplabs/knp-snappy-bundle": "^1.4",
-        "h4cc/wkhtmltopdf-amd64": "^0.12.3",
-        "liuggio/excelbundle": "~2.0",
-        "vich/uploader-bundle": "^1.4",
-        "jms/metadata": "^1.6"
+        "phpoffice/phpspreadsheet": "^1.4",
+        "sensio/framework-extra-bundle": "^5.2",
+        "symfony/apache-pack": "^1.0",
+        "symfony/console": "*",
+        "symfony/flex": "^1.1",
+        "symfony/form": "*",
+        "symfony/framework-bundle": "*",
+        "symfony/monolog-bundle": "^3.3",
+        "symfony/orm-pack": "^1.0",
+        "symfony/profiler-pack": "^1.0",
+        "symfony/requirements-checker": "^1.1",
+        "symfony/swiftmailer-bundle": "^3.2",
+        "symfony/translation": "*",
+        "symfony/twig-bundle": "*",
+        "symfony/validator": "*",
+        "symfony/webpack-encore-pack": "^1.0",
+        "symfony/yaml": "*",
+        "twbs/bootstrap": "^4.1",
+        "twig/extensions": "^1.5",
+        "vich/uploader-bundle": "^1.8"
     },
     "require-dev": {
-        "sensio/generator-bundle": "^3.0",
-        "symfony/phpunit-bridge": "^3.0"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
-            "Mopa\\Bundle\\BootstrapBundle\\Composer\\ScriptHandler::postInstallSymlinkTwitterBootstrap"
-        ],
-        "post-update-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
-            "Mopa\\Bundle\\BootstrapBundle\\Composer\\ScriptHandler::postInstallSymlinkTwitterBootstrap"
-        ]
-    },
-    "extra": {
-        "symfony-app-dir": "app",
-        "symfony-bin-dir": "bin",
-        "symfony-var-dir": "var",
-        "symfony-web-dir": "web",
-        "symfony-tests-dir": "tests",
-        "symfony-assets-install": "relative",
-        "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
-        },
-        "branch-alias": {
-            "dev-master": "3.1-dev"
-        }
+        "doctrine/doctrine-fixtures-bundle": "^3.0",
+        "sensiolabs/security-checker": "^5.0",
+        "symfony/dotenv": "*",
+        "symfony/web-server-bundle": "*"
     },
     "config": {
-        "platform": {
-            "php": "7.0.49"
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "paragonie/random_compat": "2.*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php71": "*",
+        "symfony/polyfill-php70": "*",
+        "symfony/polyfill-php56": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "security-checker security:check": "script",
+            "requirements-checker": "script"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "4.1.*"
         }
     }
 }

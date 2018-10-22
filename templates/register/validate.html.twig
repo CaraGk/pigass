@@ -1,0 +1,9 @@
+{% extends 'layout.html.twig' %}
+
+{% block headline %}Adhésion : {{ membership.person }}{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        {{ form(form) }}
+    </div>
+{% endblock %}

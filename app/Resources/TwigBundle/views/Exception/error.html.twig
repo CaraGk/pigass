@@ -1,9 +1,0 @@
-{% extends "PigassCoreBundle::layout.html.twig" %}
-
-{% block title %}Erreur : {{ status_text }}{% endblock %}
-
-{% block headline %}Erreur {{ status_code }}{% endblock %}
-
-{% block content %}
-    <div>Le serveur a retourné une erreur "{{ status_code }} {{ status_text }}".</div>
-{% endblock %}

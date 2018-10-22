@@ -1,0 +1,23 @@
+{% extends 'layout.html.twig' %}
+
+{% block headline %}Adhésion - enregistrement{% endblock %}
+
+{% block action %}
+    <li class="panel panel-primary">
+        <div class="panel-heading">
+            Pour s'inscrire au site et pouvoir adhérer à {{ structure }}, il est nécessaire d'indiquer des coordonnées postales, e-mail et téléphoniques ainsi que quelques informations d'état-civil. Ces informations sont nécessaires au fonctionnement interne de {{ structure }} qui s'engage à ne pas les diffuser à quelque tiers que ce soit sans votre consentement exprès. Nous vous recommandons d'indiquer vos coordonnées professionnelles ici.
+        </div>
+    </li>
+    <li class="panel panel-danger">
+        <div class="panel-heading">
+            <p>Vous vous apprêtez à adhérer à {{ structure }} en réglant la cotisation.</p>
+            <p>Si plusieurs tarifs d'adhésion sont proposés, vous devrez fournir les éventuelles pièces justificatives du tarif demandé avant validation de votre adhésion.</p>
+        </div>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        {{ form(form) }}
+    </div>
+{% endblock %}

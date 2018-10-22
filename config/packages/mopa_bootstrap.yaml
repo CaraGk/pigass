@@ -1,0 +1,30 @@
+mopa_bootstrap:
+    menu: ~
+    form:
+        show_legend: false
+        show_child_legend: false
+        render_required_asterisk: true
+        render_optional_text: false
+        checkbox_label: 'widget'
+        error_type: 'block'
+        collection:
+            widget_remove_btn:
+                icon: trash
+                icon_inverted: true
+            widget_add_btn:
+                icon: plus-sign
+        horizontal_label_class: col-sm-2
+        horizontal_input_wrapper_class: col-sm-10
+    navbar: ~
+    initializr:
+        meta:
+            keywords: "adhésion, intersyndicale, pigass"
+            author_name: "Pierre-François Angrand"
+            nofollow: false
+            noindex: false
+        diagnostic_mode: true
+        dns_prefetch:
+            - '//ajax.googleapis.com'
+    icons:
+        icon_set: fontawesome4
+        shortcut: icon

@@ -1,0 +1,11 @@
+payum_capture:
+    resource: "@PayumBundle/Resources/config/routing/capture.xml"
+    prefix: /member/payment
+
+payum_notify:
+    resource: "@PayumBundle/Resources/config/routing/notify.xml"
+    prefix: /member/payment
+
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index

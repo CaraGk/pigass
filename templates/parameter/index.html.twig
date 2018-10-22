@@ -1,0 +1,20 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ parent() }} - {{ structure.name }} - Paramètres{% endblock %}
+
+{% block headline %}{{ structure.name }} - Paramètres{% endblock %}
+
+{% block action %}
+    </ul>
+    {{ mopa_bootstrap_menu('parameter') }}
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        {{ form(parameter_form) }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+{% endblock %}

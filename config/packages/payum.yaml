@@ -1,0 +1,12 @@
+payum:
+    storages:
+        App\Entity\Payment: { doctrine: orm }
+
+    security:
+        token_storage:
+            App\Entity\PaymentToken: { doctrine: orm }
+
+    dynamic_gateways:
+        sonata_admin: false
+        config_storage:
+            App\Entity\Gateway: { doctrine: orm }

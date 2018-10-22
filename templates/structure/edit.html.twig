@@ -1,0 +1,20 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - {% if structure is not null %}{{ structure.name }} - Modification {% else %} Structure - Ajout {% endif %}
+{% endblock %}
+
+{% block headline %}
+    {% if structure is not null %}{{ structure.name }} - Modification {% else %} Structure - Ajout {% endif %}
+{% endblock %}
+
+{% block action %}
+    </ul>
+    {{ mopa_bootstrap_menu('parameter') }}
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        {{ form(form) }}
+    </div>
+{% endblock %}

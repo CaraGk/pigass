@@ -10,8 +10,8 @@
 
 {% block action %}
     {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-        <li class="panel panel-primary">
-            <div class="panel-heading">Pour adhérer, veuillez cliquer sur la structure de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
+        <li class="card">
+            <div class="card-header bg-primary text-white">Pour adhérer, veuillez cliquer sur la structure de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
         </li>
     {% elseif is_granted('ROLE_ADMIN') %}
         <li class="btn btn-primary">
@@ -23,11 +23,11 @@
     </ul>
     <ul>
     {% for structure in structures %}
-        <li class="panel panel-primary description structure_{{ structure.slug }}">
-            <div class="panel-heading">
+        <li class="card description structure_{{ structure.slug }}">
+            <div class="card-header bg-primary text-white">
                 {{ structure.area }} : {{ structure.name }}
             </div>
-            <div class="panel-body row">
+            <div class="card-body row">
                 <div class="float-right">
                 {% if structure.email is not null %}
                     <div>
@@ -59,7 +59,7 @@
                     <div class="col-sm-12">{{ structure.fullname }}</div>
                 {% endif %}
             </div>
-            <ul class="panel-footer btn-group-vertical">
+            <ul class="card-footer btn-group-vertical">
                 <li class="btn btn-primary">
                         {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                         <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">

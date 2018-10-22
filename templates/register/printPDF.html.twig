@@ -17,7 +17,7 @@
             .centered { text-align: center; }
             .row { padding: 0; margin: 0; }
             .info { padding: 1px 15px; margin: 0; }
-            .panel-body { margin: 5px 0; }
+            .card-body { margin: 5px 0; }
         </style>
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -26,12 +26,12 @@
     </head>
     <body>
         <div class="container">
-            <div class="panel panel-default">
-                <div class="panel-header jumbotron row">
+            <div class="card">
+                <div class="card-header jumbotron row">
                     <div class="col-xs-2"><img src="{{ membership.structure.logo }}" alt="Logo de {{ membership.structure.name }}" /></div>
                     <h1 class="col-xs-10 centered">Adhésion à {{ membership.structure.name }}</h1>
                 </div>
-                <div class="panel-body row">
+                <div class="card-body row">
                     <div class="col-xs-2 title">Nom :</div>
                     <div class="col-xs-4 value">{{ membership.person.surname }}</div>
                     <div class="col-xs-2 title">Prénom :</div>
@@ -75,7 +75,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="panel-footer jumbotron row">
+                <div class="card-footer jumbotron row">
                     <div class="col-xs-2 title">Date :</div>
                     <div class="col-xs-4 value"></div>
                     <div class="col-xs-2 title">Signature :</div>

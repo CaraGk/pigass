@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-    <ul class="entities fees list-group panel panel-default">
+    <ul class="entities fees list-group card">
         {% for fee in fees %}
             <li class="entity fee list-group-item row">
                 {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STRUCTURE') %}

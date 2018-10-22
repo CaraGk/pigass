@@ -101,11 +101,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('bundles/pigasscore/js/confirm.js') }}" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js" charset="utf-8"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js" charset="utf-8"></script>
-    <script src="{{ asset('bundles/pigasscore/js/jquery.mapael.min.js') }}" charset="utf-8"></script>
-    <script src="{{ asset('bundles/pigasscore/js/france_regions.min.js') }}" charset="utf-8"></script>
+    <script src="{{ asset('build/map.js') }}" type="text/javascript"></script>
     <script type="text/javascript">
         $(function(){
             $('.description').hide();

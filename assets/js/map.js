@@ -7,15 +7,7 @@
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
 */
 
-require('../css/app.scss');
-
-const $ = require('jquery');
-
-require('bootstrap');
-
-require('./confirm.js');
-
-$(document).ready(function() {
-    $('[data-toggle="popover"]').popover();
-    $('[data-toggle="tooltip"]').tooltip();
-});
+require('raphael');
+require('jquery-mousewheel');
+const mapael = require('jquery-mapael');
+require('./france_regions.min.js');

@@ -16,6 +16,8 @@ use Symfony\Component\Form\Form,
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
 use App\Entity\Membership,
+    App\Entity\MemberInfo,
+    App\Entity\MemberQuestion,
     App\Entity\Person,
     App\Entity\Structure;
 
@@ -24,9 +26,9 @@ use App\Entity\Membership,
  */
 class MembershipHandler
 {
-    private $form, $request, $em, $um, $options, $structure, $person;
+    private $form, $request, $em, $um, $options, $structure, $person, $questions, $admin;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um, Structure $structure, $options = ['payment' => '60', 'date' => "2015-09-01", 'periodicity' => "+ 1 year", 'anticipated' => "+ 0 day"], $person = null)
+    public function __construct(Form $form, Request $request, EntityManager $em, UserManager $um, Structure $structure, $options = ['payment' => '60', 'date' => "2015-09-01", 'periodicity' => "+ 1 year", 'anticipated' => "+ 0 day"], $person = null, $questions = null, $admin = false)
     {
       $this->form        = $form;
       $this->request     = $request;
@@ -35,6 +37,8 @@ class MembershipHandler
       $this->options     = $options;
       $this->structure   = $structure;
       $this->person      = $person;
+      $this->questions   = $questions;
+      $this->admin       = $admin;
     }
 
     public function process()
@@ -52,6 +56,17 @@ class MembershipHandler
 
     public function onSuccess(Membership $membership)
     {
+        foreach ($this->questions as $question) {
+            $info = $this->form->get('question_' . $question->getId())->getData();
+            if($question->getType() == 3) {
+                foreach($info as $item) {
+                    $this->setQuestionInfo($question, $item);
+                }
+            } else {
+                $this->setQuestionInfo($membership, $question, $info);
+            }
+        }
+
         $expire = new \DateTime($this->options['date']);
         $expire->modify('- 1 day');
         $now = new \DateTime('now');
@@ -116,5 +131,16 @@ class MembershipHandler
         }
 
         return $password;
+    }
+
+    private function setQuestionInfo(Membership $membership, MemberQuestion $question, $value)
+    {
+        $member_info = new MemberInfo();
+        $member_info->setMembership($membership);
+        $member_info->setValue($value);
+        $member_info->setQuestion($question);
+
+        if (!$this->admin or $member_info->getValue())
+            $this->em->persist($member_info);
     }
 }

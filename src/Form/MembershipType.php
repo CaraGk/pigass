@@ -14,8 +14,12 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\DateType,
+    Symfony\Component\Form\Extension\Core\Type\TimeType,
+    Symfony\Component\Form\Extension\Core\Type\TextareaType,
+    Symfony\Component\Form\Extension\Core\Type\IntegerType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Form\PersonUserType;
 use Doctrine\ORM\EntityRepository;
@@ -26,19 +30,110 @@ use App\Repository\FeeRepository;
  */
 class MembershipType extends AbstractType
 {
-    private $structure, $fees, $withPerson;
+    private $structure, $fees, $withPerson, $questions, $admin, $withQuestions;
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->structure = $options['structure'];
         $this->withPerson = $options['withPerson'];
         $this->withPayment = $options['withPayment'];
+        $this->withQuestions = $options['withQuestions'];
+        $this->questions = $options['questions'];
+        $this->admin = $options['admin'];
 
         if ($this->withPerson) {
             $builder
                 ->add('person', PersonUserType::class, [
                     'label' => 'Identité'
                 ]);
+        }
+
+        foreach($this->questions as $question) {
+            if($question->getType() == 1) {
+                $builder->add('question_' . $question->getId(), ChoiceType::class, array(
+                    'choices'  => $this->getQuestionSubjectiveChoiceOptions($question->getMore()),
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'multiple' => false,
+                    'expanded' => true,
+                    'label'    => $question->getName(),
+                    'widget_type' => 'inline',
+                    'mapped'        => false,
+                 ));
+            } elseif($question->getType() == 2) {
+                $builder->add('question_' . $question->getId(), TextareaType::class, array(
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'trim'       => true,
+                    'max_length' => 250,
+                    'label'      => $question->getName(),
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 3) {
+                $builder->add('question_' . $question->getId(), ChoiceType::class, array(
+                    'choices' => $question->getMore(),
+                    'choice_label' => function ($value, $key, $index) { return $value; },
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'multiple' => true,
+                    'expanded' => true,
+                    'label'    => $question->getName(),
+                    'widget_type' => 'inline',
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 4) {
+                $builder->add('question_' . $question->getId(), IntegerType::class, array(
+                    'scale'     => (int) $question->getMore(),
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'label'     => $question->getName(),
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 5) {
+                $builder->add('question_' . $question->getId(), ChoiceType::class, array(
+                    'choices' => $question->getMore(),
+                    'choice_label' => function ($value, $key, $index) { return $value; },
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'multiple' => false,
+                    'expanded' => true,
+                    'label'    => $question->getName(),
+                    'widget_type' => 'inline',
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 6) {
+                $builder->add('question_' . $question->getId(), TimeType::class, array(
+                    'input'        => 'string',
+                    'widget'       => 'single_text',
+                    'with_seconds' => false,
+                    'html5'        => true,
+                    'horizontal_input_wrapper_class' => 'col-lg-4',
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'label'        => $question->getName(),
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 7) {
+                $builder->add('question_' . $question->getId(), DateType::class, array(
+                    'input'        => 'string',
+                    'widget'       => 'single_text',
+                    'html5'        => true,
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'label'        => $question->getName(),
+                    'help_block'   => 'En cas de souci lié à l\'utilisation de Safari ou d\'un navigateur ancien, indiquez la date au format "AAAA-MM-JJ"',
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 8) {
+                $builder->add('question_' . $question->getId(), ChoiceType::class, array(
+                    'choices' => $question->getMore(),
+                    'choice_label' => function ($value, $key, $index) { return $value; },
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'multiple' => false,
+                    'expanded' => false,
+                    'label'    => $question->getName(),
+                    'mapped'        => false,
+                ));
+            } elseif ($question->getType() == 9) {
+                $builder->add('question_' . $question->getId(), TextType::class, array(
+                    'required' => $this->admin?false:($question->isRequired()?true:false),
+                    'label'        => $question->getName(),
+                    'mapped'        => false,
+                ));
+            }
         }
 
         $builder
@@ -88,7 +183,7 @@ class MembershipType extends AbstractType
             ->add('Save', SubmitType::class, [
                 'label' => 'Continuer',
                 'attr'  => [
-                    'class' => 'btn btn-primary pull-right',
+                    'class' => 'btn btn-primary float-right',
                 ],
             ])
         ;
@@ -101,6 +196,25 @@ class MembershipType extends AbstractType
             'structure'   => null,
             'withPerson'  => null,
             'withPayment' => null,
+            'withQuestions' => null,
+            'questions'   => null,
+            'admin'       => false,
         ]);
+    }
+
+    public function getQuestionSubjectiveChoiceOptions($options)
+    {
+        $opt = explode("|", $options);
+        $label = explode(",", $opt[1]);
+        $choices = array();
+
+        for ($i = 0 ; $i < (int) $opt[0] ; $i ++) {
+            $j = $i + 1;
+            $choices[$j] = (string) $j;
+            if ($label[$i] != null)
+                $choices[$j] .= ' (' . $label[$i] . ')';
+        }
+
+        return $choices;
     }
 }

@@ -671,6 +671,7 @@ class RegisterController extends AbstractController
             'anticipated' => $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_anticipated')->getValue(),
         );
 
+        $is_admin = false;
         if (!$checker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $options['token'] = $tokenGenerator->generateToken();
         } else {
@@ -706,6 +707,8 @@ class RegisterController extends AbstractController
                     return $this->redirect($this->generateUrl('user_register_join', ["slug" => $slug, "rejoin" => true]));
                 }
             }
+            if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE'))
+                $is_admin = true;
         }
 
         if (isset($current_membership) and $current_membership->getStatus() == 'registered')
@@ -716,8 +719,10 @@ class RegisterController extends AbstractController
         if (isset($person))
             $membership->setPerson($person);
 
-        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true]);
-        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, isset($person)?$person:null);
+        $questions = $this->em->getRepository('App:MemberQuestion')->getAll($structure);
+
+        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true, 'withQuestions' => true, 'questions' => $questions, 'admin' => $is_admin]);
+        $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, isset($person)?$person:null, $questions, $is_admin);
 
         if($result = $form_handler->process()) {
             /* If User is allready in db and action is not to rejoin */
@@ -1008,9 +1013,6 @@ class RegisterController extends AbstractController
      */
     public function listAction(Request $request)
     {
-        if (!($this->security->isGranted('ROLE_STRUCTURE') or $this->security->isGranted('ROLE_ADMIN')))
-            throw new AccessDeniedException();
-
         $user = $this->getUser();
         $filter = $this->session->get('user_register_filter', null);
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
@@ -1121,9 +1123,6 @@ class RegisterController extends AbstractController
      */
     public function showInfosAction(Membership $membership, Request $request)
     {
-        if (!($this->security->isGranted('ROLE_STRUCTURE') or $this->security->isGranted('ROLE_ADMIN')))
-            throw new AccessDeniedException();
-
         $user = $this->getUser();
         $userid = $request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);

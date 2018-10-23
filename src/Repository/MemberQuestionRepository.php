@@ -54,4 +54,15 @@ class MemberQuestionRepository extends EntityRepository
             ->getResult()
         ;
     }
+
+    public function getAllArray(Structure $structure = null, $exclude = null)
+    {
+        $results = $this->getAll($structure, $exclude);
+
+        foreach ($results as $result) {
+            $array[$result->getId()] = $result;
+        }
+
+        return $array;
+    }
 }

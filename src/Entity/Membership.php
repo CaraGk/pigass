@@ -101,6 +101,13 @@ class Membership
     private $ref;
 
     /**
+     * @var boolean $privacy
+     *
+     * @ORM\Column(name="privacy", type="boolean")
+     */
+    private $privacy;
+
+    /**
      * @ORM\OneToMany(targetEntity="MemberInfo", mappedBy="membership", cascade={"remove", "persist"}, orphanRemoval=true)
      */
     private $infos;
@@ -379,5 +386,27 @@ class Membership
     public function getRef()
     {
         return $this->ref;
+    }
+
+    /**
+     * Set privacy
+     *
+     * @param boolean $privacy
+     *
+     * @return Membership
+     */
+    public function setPrivacy($privacy)
+    {
+        $this->privacy = $privacy;
+    }
+
+    /**
+     * Get privacy
+     *
+     * @return boolean
+     */
+    public function getPrivacy()
+    {
+        return $this->privacy;
     }
 }

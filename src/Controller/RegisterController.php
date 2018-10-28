@@ -720,7 +720,15 @@ class RegisterController extends AbstractController
 
         $questions = $this->em->getRepository('App:MemberQuestion')->getAll($structure);
 
-        $form = $this->createForm(MembershipType::class, $membership, ['structure' => $structure, 'withPerson' => true, 'withQuestions' => true, 'questions' => $questions, 'admin' => $is_admin]);
+        $form = $this->createForm(MembershipType::class, $membership, [
+            'structure' => $structure,
+            'withPerson' => true,
+            'withPrivacy' => true,
+            'withPayment' => false,
+            'withQuestions' => true,
+            'questions' => $questions,
+            'admin' => $is_admin
+        ]);
         $form_handler = new MembershipHandler($form, $request, $this->em, $this->um, $structure, $options, isset($person)?$person:null, $questions, $is_admin);
 
         if($result = $form_handler->process()) {
@@ -826,6 +834,7 @@ class RegisterController extends AbstractController
                 'config'     => $config,
                 'address'    => $address,
                 'payableTo'  => (isset($config['payableTo'])?$config['payableTo']:'non défini'),
+                'form'       => ($form?$form->createView():null),
                 'questions'  => $questions,
                 'infos'      => $infos,
                 'iban'       => (isset($config['iban'])?$config['iban']:null),

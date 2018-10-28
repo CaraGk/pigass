@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
     Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\DateType,
     Symfony\Component\Form\Extension\Core\Type\TimeType,
@@ -37,6 +38,7 @@ class MembershipType extends AbstractType
         $this->structure = $options['structure'];
         $this->withPerson = $options['withPerson'];
         $this->withPayment = $options['withPayment'];
+        $this->withPrivacy = $options['withPrivacy'];
         $this->withQuestions = $options['withQuestions'];
         $this->questions = $options['questions'];
         $this->admin = $options['admin'];
@@ -45,7 +47,17 @@ class MembershipType extends AbstractType
             $builder
                 ->add('person', PersonUserType::class, [
                     'label' => 'Identité'
-                ]);
+                ])
+            ;
+        }
+
+        if ($this->withPrivacy) {
+            $builder
+                ->add('privacy', CheckboxType::class, [
+                    'label' => 'J\'accepte que mes informations personnelles soient traitées dans le cadre défini par la politique de confidentialité du site.',
+                    'required' => true,
+                ])
+            ;
         }
 
         if ($this->withQuestions) {
@@ -182,11 +194,11 @@ class MembershipType extends AbstractType
         }
 
         $builder
-            ->add('Save', SubmitType::class, [
-                'label' => 'Continuer',
+            ->add('save', SubmitType::class, [
+                'label' => 'Enregistrer',
                 'attr'  => [
-                    'class' => 'btn btn-primary float-right',
-                ],
+                    'class' => 'btn btn-primary',
+                ]
             ])
         ;
     }
@@ -198,6 +210,7 @@ class MembershipType extends AbstractType
             'structure'   => null,
             'withPerson'  => null,
             'withPayment' => null,
+            'withPrivacy' => null,
             'withQuestions' => null,
             'questions'   => null,
             'admin'       => false,

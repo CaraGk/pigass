@@ -5,7 +5,7 @@
 {% block headline %}Adhérents actuels{% endblock %}
 
 {% block action %}
-    <li class="btn btn-info">
+    <div class="btn btn-info">
         {% if count < 1 %}
             Aucun adhérent
         {% elseif count == 1 %}
@@ -13,34 +13,25 @@
         {% else %}
             {{ count }} adhérents
         {% endif %}
-    </li>
-    <li class="btn btn-primary btn-block">
-        <a href="{{ path('user_register_export', {'slug': slug}) }}" title="Exporter la liste des adhérents à jour de cotisation">
+    </div>
+        <a class="btn btn-primary" href="{{ path('user_register_export', {'slug': slug}) }}" title="Exporter la liste des adhérents à jour de cotisation">
             <i class='fas fa-download'></i> Exporter (xls)
         </a>
-    </li>
-    <li class="btn btn-primary btn-block">
-        <a href="{{ path('user_register_import', {'slug': slug}) }}" title="Importer une liste d'adhérents">
+        <a class="btn btn-primary" href="{{ path('user_register_import', {'slug': slug}) }}" title="Importer une liste d'adhérents">
             <i class='fas fa-upload'></i> Importer
         </a>
-    </li>
-    <li class="btn btn-primary btn-block">
-        <a href="{{ path('user_register_register', {'slug': slug}) }}" title ="Ajouter un adhérent">
+        <a class="btn btn-primary" href="{{ path('user_register_register', {'slug': slug}) }}" title ="Ajouter un adhérent">
             <i class='fas fa-user-plus'></i> Ajouter
         </a>
-    </li>
-    <li class="btn btn-primary btn-block">
-        <a href="{{ path('user_person_export', {'slug': slug}) }}" title="Afficher la liste des e-mails">
+        <a class="btn btn-primary" href="{{ path('user_person_export', {'slug': slug}) }}" title="Afficher la liste des e-mails">
             <i class='fas fa-envelope'></i> Liste des e-mails
         </a>
-    </li>
-    <li class="btn btn-block">
-        <form>
+        <form class="btn btn-light">
             <div class="input-group">
                 <span class="input-group-addon">
                     <i class='fas fa-search'></i>
                 </span>
-                <input type="text" class="form-control" id="search" name="search" value="{{ filters['search'] }}" />
+                <input type="text" class="form-control form-control-sm" id="search" name="search" value="{{ filters['search'] }}" />
                 <span class="input-group-btn">
                     <a href="{{ path('user_register_index', {'slug': slug, 'skipsearch': true}) }}" title="Supprimer la recherche">
                         <i class='fas fa-trash'></i>
@@ -48,47 +39,34 @@
                 </span>
             </div>
         </form>
-    </li>
     {% if filters['valid'] is null %}
-        <li class="btn btn-sm btn-default btn-block">
-            <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion validée">
+            <a class="btn btn-light btn-sm" href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion validée">
                 Validation ?
             </a>
-        </li>
     {% elseif filters['valid'] == true %}
-        <li class="btn btn-sm btn-success btn-block">
-            <a href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
+            <a class="btn btn-success bg-white btn-sm" href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
                 Validation : Oui
             </a>
-        </li>
     {% elseif filters['valid'] == false %}
-        <li class="btn btn-sm btn-danger btn-block">
-            <a href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
+            <a class="btn btn-danger bg-white btn-sm" href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
                 Validation : Non
             </a>
-        </li>
     {% endif %}
     {% if filters['ending'] is null %}
-        <li class="btn btn-sm btn-default btn-block">
-            <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion se terminant bientôt">
+            <a class="btn btn-light btn-sm" href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion se terminant bientôt">
                 Péremption prochaine ?
             </a>
-        </li>
     {% elseif filters['ending'] == true %}
-        <li class="btn btn-sm btn-success btn-block">
-            <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
+            <a class="btn btn-success bg-white btn-sm" href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
                 Adhésion arrivant à terme
             </a>
-        </li>
     {% elseif filters['ending'] == false %}
-        <li class="btn btn-sm btn-danger btn-block">
-            <a href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
+            <a class="btn btn-danger bg-white btn-sm" href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
                 Adhésion n'arrivant pas à terme
             </a>
-        </li>
     {% endif %}
     {% if fees is not null %}
-        <li class="btn btn-sm btn-default btn-block">
+        <div class="btn btn-sm btn-light btn-sm">
             <div class="title">Type d'adhésion</div>
             {% for fee in fees %}
                 {% if filters['fee'] == fee.id %}
@@ -105,17 +83,17 @@
                     </div>
                 {% endif %}
             {% endfor %}
-        </li>
+        </div>
     {% endif %}
     {% for question in questions %}
-        <li class="btn btn-sm btn-default btn-block">
+        <div class="btn btn-sm btn-light btn-sm">
             <div class="title">{{ question.short }}</div>
             {% if filters['questions'][question.id] is defined %}
-                <div class="item">
-                    <a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">
-                        {{ filters['questions'][question.id] }}
-                    </a>
-                </div>
+            <div class="item">
+                <a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">
+                    {{ filters['questions'][question.id] }}
+                </a>
+            </div>
             {% else %}
                 {% for answer in question.more %}
                     <div class="item">
@@ -125,7 +103,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
-        </li>
+        </div>
     {% endfor %}
 
 {% endblock %}
@@ -160,7 +138,7 @@
                     {% elseif membership.status == 'validated' %}
                         <li class="btn btn-link btn-sm btn-block">
                             <a href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Modifier le paiement de cette adhésion">
-                                <i class='fas fa-pencil'></i> Modifier le paiement
+                                <i class='fas fa-pencil-alt'></i> Modifier le paiement
                             </a>
                         </li>
                     {% endif %}
@@ -179,27 +157,37 @@
                 </ul>
             </span>
 
-            <div class="field title">
-                {% if membership.status == 'registered' %}
-                    <span style="color:red;" title="Adhésion incomplète : manque le paiement"><i class='fas fa-euro'></i></span>
-                {% elseif membership.status == 'paid' %}
-                    <span stype="color:red;" title="Adhésion incomplète : manque la fiche signée"><i class='fas fa-list-alt'></i></span>
+            <div class="title">
+                <i class="fas fa-user"></i> {{ membership.person }}
+                {% if 'ROLE_ADMIN' in membership.person.user.roles %}
+                    <span class="text-primary" title="Super-admininstateur"><i class="fas fa-jedi"></i></span>
+                {% elseif 'ROLE_STRUCTURE' in membership.person.user.roles %}
+                    <span class="text-primary" title="Administrateur local"><i class='fas fa-star'></i></span>
                 {% endif %}
-                {% if membership.expiredOn|date('Ymd') < "now"|date_modify(param('reg_'~slug~'_anticipated'))|date('Ymd') %}
-                    <span style="color:orange;" title="Fin de période d'adhésion proche">
-                        <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Fin de la période d'adhésion proche" style="color:orange; text-decoration:none;">
-                            <i class='fas fa-hourglass-end'></i>
-                        </a>
-                    </span>
-                {% endif %}
-                {{ membership.person }}
-                {% if 'ROLE_STRUCTURE' in membership.person.user.roles %}
-                    <span style="color:yellow;" title="Administrateur local"><i class='fas fa-star'></i></span>
-                {% endif %}
+                </span>
             </div>
-            <div class="field">({{ membership.person.birthday|date('d/m/Y') }})</div>
-            {% if membership.payedOn is not null %}
-                <div class="">Adhésion par {{ membership.method.label|lower }} effectuée le {{ membership.payedOn|date('d/m/Y') }}</div>
+            {% if membership.status == 'registered' and membership.payedOn is not null %}
+                <div class="text-danger" title="Adhésion incomplète : manque la validation du paiement">
+                    <i class='fas fa-euro-sign'></i> Paiement par {{ membership.method.label|lower }} du {{ membership.payedOn|date('d/m/Y') }} non validé (tarif alternatif).
+                </div>
+            {% elseif membership.status == 'registered' %}
+                <div class="text-danger" title="Adhésion incomplète : manque le paiement">
+                    <i class='fas fa-euro-sign'></i> Paiement non reçu.
+                </div>
+            {% elseif membership.status == 'paid' %}
+                <div class="text-danger" title="Adhésion incomplète : manque la fiche signée">
+                    <i class='fas fa-file-signature'></i> Paiement par {{ membership.method.label|lower }} le {{ membership.payedOn|date('d/m/Y') }}. Fiche signée non reçue.
+                </div>
+            {% elseif membership.expiredOn|date('Ymd') < "now"|date_modify(param('reg_'~slug~'_anticipated'))|date('Ymd') %}
+                <div class="text-warning" title="Fin de période d'adhésion proche">
+                    <a href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Fin de la période d'adhésion proche" style="color:orange; text-decoration:none;">
+                        <i class='fas fa-hourglass-end'></i> {{ membership.method.label|lower }} le {{ membership.payedOn|date('d/m/Y') }}. Adhésion en fin de validité.
+                    </a>
+                </div>
+            {% elseif membership.payedOn is not null %}
+                <div class="text-success" title="Adhésion valide">
+                    <i class='fas fa-id-card'></i> Paiement par {{ membership.method.label|lower }} le {{ membership.payedOn|date('d/m/Y') }}.
+                </div>
             {% endif %}
         </li>
         {% endif %}

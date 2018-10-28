@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu">
                         <li class="action">
                             <a href="{{ path('user_payment_edit', {'id': gateway.id, 'slug': structure.slug}) }}" title="Modifier le moyen de paiement '{{ gateway.gatewayName }}'" class="edit">
-                                <i class='fas fa-pencil'></i> Modifier
+                                <i class='fas fa-pencil-alt'></i> Modifier
                             </a>
                         </li>
                         {% if is_granted('ROLE_ADMIN') %}

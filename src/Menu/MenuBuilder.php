@@ -40,7 +40,7 @@ class MenuBuilder
         $session = $requestStack->getCurrentRequest()->getSession();
 
         if (!$security->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $menu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure'), 'icon' => 'handshake-o'));
+            $menu->addChild('Structures', array('route' => 'core_structure_map', 'label' => 'S\'enregistrer', 'attributes' => array('title' => 'S\'enregistrer et adhérer à une structure'), 'icon' => 'handshake-o'));
             $menu->addChild('Login', array('route' => 'fos_user_security_login', 'label' => 'S\'identifier', 'attributes' => array('title' => 'S\'identifier pour accéder au site'), 'icon' => 'sign-in'));
         } else {
             if ($security->isGranted('ROLE_MEMBER')) {
@@ -54,7 +54,7 @@ class MenuBuilder
             }
             if ($security->isGranted('ROLE_ADMIN')) {
                 $adminMenu = $menu->addChild('Administration', array('label' => 'Administrer', 'dropdown' => true, 'caret' => true, 'icon' => 'star'));
-                $adminMenu->addChild('Structures', array('route' => 'core_structure_index', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'sitemap'));
+                $adminMenu->addChild('Structures', array('route' => 'core_structure_map', 'label' => 'Structures', 'attributes' => array('title' => 'Gérer les structures'), 'icon' => 'sitemap'));
                 $adminMenu->addChild('Questions', array('route' => 'user_register_question_index', 'routeParameters' => ['slug' => 'all'], 'label' => 'Questions complémentaires', 'attributes' => array('title' => 'Gérer les questions complémentaires'), 'icon' => 'question-circle'));
             }
             $menu->addChild('Logout', array('route' => 'fos_user_security_logout', 'label' => 'Se déconnecter', 'attributes' => array('title' => 'Se déconnecter du site'), 'icon' => 'sign-out'));

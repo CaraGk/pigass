@@ -15,6 +15,8 @@ global.$ = global.jQuery = $;
 require('bootstrap');
 
 require('./confirm.js');
+require('./filter.js');
+require('./switchSeparator.js');
 
 $(document).ready(function() {
     $('[data-toggle="popover"]').popover();

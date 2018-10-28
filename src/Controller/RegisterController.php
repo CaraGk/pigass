@@ -37,7 +37,6 @@ use App\Entity\Membership,
     App\Entity\Fee;
 use App\Form\FilterType,
     App\FormHandler\FilterHandler,
-    App\Form\QuestionType,
     App\FormHandler\QuestionHandler,
     App\Form\MemberQuestionType,
     App\FormHandler\MemberQuestionHandler,
@@ -819,11 +818,6 @@ class RegisterController extends AbstractController
         }
         $questions = $this->em->getRepository('App:MemberQuestion')->getAll($membership->getStructure());
         $infos = $this->em->getRepository('App:MemberInfo')->getByMembership($membership->getPerson(), $membership);
-        if (count($questions) > count($infos)) {
-            $form = $this->createForm(QuestionType::class, null, array('questions' => $questions));
-        } else {
-		$form = null;
-	}
 
         $html = $this->renderView(
             'register/printPDF.html.twig',
@@ -832,7 +826,6 @@ class RegisterController extends AbstractController
                 'config'     => $config,
                 'address'    => $address,
                 'payableTo'  => (isset($config['payableTo'])?$config['payableTo']:'non défini'),
-                'form'       => ($form?$form->createView():null),
                 'questions'  => $questions,
                 'infos'      => $infos,
                 'iban'       => (isset($config['iban'])?$config['iban']:null),
@@ -846,61 +839,6 @@ class RegisterController extends AbstractController
                 'Content-Type'        => 'application/pdf',
                 'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
             ]
-        );
-    }
-    /**
-     * Complementary questions to member
-     *
-     * @Route("/member/questions", name="user_register_question")
-     * @Template()
-     */
-    public function questionAction(Request $request)
-    {
-        if (!$this->security->isGranted('ROLE_MEMBER'))
-            throw new AccessDeniedException();
-
-        $user = $this->getUser();
-        $filter = $this->session->get('user_register_filter', null);
-        $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
-        $person = $this->testAdminTakeOver($user, $userid);
-        $membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
-        if (!$membership) {
-            $membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
-            if (!$membership) {
-                return $this->redirect($this->generateUrl('user_register_register'));
-            }
-        }
-        $structure = $membership->getStructure();
-        $questions = $this->em->getRepository('App:MemberQuestion')->getAll($structure);
-        $member_infos = $this->em->getRepository('App:MemberInfo')->getByMembership($person, $membership);
-
-        if ($member_infos and count($member_infos) < count($questions)) {
-            $exclude = '(';
-            foreach ($member_infos as $member_info) {
-                $exclude .= $member_info->getQuestion()->getId() . ', ';
-            }
-            $exclude .= '0)';
-            $questions = $this->em->getRepository('App:MemberQuestion')->getAll($structure, $exclude);
-        }
-
-        if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) {
-            $form = $this->createForm(QuestionType::class, null, ['questions' => $questions, 'admin' => true]);
-            $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions, true);
-        } else {
-            $form = $this->createForm(QuestionType::class, null, ['questions' => $questions]);
-            $form_handler = new QuestionHandler($form, $request, $this->em, $membership, $questions);
-        }
-
-        if($form_handler->process()) {
-            $this->session->getFlashBag()->add('notice', 'Informations complémentaires enregistrées.');
-
-            return $this->redirect($this->generateUrl('user_register_list', ['userid' => $userid]));
-        }
-
-        return array(
-            'form'   => $form->createView(),
-            'ato'    => $filter?true:false,
-            'person' => $person,
         );
     }
 
@@ -1038,16 +976,6 @@ class RegisterController extends AbstractController
                 $slug = $request->get('slug', null);
             }
             $reJoinable = true;
-        }
-
-        /* Tests if all memberQuestions have allready been answered */
-        $skipFilter = $request->query->get('skip', null);
-        if (isset($membership) and !$skipFilter) {
-            $questions = $this->em->getRepository('App:MemberQuestion')->getAll($membership->getStructure());
-            $member_infos = $this->em->getRepository('App:MemberInfo')->getByMembership($person, $membership);
-            if (count($member_infos) < count($questions)) {
-                return $this->redirect($this->generateUrl('user_register_question', ['userid' => $person->getUser()->getId()]));
-            }
         }
 
         $memberships = $this->em->getRepository('App:Membership')->findBy(['person' => $person]);

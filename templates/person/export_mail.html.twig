@@ -4,23 +4,23 @@
 {% block headline %}{{ structure }} : adresses mails{% endblock %}
 
 {% block action %}
-    <li class="btn btn-primary">
+    <div class="btn btn-primary">
         <a href="{{ path('user_register_index', {'slug': structure.slug}) }}">
             <i class='fas fa-arrow-left'></i> Retour
         </a>
-    </li>
-    <li class="btn btn-info">
+    </div>
+    <div class="btn btn-light btn-sm">
         Séparateur :
         <select id="separator" class="">
             <option value=", " selected>,</option>
             <option value=" ; ">;</option>
             <option value="retour">À la ligne</option>
         </select>
-    </li>
+    </div>
 {% endblock %}
 
 {% block content %}
-    <div class="card bg-primary">
+    <div class="card">
         <div class="card-body">
             <textarea id="showlist" class="export">{{ mails }}</textarea>
         </div>

@@ -1,97 +1,22 @@
-{% extends 'base_mopa.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block head_style %}
-    <link href="{{ asset('build/app.css') }}" type="text/css" rel="stylesheet" media="screen" />
-
-    <style type="text/css">
-        body,
-        .container-fluid,
-        #content
-        {
-            background-image: url({{ asset('uploads/background.png') }});
-            background-repeat: repeat-x;
-            background-attachment: fixed;
-        }
-        .mapael .map {
-            background-color: #FFF;
-            border: 1px solid #AAA;
-            border-radius: 5px;
-        }
-    </style>
-{% endblock head_style %}
-
-{% block title %}Adhésions{% endblock title %}
-
-{% block favicon %}
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
-{% endblock favicon %}
-
-{% block head_bottom %}
-    <meta name="application-name" content="PIGASS" />
-{% endblock head_bottom %}
-
-{% block body_tag %}
-    <body>
-{% endblock body_tag %}
-
-{% block container_div_start %}
-    <div class="container-fluid">
-{% endblock container_div_start %}
-
-{% block navbar %}
-{% endblock navbar %}
-
-{% block page_header %}
-<header id="header" class="row">
-    <span class="hidden-xs col-sm-1">
-        {% block logo %}
-            <a href="{{ path('core_structure_index') }}">
-                <img src="{{ asset('images/pigass_medium.png') }}" alt="logo PIGASS">
-            </a>
-        {% endblock logo %}
-    </span>
-    <h1 class="col-sm-4">{% block headline %}{% endblock headline %}</h1>
-    <aside id="menu" class="col-sm-7">
-        {% block nav %}
-            {{ knp_menu_render('main', {'automenu': 'navbar'}) }}
-        {% endblock nav %}
-    </aside>
-</header>
-{% endblock page_header %}
-
-{% block flashes %}{{ parent() }}{% endblock flashes %}
-
-{% block content_row %}
-<div class="row">
-    <aside id="submenu" class="col-sm-2">
-        <ul class="btn-group-vertical">
-            {% block action %}{% endblock action %}
-        </ul>
-    </aside>
-    <section id="content" class="col-sm-10 col-xs-12">
-        <div class="content">
-            {% block content %}{% endblock content %}
-        </div>
-    </section>
-</div>
+{{ parent() }}
+<style type="text/css">
+    body,
+    .container,
+    #content
+    {
+        background-image: url({{ asset('uploads/background.png') }});
+        background-repeat: repeat-x;
+        background-attachment: fixed;
+    }
+    .mapael .map {
+        background-color: #FFF;
+        border: 1px solid #AAA;
+        border-radius: 5px;
+    }
+</style>
 {% endblock %}
 
-{% block footer_tag_start %}
-<footer id="footer" class="row">
-{% endblock footer_tag_start %}
-
-{% block footer %}
-<ul class="col-sm-6 col-xs-12 text-center">
-    <li><a href="https://github.com/CaraGk/pigass/issues">Reporter un bug ou un souhait</a></li>
-</ul>
-<div class="miniature col-sm-6 col-xs-12">
-    <a href="https://github.com/CaraGk/pigass"><img src="{{ asset('pigass_small.png') }}" alt="pigass" /></a> powered by <a href="http://symfony.com/"><img src="{{ asset('symfony_logo.png') }}" alt="symfony 2" /></a>
-</div>
-{% endblock footer %}
-
-{% block foot_script_assetic %}
-    {{ parent() }}
-    {% block javascripts %}
-        <script type="text/javascript" src="{{ asset('build/app.js') }}"></script>
-    {% endblock javascripts %}
-{% endblock foot_script_assetic %}
+{% block title %}Adhésions{% endblock title %}

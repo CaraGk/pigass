@@ -27,7 +27,7 @@ class AddressType extends AbstractType
     {
         $builder
             ->add('number', TextType::class, array(
-                'label' => 'Nº dans la voie',
+                'label' => 'N°',
             ))
             ->add('type', ChoiceType::class, array(
                 'label' => 'Type de voie',

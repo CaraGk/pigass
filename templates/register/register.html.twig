@@ -3,21 +3,48 @@
 {% block headline %}Adhésion - enregistrement{% endblock %}
 
 {% block action %}
-    <li class="card text-white">
-        <div class="card-body bg-primary">
+    <div class="card">
+        <div class="card-body bg-primary text-white">
             <p class="card-text">Pour s'inscrire au site et pouvoir adhérer à {{ structure }}, il est nécessaire d'indiquer des coordonnées postales, e-mail et téléphoniques ainsi que quelques informations d'état-civil. Ces informations sont nécessaires au fonctionnement interne de {{ structure }} qui s'engage à ne pas les diffuser à quelque tiers que ce soit sans votre consentement exprès. Nous vous recommandons d'indiquer vos coordonnées professionnelles ici.</p>
         </div>
-    </li>
-    <li class="card text-white">
-        <div class="card-body bg-danger">
+    </div>
+    <div class="card mt-2">
+        <div class="card-body bg-danger text-white">
             <p class="card-text">Vous vous apprêtez à adhérer à <b>{{ structure }}</b> en réglant la cotisation.</p>
             <p class="card-text">Si plusieurs tarifs d'adhésion sont proposés, vous devrez fournir les éventuelles pièces justificatives du tarif demandé avant validation de votre adhésion.</p>
         </div>
-    </li>
+    </div>
 {% endblock %}
 
 {% block content %}
     <div class="card">
-        {{ form(form) }}
+        <div class="card-body">
+            {{ form_start(form, {attr: {class: 'row'}}) }}
+                <div class="col-2">{{ form_row(form.person.title) }}</div>
+                <div class="col-5">{{ form_row(form.person.name) }}</div>
+                <div class="col-5">{{ form_row(form.person.surname) }}</div>
+                <div class="w-100"></div>
+                <div class="col">{{ form_row(form.person.birthday) }}</div>
+                <div class="col">{{ form_row(form.person.birthplace) }}</div>
+                <div class="w-100"></div>
+                <div class="col mt-3">{{ form_row(form.person.user.email) }}</div>
+                <div class="col mt-3">{{ form_row(form.person.phone) }}</div>
+                <div class="w-100"></div>
+                <div class="col-2">{{ form_row(form.person.address.number) }}</div>
+                <div class="col-4">{{ form_row(form.person.address.type) }}</div>
+                <div class="col-6">{{ form_row(form.person.address.street) }}</div>
+                <div class="col-12">{{ form_row(form.person.address.complement) }}</div>
+                <div class="col-4">{{ form_row(form.person.address.code) }}</div>
+                <div class="col-4">{{ form_row(form.person.address.city) }}</div>
+                <div class="col-4">{{ form_row(form.person.address.country) }}</div>
+                {% for i in 0..100 if attribute(form, 'question_'~i) is defined %}
+                    <div class="col-4">{{ form_row(attribute(form, 'question_'~i)) }}</div>
+                {% endfor %}
+                <div class="w-100"></div>
+                <div class="col">{{ form_row(form.fee) }}</div>
+                <div class="col">{{ form_row(form.method) }}</div>
+                <div class="w-100"></div>
+            {{ form_end(form) }}
+        </div>
     </div>
 {% endblock %}

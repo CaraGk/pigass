@@ -56,14 +56,16 @@ class MembershipHandler
 
     public function onSuccess(Membership $membership)
     {
-        foreach ($this->questions as $question) {
-            $info = $this->form->get('question_' . $question->getId())->getData();
-            if($question->getType() == 3) {
-                foreach($info as $item) {
-                    $this->setQuestionInfo($question, $item);
+        if ($this->questions) {
+            foreach ($this->questions as $question) {
+                $info = $this->form->get('question_' . $question->getId())->getData();
+                if($question->getType() == 3) {
+                    foreach($info as $item) {
+                        $this->setQuestionInfo($question, $item);
+                    }
+                } else {
+                    $this->setQuestionInfo($membership, $question, $info);
                 }
-            } else {
-                $this->setQuestionInfo($membership, $question, $info);
             }
         }
 

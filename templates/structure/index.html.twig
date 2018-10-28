@@ -25,9 +25,9 @@
 {% endblock %}
 
 {% block content %}
-    <ul class="entities structures list-group">
+    <ul class="card-columns">
         {% for structure in structures %}
-            <li class="entity structure list-group-item row">
+            <li class="card p-0">
                 {% if is_granted('ROLE_ADMIN') %}
                     <span class="float-right">
                         <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown"><i class='fas fa-bars'></i> <span class="caret"></span></button>
@@ -51,31 +51,23 @@
                     </span>
                 {% endif %}
 
-                <div class="col-sm-1">
-                    {% if structure.logo is not null %}
-                        <img src="{{ asset('uploads/' ~ structure.logo) }}" alt="{{ structure.logo }}" class="logo"/>
-                    {% endif %}
-                </div>
-                <div class="col-sm-10">
-                    <div class="col-sm-12 title">
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de {{ structure.name }}">
-                                {% if structure.area is not null %}{{ structure.area }} :{% endif %}
-                                {{ structure.name }}
-                                ({{ structure.slug }})
-                            </a>
-                        {% else %}
-                            <a href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
-                                {% if structure.area is not null %}{{ structure.area }} :{% endif %}
-                                {{ structure.name }}
-                            </a>
+                    <div class="card-title text-center">
+                        {% if structure.logo is not null %}
+                            <img src="{{ asset('uploads/' ~ structure.logo) }}" alt="{{ structure.logo }}" class="logo"/>
                         {% endif %}
+                        {{ structure.name }}
                     </div>
-                    {% if structure.fullname is not null %}<div class="col-sm-12">{{ structure.fullname }}</div>{% endif %}
-                    <div class="col-sm-12">
-                        {% if structure.email is not null %}<a href="mailto:{{ structure.email }}" title="{{ structure.email }}"><i class='fas fa-envelope'></i></a>{% endif %}
-                        {% if structure.address['city'] is not null and structure.address['city'] != '-' %}<a href="#" title="{{ structure.printableAddress }}"><i class='fas fa-home'></i></a>{% endif %}
-                    </div>
+                <div class="card-body">
+                    {% if structure.fullname is not null %}<p class="card-text">{{ structure.fullname }}</p>{% endif %}
+                    {% if structure.area is not null %}<p class="card-text m-0 p-0"><i class="fas fa-flag"></i> {{ structure.area }}</p>{% endif %}
+                    {% if structure.email is not null %}<a class="card-text" href="mailto:{{ structure.email }}" title="{{ structure.email }}"><i class='fas fa-envelope'></i> {{ structure.email }}</a>{% endif %}
+                    {% if structure.address['city'] is not null and structure.address['city'] != '-' %}<p class="card-link" href="#" title="{{ structure.printableAddress }}"><i class='fas fa-home'></i> {{ structure.printableAddress }}</p>{% endif %}
+                </div>
+                <div class="card-footer bg-default text-center">
+                    <a class="btn btn-primary btn-sm" href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">Adhérer</a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a class="btn btn-primary btn-sm" href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de {{ structure.name }}">Adhérents</a>
+                    {% endif %}
                 </div>
             </li>
         {% else %}

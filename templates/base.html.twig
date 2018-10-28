@@ -1,0 +1,105 @@
+{% from 'flash.html.twig' import session_flash %}
+
+<!DOCTYPE html>
+
+<html lang="{{ locale }}">
+
+{% block head %}
+<head>
+    <meta charset="{{ _charset }}" />
+    {% block head_style %}
+        <link href="{{ asset('build/app.css') }}" type="text/css" rel="stylesheet" media="screen" />
+
+    {% endblock head_style %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block head_script %}
+    {% endblock head_script %}
+
+    <title>{% block title %}PIGASS : Projet d'Interface de Gestion des Adhérents de Structures Syndicales{% endblock title %}</title>
+    {% block favicon %}<link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />{% endblock %}
+
+    {% block head_bottom %}
+        <meta name="application-name" content="PIGASS" />
+    {% endblock head_bottom %}
+</head>
+{% endblock head %}
+
+<body>
+
+{% block body_start %}
+{% endblock body_start %}
+
+{% block body %}
+    {% block navbar %}
+    <nav id="menu" class="navbar navbar-expand sticky-top navbar-dark bg-dark">
+        <div class="container-fluid">
+            {% block logo %}
+            <a href="{{ path('core_structure_map') }}" class="navbar-brand">
+                <img src="{{ asset('images/pigass_medium.png') }}" alt="logo PIGASS">
+            </a>
+            {% endblock logo %}
+            <p class="navbar-brand">{% block headline %}Adhésions{% endblock headline %}</p>
+            {{ mopa_bootstrap_menu('main', {'automenu': 'navbar'}) }}
+    </nav>
+    {% endblock navbar %}
+
+    {% block container %}
+    <div class="{% block container_class %}container{% endblock container_class %} mt-3">
+        {% block header %}
+        {% endblock header %}
+
+        <div class="content row">
+
+            <aside id="submenu" class="col-sm-4">
+
+                <div class="btn-group-vertical w-100">
+                    {% block action %}{% endblock action %}
+                </div>
+
+            </aside>
+
+            <section id="content" class="col-sm-8 col-xs-12">
+
+                {% block flashes %}
+                    {% if app.session.flashbag.peekAll|length > 0 %}
+                        <div class="w-100">{{ session_flash(true, true) }}</div>
+                    {% endif %}
+                {% endblock flashes %}
+
+                <div class="content">
+                    {% block content %}{% endblock content %}
+                </div>
+
+            </section>
+
+        </div>
+
+        <footer id="footer" class="row justify-content-between mt-3">
+
+            {% block footer %}
+            <a class="col-4 align-self-center" href="https://github.com/CaraGk/pigass/issues">Reporter un bug ou un souhait</a>
+            <div class="col-4 align-self-center miniature">
+                <a href="https://github.com/CaraGk/pigass"><img src="{{ asset('images/pigass_small.png') }}" alt="pigass" /></a>
+                powered by
+                <a href="http://symfony.com/"><img src="{{ asset('images/symfony_logo.png') }}" alt="symfony" /></a>
+            </div>
+            {% endblock footer %}
+
+        </footer>
+
+    </div><!-- /container -->
+    {% endblock container %}
+
+    {% block foot_script %}
+        <script type="text/javascript" src="{{ asset('build/app.js') }}"></script>
+        {% block javascripts %}
+        {% endblock javascripts %}
+    {% endblock foot_script %}
+
+{% endblock body %}
+
+</body>
+
+</html>

@@ -44,22 +44,18 @@
                     <div class="col-xs-9 value">{{ membership.person.user.email }}</div>
                     <div class="col-xs-4 title">Adresse professionnelle :</div>
                     <div class="col-xs-8 value">{{ membership.person.PrintableAddress(false) }}</div>
-                    {% if form %}
-                        {{ form_widget(form) }}
-                    {% else %}
-                        {% for info in infos %}
-                            <div class="row">
-                                <div class="col-xs-8 info">{{ info.question.name }}</div>
-                                <div class="col-xs-4 info">
-                                    {% if info.question.type == 7 %}
-                                        {{ info.value|date('d/m/Y') }}
-                                    {% else %}
-                                        {{ info.value }}
-                                    {% endif %}
-                                </div>
+                    {% for info in infos %}
+                        <div class="row">
+                            <div class="col-xs-8 info">{{ info.question.name }}</div>
+                            <div class="col-xs-4 info">
+                                {% if info.question.type == 7 %}
+                                    {{ info.value|date('d/m/Y') }}
+                                {% else %}
+                                    {{ info.value }}
+                                {% endif %}
                             </div>
-                        {% endfor %}
-                    {% endif %}
+                        </div>
+                    {% endfor %}
                     <div class="col-xs-12">Je désire adhérer à {{ membership.structure.name }} du {{ membership.payedOn|date('d/m/Y') }} au {{ membership.expiredOn|date('d/m/Y') }}.</div>
                     {% if membership.status == 'paid' %}
                         <div class="col-xs-12">J'ai déjà réglé la somme de {{ (membership.amount/100)|number_format(2,',',' ') }} € à {{ membership.structure.name }} par {{ membership.method.label|lower }} le {{ membership.payedOn|date('d/m/Y') }}.</div>

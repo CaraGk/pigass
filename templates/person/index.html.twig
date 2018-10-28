@@ -16,7 +16,7 @@
         </li>
         <li class="btn btn-primary">
             <a href="{{ path('user_register_index') }}">
-                <i class='fas fa-euro'></i> Adhérents
+                <i class='fas fa-euro-sign'></i> Adhérents
             </a>
         </li>
     {% endif %}
@@ -37,7 +37,7 @@
                     <ul class="dropdown-menu">
                         <li class="action">
                             <a href="{{ path('user_person_edit', {'id': person.id}) }}?{{ app.request.queryString }}#person_{{ person.id }}" title="Modifier l'étudiant '{{ person }}'" class="edit">
-                                <i class='fas fa-pencil'></i> Modifier
+                                <i class='fas fa-pencil-alt'></i> Modifier
                             </a>
                         </li>
                         <li class="action">

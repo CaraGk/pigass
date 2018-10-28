@@ -2,8 +2,18 @@
 
 {% block headline %}Adhésion : {{ membership.person }}{% endblock %}
 
+{% block action %}
+    <div class="btn btn-primary">
+        <a href="{{ path('user_register_index', {'slug': membership.structure.slug}) }}">
+            <i class='fas fa-arrow-left'></i> Retour
+        </a>
+    </div>
+{% endblock %}
+
 {% block content %}
     <div class="card">
-        {{ form(form) }}
+        <div class="card-body">
+            {{ form(form) }}
+        </div>
     </div>
 {% endblock %}

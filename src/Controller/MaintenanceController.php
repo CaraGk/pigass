@@ -175,6 +175,6 @@ class MaintenanceController extends AbstractController
         }
         $this->em->flush();
 
-        return $this->redirect($this->generateUrl('core_structure_index'));
+        return $this->redirect($this->generateUrl('core_structure_map'));
     }
 }

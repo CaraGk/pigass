@@ -205,7 +205,7 @@ class ReceiptController extends AbstractController
         }
 
         $html = $this->renderView(
-            'App:Receipt:printPDF.html.twig',
+            'receipt/printPDF.html.twig',
             [
                 'receipt'    => $receipt,
                 'membership' => $membership,

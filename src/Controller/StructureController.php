@@ -68,14 +68,14 @@ class StructureController extends AbstractController
             }
 
             if ($user->hasRole('ROLE_ADMIN')) {
-                return $this->redirect($this->generateUrl('core_structure_index'));
+                return $this->redirect($this->generateUrl('core_structure_map'));
             }
 
             if ($user->hasRole('ROLE_MEMBER')) {
                 return $this->redirect($this->generateUrl('user_register_list'));
             }
         } else {
-            return $this->redirect($this->generateUrl('core_structure_index'));
+            return $this->redirect($this->generateUrl('core_structure_map'));
         }
     }
 
@@ -173,7 +173,7 @@ class StructureController extends AbstractController
             $this->em->flush();
 
             $this->session->getFlashBag()->add('notice', 'Structure "' . $structure . '" enregistrée.');
-            return $this->redirect($this->generateUrl('core_structure_index'));
+            return $this->redirect($this->generateUrl('core_structure_map'));
         }
 
         return array(
@@ -229,7 +229,7 @@ class StructureController extends AbstractController
 
             $this->session->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');
             if ($user->hasRole('ROLE_ADMIN'))
-                return $this->redirect($this->generateUrl('core_structure_index'));
+                return $this->redirect($this->generateUrl('core_structure_map'));
             else
                 return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
         }
@@ -256,6 +256,6 @@ class StructureController extends AbstractController
         $this->em->flush();
 
         $this->session->getFlashBag()->add('notice', 'Session "' . $structure . '" supprimée.');
-        return $this->redirect($this->generateUrl('core_structure_index'));
+        return $this->redirect($this->generateUrl('core_structure_map'));
     }
 }

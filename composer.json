@@ -39,7 +39,6 @@
         "vich/uploader-bundle": "^1.8"
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.0",
         "sensiolabs/security-checker": "^5.0",
         "symfony/web-server-bundle": "*"
     },

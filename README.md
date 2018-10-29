@@ -7,25 +7,26 @@ Pré-requis
 ----------
 
 - php >= 7.2 pour la branche 2.x
-- Extensions PHP : php-intl, php-curl, php-mbstring, php-xml, php-mysql
+- Extensions PHP : php-intl, php-curl, php-mbstring, php-xml, php-mysql, php-zip, php-gd, php-dom, php-xml
 - MySQL (par défaut)
 - NodeJS
 - Composer
 
 Installation
 ------------
-Procédure d'installation en console sur un serveur GNU/Linux :
+Procédure d'installation (en production) en console sur un serveur GNU/Linux :
 
 1. git clone https://github.com/CaraGk/pigass.git pigass/
 2. cd pigass/
-3. composer install
-4. Corriger les éventuelles erreurs de dépendances et indiquer les paramètres pour la génération du parameters.yml
-5. ./bin/console doctrine:migrations:migrate --no-interaction
-6. ./bin/console fos:user:create user@exemple.fr user@exemple.fr MonMotDePasse
-7. ./bin/console fos:user:promote user@exemple.fr ROLE_ADMIN
-8. ./bin/console assets:install web
-9. yarn install
-10. yarn encore production
+3. Indiquer les variables d'environnement de .env.dist dans la configuration de votre VirtualHost (si Apache2)
+4. composer install --no-dev --optimize-autoloader
+5. Corriger les éventuelles erreurs de dépendances
+6. ./bin/console doctrine:migrations:migrate --no-interaction
+7. ./bin/console fos:user:create user@exemple.fr user@exemple.fr MonMotDePasse
+8. ./bin/console fos:user:promote user@exemple.fr ROLE_ADMIN
+9. ./bin/console assets:install web
+10. yarn install
+11. yarn encore production
 
 À partir de là on peut accéder au site et se connecter avec l'utilisateur user@exemple.fr pour créer les structures.
 

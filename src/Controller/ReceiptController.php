@@ -134,7 +134,7 @@ class ReceiptController extends AbstractController
         }
 
         if ($receipt->getImage()) {
-            $receipt->setImage(new File($this->getParameter('logo_dir') . '/signs/' . $receipt->getImageName()));
+            $receipt->setImage(new File($this->getParameter('app.logo_dir') . '/signs/' . $receipt->getImageName()));
         }
         $form = $this->createForm(ReceiptType::class, $receipt, array('structure' => $structure));
         $formHandler = new ReceiptHandler($form, $request, $this->em, $structure);

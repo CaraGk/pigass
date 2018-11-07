@@ -70,4 +70,34 @@ class DashboardController extends AbstractController
             'modules'   => $modules,
         ];
     }
+
+    /**
+     * Superadmin dashboard
+     *
+     * @Route("/admin", name="app_dashboard_superadmin")
+     * @Template
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function superadmin(Request $request)
+    {
+        $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
+
+        $structures = $this->em->getRepository('App:Structure')->getAll(true);
+        foreach ($structures as $structure) {
+            $modules['adhesion']['count_validated']['structures'][$structure->getName()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+                'valid' => true,
+            ]));
+            $modules['adhesion']['count_unvalidated']['structures'][$structure->getName()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+                'valid' => false,
+            ]));
+        }
+        $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure(null, [
+            'valid' => true,
+        ]));
+
+        return [
+            'me'      => $me,
+            'modules' => $modules,
+        ];
+    }
 }

@@ -71,10 +71,16 @@ class MembershipRepository extends EntityRepository
     {
         $query = $this->getBaseQuery();
         $query
-            ->where('s.slug = :slug')
-            ->setParameter('slug', $slug)
+            ->where('true != false')
             ->orderBy('p.name', 'asc')
         ;
+
+        if ($slug != null) {
+            $query
+                ->andWhere('s.slug = :slug')
+                ->setParameter('slug', $slug)
+            ;
+        }
 
         if (isset($filter['valid'])) {
             if ($filter['valid'])
@@ -127,6 +133,7 @@ class MembershipRepository extends EntityRepository
         return $query;
     }
 
+
     public function getAllByStructure($slug, $filter = null, $anticipated = null)
     {
         $query = $this->getAllByStructureQuery($slug, $filter, $anticipated);
@@ -147,6 +154,7 @@ class MembershipRepository extends EntityRepository
 
         return $query;
     }
+
 
     public function getCurrentByStructure($slug, $filter = null, $anticipated = null) {
         return $this->getCurrentByStructureQuery($slug, $filter, $anticipated)

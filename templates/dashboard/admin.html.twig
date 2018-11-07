@@ -11,12 +11,12 @@
 
 {% block content %}
     <div class="card">
-        <div class="card-header bg-primary text-white">Adhésions</div>
+        <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
             <p class="card-text">Nombre d'adhésions validées : {{ modules.adhesion.count_validated.total }}</p>
             <ul>
             {% for fee_name, fee_count in modules.adhesion.count_validated.fees %}
-                <li class="card-text">«&nbsp;{{ fee_name }}&nbsp;» : {{ fee_count }}</li>
+                <li class="card-text">{{ fee_name }}&nbsp;: {{ fee_count }}</li>
             {% endfor %}
             </ul>
             <p class="card-text">Nombre d'adhésions non validées : {{ modules.adhesion.count_unvalidated.total }}</p>

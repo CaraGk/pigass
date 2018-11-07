@@ -40,8 +40,53 @@
                 <img src="{{ asset('images/pigass_medium.png') }}" alt="logo PIGASS">
             </a>
             {% endblock logo %}
-            <p class="navbar-brand">{% block headline %}Adhésions{% endblock headline %}</p>
-            {{ mopa_bootstrap_menu('main', {'automenu': 'navbar'}) }}
+            <p class="navbar-brand m-0">{% block headline %}Adhésions{% endblock headline %}</p>
+            <ul class="nav navbar-nav row">
+                {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                    <li class="col-sm p-0">
+                        <a class="btn btn-dark" href="{{ path('fos_user_resetting_request') }}" title="Réinitialiser le mot de passe">
+                            <i class="fas fa-question"></i> Mot de passe oublié
+                        </a>
+                    </li>
+                    <li class="col-sm p-0">
+                        <form action="{{ path("fos_user_security_check") }}" method="post" class="form form-inline">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+                            <input type="hidden" id="remember_me" name="_remember_me" value="on"/>
+                            <input type="text" id="username" name="_username" required="required" class="form-control" />
+                            <input type="password" id="password" name="_password" required="required" class="form-control"/>
+                            <input type="submit" value="Ok" class="btn btn-dark"/>
+                        </form>
+                    </li>
+                {% else %}
+                    {% if is_granted('ROLE_MEMBER') %}
+                        <li class="col-sm p-0">
+                            <a class="btn btn-dark" href="{{ path('user_register_list') }}" title="Mon tableau de bord">
+                                <i class="fas fa-id-card"></i> {{ app.user.username }}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_STRUCTURE') %}
+                        <li class="col-sm p-0">
+                            <a class="btn btn-dark" href="{{ path('app_dashboard_admin', {'slug': 'test'}) }}" title="Tableau de bord de la structure">
+                                <i class="fas fa-star"></i> Structure
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="col-sm p-0">
+                            <a class="btn btn-dark" href="{{ path('app_dashboard_superadmin') }}" title="Administration du site">
+                                <i class="fas fa-jedi"></i> Administration
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="col-sm p-0">
+                        <a class="btn btn-dark" href="{{ path('fos_user_security_logout') }}" title="Se déconnecter">
+                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </nav>
     {% endblock navbar %}
 

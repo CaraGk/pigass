@@ -60,8 +60,8 @@ class DashboardController extends AbstractController
         $gateways = $this->em->getRepository('App:Gateway')->findByStructure($structure);
         foreach ($gateways as $gateway) {
             $modules['adhesion']['count_validated']['gateways'][$gateway->getLabel()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
-                'valid' => true,
-                'gateway'   => $gateway->getId(),
+                'valid'   => true,
+                'gateway' => $gateway->getGatewayName(),
             ]));
         }
         $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [

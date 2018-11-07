@@ -91,19 +91,31 @@ class MembershipRepository extends EntityRepository
 
         if (isset($filter['ending']) and $anticipated) {
             if ($filter['ending'] == true) {
-                $query->andWhere('m.expiredOn < :anticipated')
+                $query
+                    ->andWhere('m.expiredOn < :anticipated')
                     ->setParameter('anticipated', $anticipated)
                 ;
             } elseif($filter['ending'] == false) {
-                $query->andWhere('m.expiredOn > :anticipated')
+                $query
+                    ->andWhere('m.expiredOn > :anticipated')
                     ->setParameter('anticipated', $anticipated)
                 ;
             }
         }
 
         if (isset($filter['fee']) and $filter['fee']) {
-            $query->andWhere('m.fee = :fee')
+            $query
+                ->andWhere('m.fee = :fee')
                 ->setParameter('fee', $filter['fee'])
+            ;
+        }
+
+        if (isset($filter['gateway']) and $filter['gateway']) {
+            $query
+                ->join('m.method', 'g')
+                ->addSelect('g')
+                ->andWhere('g.gatewayName = :gateway')
+                ->setParameter('gateway', $filter['gateway'])
             ;
         }
 

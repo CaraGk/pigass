@@ -602,4 +602,14 @@ class Structure
     {
         return $this->phone;
     }
+
+    /**
+     * Get Role
+     *
+     * @return string
+     */
+    public function getRole()
+    {
+        return 'ROLE_STRUCTURE_' . strtoupper($this->slug);
+    }
 }

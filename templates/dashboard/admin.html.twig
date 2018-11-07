@@ -1,0 +1,34 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ parent() }} - {{ structure.name }} - {{ structure.name }} - Administration{% endblock %}
+
+{% block headline %}{{ structure.name }} - Administration{% endblock %}
+
+{% block action %}
+    </ul>
+    {{ mopa_bootstrap_menu('parameter') }}
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header bg-primary text-white">Adhésions</div>
+        <div class="card-body">
+            <p class="card-text">Nombre d'adhésions validées : {{ modules.adhesion.count_validated.total }}</p>
+            <ul>
+            {% for fee_name, fee_count in modules.adhesion.count_validated.fees %}
+                <li class="card-text">«&nbsp;{{ fee_name }}&nbsp;» : {{ fee_count }}</li>
+            {% endfor %}
+            </ul>
+            <p class="card-text">Nombre d'adhésions non validées : {{ modules.adhesion.count_unvalidated.total }}</p>
+        </div>
+        <div class="card-footer">
+            <a class="card-link btn btn-primary btn-sm" href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Voir la liste des adhérents">
+                <i class="fas fa-users"></i> Adhérents
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+{% endblock %}

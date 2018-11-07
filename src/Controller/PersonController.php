@@ -13,15 +13,19 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route,
-    Symfony\Component\Security\Core\Security,
+    Symfony\Component\Security\Core\Security as BaseSecurity,
     Symfony\Component\Security\Core\Exception\AccessDeniedException,
     Symfony\Component\HttpFoundation\Session\SessionInterface,
     Symfony\Component\HttpFoundation\Request,
     Doctrine\ORM\EntityManagerInterface,
     FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\Validator\Constraints\File;
 use App\Entity\Person,
+    App\Entity\Structure,
     App\Entity\User;
 use App\Form\PersonType,
     App\Form\PersonUserType,
@@ -36,7 +40,7 @@ class PersonController extends AbstractController
 {
     protected $security, $session, $em, $um;
 
-    public function __construct(Security $security, SessionInterface $session, UserManagerInterface $um, EntityManagerInterface $em)
+    public function __construct(BaseSecurity $security, SessionInterface $session, UserManagerInterface $um, EntityManagerInterface $em)
     {
         $this->security = $security;
         $this->em = $em;
@@ -155,40 +159,41 @@ class PersonController extends AbstractController
     /**
      * Promote a person to higher rights
      *
-     * @Route("/{slug}/person/{id}/promote", name="user_person_promote", requirements={"id" = "\d+", "slug" = "\w+"})
+     * @Route("/{slug}/person/{id}/promote", name="user_person_promote", requirements={"slug" = "\w+", "id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
+     * @Security("is_granted('ROLE_ADMIN') or (is_granted('ROLE_STRUCTURE') and  is_granted(structure.getRole()))")
      */
-    public function promoteAction(Person $person, Request $request, $slug)
+    public function promoteAction(Structure $structure, Person $person, Request $request)
     {
-        if (!($this->security->isGranted('ROLE_STRUCTURE') or $this->security->isGranted('ROLE_ADMIN')))
-            throw new AccessDeniedException();
-
         $user = $person->getUser();
         $user->addRole('ROLE_STRUCTURE');
+        $user->addRole($structure->getRole());
 
         $this->um->updateUser($user);
 
         $this->session->getFlashBag()->add('notice', 'Droits d\'administration donnés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $slug)));
+        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**
      * Demote a person to lower rights
      *
-     * @Route("/{slug}/person/{id}/demote", name="user_person_demote", requirements={"id" = "\d+", "slug" = "\w+"})
+     * @Route("/{slug}/person/{id}/demote", name="user_person_demote", requirements={"slug" = "\w+", "id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
+     * @Security("is_granted('ROLE_ADMIN') or (is_granted('ROLE_STRUCTURE') and  is_granted(structure.getRole()))")
      */
-    public function demoteAction(Person $person, Request $request, $slug)
+    public function demoteAction(Structure $structure, Person $person, Request $request)
     {
-        if (!($this->security->isGranted('ROLE_STRUCTURE') or $this->security->isGranted('ROLE_ADMIN')))
-            throw new AccessDeniedException();
-
         $user = $person->getUser();
-        if ($user->hasRole('ROLE_STRUCTURE'))
+        if ($user->hasRole($structure->getRole()))
+            $user->removeRole($structure->getRole());
+        if (!preg_grep("/ROLE_STRUCTURE_(.*)/", $user->getRoles()))
             $user->removeRole('ROLE_STRUCTURE');
 
         $this->um->updateUser($user);
 
         $this->session->getFlashBag()->add('notice', 'Droits d\'administration retirés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $slug)));
+        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**

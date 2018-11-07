@@ -44,11 +44,11 @@
                 Validation ?
             </a>
     {% elseif filters['valid'] == true %}
-            <a class="btn btn-success bg-white btn-sm" href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
+            <a class="btn btn-success btn-sm" href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
                 Validation : Oui
             </a>
     {% elseif filters['valid'] == false %}
-            <a class="btn btn-danger bg-white btn-sm" href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
+            <a class="btn btn-danger btn-sm" href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
                 Validation : Non
             </a>
     {% endif %}
@@ -57,11 +57,11 @@
                 Péremption prochaine ?
             </a>
     {% elseif filters['ending'] == true %}
-            <a class="btn btn-success bg-white btn-sm" href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
+            <a class="btn btn-success btn-sm" href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
                 Adhésion arrivant à terme
             </a>
     {% elseif filters['ending'] == false %}
-            <a class="btn btn-danger bg-white btn-sm" href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
+            <a class="btn btn-danger btn-sm" href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
                 Adhésion n'arrivant pas à terme
             </a>
     {% endif %}

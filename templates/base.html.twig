@@ -67,8 +67,8 @@
                     {% endif %}
                     {% if is_granted('ROLE_STRUCTURE') %}
                         <li class="col-sm p-0">
-                            <a class="btn btn-dark" href="{{ path('app_dashboard_admin', {'slug': 'test'}) }}" title="Tableau de bord de la structure">
-                                <i class="fas fa-star"></i> Structure
+                            <a class="btn btn-dark" href="{{ path('app_dashboard_admin', {'slug': app.session.get('slug')}) }}" title="Tableau de bord de la structure">
+                                <i class="fas fa-star"></i> {{ app.session.get('slug')|capitalize }}
                             </a>
                         </li>
                     {% endif %}

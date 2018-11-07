@@ -13,13 +13,19 @@
     <div class="card">
         <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
-            <p class="card-text">Nombre d'adhésions validées : {{ modules.adhesion.count_validated.total }}</p>
-            <ul>
-            {% for fee_name, fee_count in modules.adhesion.count_validated.fees %}
-                <li class="card-text">{{ fee_name }}&nbsp;: {{ fee_count }}</li>
-            {% endfor %}
-            </ul>
-            <p class="card-text">Nombre d'adhésions non validées : {{ modules.adhesion.count_unvalidated.total }}</p>
+            <p class="card-text">
+                Adhésions validées : <span class="badge badge-danger">{{ modules.adhesion.count_validated.total }} / {{ modules.adhesion.count_unvalidated.total }}</span>
+            </p>
+            <p class="card-text">
+                {% for fee_name, fee_count in modules.adhesion.count_validated.fees %}
+                    <div class="btn btn-light">{{ fee_name }} <span class="badge badge-secondary">{{ fee_count }}</span></div>
+                {% endfor %}
+            </p>
+            <p class="card-text">
+                {% for gateway_name, gateway_count in modules.adhesion.count_validated.gateways %}
+                    <div class="btn btn-light">{{ gateway_name }} <span class="badge badge-secondary">{{ gateway_count }}</span></div>
+                {% endfor %}
+            </p>
         </div>
         <div class="card-footer">
             <a class="card-link btn btn-primary btn-sm" href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Voir la liste des adhérents">

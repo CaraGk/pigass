@@ -14,10 +14,14 @@
     <div class="card">
         <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
-            <p class="card-text">Nombre total d'adhésions validées : {{ modules.adhesion.count_validated.total }}</p>
-            <ul>
+            <p class="card-text">
+                Nombre total d'adhésions validées : <span class="badge badge-danger">{{ modules.adhesion.count_validated.total }} / {{ modules.adhesion.count_unvalidated.total }}</span>
+            </p>
+            <p class="card-text">
             {% for structure_name, structure_count in modules.adhesion.count_validated.structures %}
-                <li class="card-text">{{ structure_name }}&nbsp;: {{ structure_count }} adhésions validées et {{ modules.adhesion.count_unvalidated.structures[structure_name] }} non validées</li>
+                <a class="btn btn-light" href="{{ path('app_dashboard_admin', {'slug': structure_name}) }}">
+                    {{ structure_name }} <span class="badge badge-secondary">{{ structure_count }} / {{ modules.adhesion.count_unvalidated.structures[structure_name] }}</span>
+                </a>
             {% endfor %}
             </ul>
         </div>

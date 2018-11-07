@@ -57,6 +57,13 @@ class DashboardController extends AbstractController
                 'fee'   => $fee->getId(),
             ]));
         }
+        $gateways = $this->em->getRepository('App:Gateway')->findByStructure($structure);
+        foreach ($gateways as $gateway) {
+            $modules['adhesion']['count_validated']['gateways'][$gateway->getLabel()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+                'valid' => true,
+                'gateway'   => $gateway->getId(),
+            ]));
+        }
         $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
             'valid' => true,
         ]));
@@ -84,15 +91,18 @@ class DashboardController extends AbstractController
 
         $structures = $this->em->getRepository('App:Structure')->getAll(true);
         foreach ($structures as $structure) {
-            $modules['adhesion']['count_validated']['structures'][$structure->getName()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+            $modules['adhesion']['count_validated']['structures'][$structure->getSlug()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
                 'valid' => true,
             ]));
-            $modules['adhesion']['count_unvalidated']['structures'][$structure->getName()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+            $modules['adhesion']['count_unvalidated']['structures'][$structure->getSlug()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
                 'valid' => false,
             ]));
         }
         $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure(null, [
             'valid' => true,
+        ]));
+        $modules['adhesion']['count_unvalidated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure(null, [
+            'valid' => false,
         ]));
 
         return [

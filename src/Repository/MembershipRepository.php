@@ -72,7 +72,8 @@ class MembershipRepository extends EntityRepository
         $query = $this->getBaseQuery();
         $query
             ->where('true != false')
-            ->orderBy('p.name', 'asc')
+            ->orderBy('p.surname', 'asc')
+            ->addOrderBy('p.name', 'asc')
         ;
 
         if ($slug != null) {

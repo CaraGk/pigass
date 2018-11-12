@@ -684,8 +684,8 @@ class RegisterController extends AbstractController
                 $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
                 /* test if person can rejoin at this time */
                 $now = new \DateTime('now');
-                $anticipated = $now->modify($options['anticipated']);
-                if (null !== $current_membership and ($current_membership->getExpiredOn() > $options['anticipated'] and $current_membership->getStatus() != 'registered')) {
+                $now->modify($options['anticipated']);
+                if (null !== $current_membership and ($current_membership->getExpiredOn() > $now and $current_membership->getStatus() != 'registered')) {
                     $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
                     if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE') and $current_membership->getStructure()->getSlug() == $slug)) {
                         return $this->redirect($this->generateUrl('user_register_index', ["slug" => $slug]));

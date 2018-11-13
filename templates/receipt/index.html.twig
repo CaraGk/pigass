@@ -15,13 +15,11 @@
             </li>
         {% endif %}
 
-        {% if is_granted('ROLE_ADMIN') %}
-            <li class="btn btn-primary">
-                <a href="{{ path('core_receipt_new', {'slug': structure.slug}) }}" title="Ajouter une nouvelle receipt">
-                    <i class='fas fa-plus'></i> Ajouter
-                </a>
-            </li>
-        {% endif %}
+        <li class="btn btn-primary">
+            <a href="{{ path('core_receipt_new', {'slug': structure.slug}) }}" title="Ajouter un nouvel émetteur de reçu fiscal">
+                <i class='fas fa-plus'></i> Ajouter
+            </a>
+        </li>
     </ul>
     {{ mopa_bootstrap_menu('parameter') }}
 {% endblock %}

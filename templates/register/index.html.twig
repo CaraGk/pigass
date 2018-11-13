@@ -112,7 +112,7 @@
     {% set cur = 0 %}
     <ul class="entities list-group">
     {% for membership in memberships %}
-        {% if not filters['search'] or membership.person.id != cur %}
+        {% if membership.person.id != cur %}
         {% set cur = membership.person.id %}
         <li class="entity person list-group-item row">
             <span class="float-right">

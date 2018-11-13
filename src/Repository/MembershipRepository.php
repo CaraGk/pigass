@@ -74,6 +74,7 @@ class MembershipRepository extends EntityRepository
             ->where('true != false')
             ->orderBy('p.surname', 'asc')
             ->addOrderBy('p.name', 'asc')
+            ->addOrderBy('m.id', 'desc')
         ;
 
         if ($slug != null) {

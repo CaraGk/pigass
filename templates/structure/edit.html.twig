@@ -9,12 +9,13 @@
 {% endblock %}
 
 {% block action %}
-    </ul>
-    {{ mopa_bootstrap_menu('parameter') }}
+{{ mopa_bootstrap_menu('parameter') }}
 {% endblock %}
 
 {% block content %}
-    <div class="card">
+<div class="card">
+    <div class="card-body">
         {{ form(form) }}
     </div>
+</div>
 {% endblock %}

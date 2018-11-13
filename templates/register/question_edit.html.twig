@@ -5,15 +5,13 @@
 {% block headline %}Question - modifier{% endblock %}
 
 {% block action %}
-    <li class="btn btn-primary">
-        <a href="{{ path('user_register_question_index', {'slug': slug}) }}" title="Retour à la liste des questions complémentaires">
-            <i class='fas fa-hand-point-left'></i> Retour
-        </a>
-    </li>
+{{ mopa_bootstrap_menu('parameter') }}
 {% endblock %}
 
 {% block content %}
-    <div class="card">
+<div class="card">
+    <div class="card-body">
         {{ form(form) }}
     </div>
+</div>
 {% endblock %}

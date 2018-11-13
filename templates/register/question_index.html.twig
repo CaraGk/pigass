@@ -5,50 +5,48 @@
 {% block headline %}Questions{% endblock %}
 
 {% block action %}
-        <li class="btn btn-primary">
-            <a href="{{ path('user_register_question_new', {'slug': slug}) }}" title="Ajouter une question">
-                <i class='fas fa-plus-sign'></i> Ajouter
-            </a>
-        </li>
-    </ul>
-    {% if slug != 'all' %}{{ mopa_bootstrap_menu('parameter') }}{% endif %}
+<a class="btn btn-primary" href="{{ path('user_register_question_new', {'slug': slug}) }}" title="Ajouter une question">
+    <i class='fas fa-plus-sign'></i> Ajouter
+</a>
+{% if slug != 'all' %}{{ mopa_bootstrap_menu('parameter') }}{% endif %}
 {% endblock %}
 
 {% block content %}
-    <ul class="entities list-group">
-        {% for question in questions %}
-            <li class="entity list-group-item row">
-                {% if is_granted("ROLE_ADMIN") or (question.structure is not null and (is_granted("ROLE_STRUCTURE") and question.structure.slug == slug)) %}
-                <span class="float-right">
-                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown"><i class='fas fa-bars'></i> <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="{{ path('user_register_question_edit', {'id': question.id, 'slug': slug}) }}" title="Modifier la question complémentaire" class="edit">
-                                <i class='fas fa-pencil-alt'></i> Modifier
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ path('user_register_question_index', {'slug': slug}) }}" title="Supprimer la question complémentaire" class="delete confirm">
-                                <i class='fas fa-trash'></i> Supprimer
-                            </a>
-                        </li>
-                    </ul>
-                </span>
-                {% endif %}
-
-                <div class="col-sm-3 title">{{ question.name }} (*{{ question.short }})</div>
-                <div class="col-sm-2">{{ question.structure }}</div>
-                <div class="col-sm-2">{{ question.readableType }}</div>
-                <ul class="col-sm-3">
+{% for question in questions %}
+    <div class="card mb-2">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-question-circle"></i>
+            {{ question.short }}
+            <span class="badge badge-warning ml-3">{{ question.structure }}</span>
+        </div>
+        <div class="card-body">
+            <p class="card-text">Question : {{ question.name }}</p>
+            {% if question.more != false %}
+                <p class="card-text">
+                    Réponses :
                     {% for answer in question.more %}
-                        <li>{{ answer }}</li>
+                        <span class="badge badge-light">{{ answer }}</span>
                     {% endfor %}
-                </ul>
-            </li>
-        {% else %}
-            <li class="noentity list-group-item">
-                Il n'y a aucune question à afficher
-            </li>
-        {% endfor %}
-    </ul>
+                </p>
+            {% endif %}
+            <p class="card-text">Type de question : {{ question.readableType }}</p>
+        </div>
+        {% if is_granted("ROLE_ADMIN") or (question.structure is not null and (is_granted("ROLE_STRUCTURE") and question.structure.slug == slug)) %}
+        <div class="card-footer text-center">
+            <a class="edit btn btn-primary btn-sm" href="{{ path('user_register_question_edit', {'id': question.id, 'slug': slug}) }}" title="Modifier la question complémentaire" class="edit">
+                <i class='fas fa-pencil-alt'></i> Modifier
+            </a>
+            <a class="delete confirm btn btn-primary btn-sm" href="{{ path('user_register_question_index', {'slug': slug}) }}" title="Supprimer la question complémentaire" class="delete confirm">
+                <i class='fas fa-trash'></i> Supprimer
+            </a>
+        </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-header">
+            Il n'y a aucune question à afficher
+        </div>
+    </div>
+{% endfor %}
 {% endblock %}

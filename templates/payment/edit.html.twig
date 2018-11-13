@@ -8,8 +8,14 @@
     {% if gateway is not null %}{{ gateway.gatewayName }} - Modification {% else %} Moyen de paiement - Ajout {% endif %}
 {% endblock %}
 
+{% block action %}
+{{ mopa_bootstrap_menu('parameter') }}
+{% endblock %}
+
 {% block content %}
-    <div class="card">
+<div class="card">
+    <div class="card-body">
         {{ form(form) }}
     </div>
+</div>
 {% endblock %}

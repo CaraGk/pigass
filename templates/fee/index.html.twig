@@ -9,52 +9,39 @@
 {% endblock %}
 
 {% block action %}
-        <li class="btn btn-primary">
-            <a href="{{ path('core_fee_new', {'slug': structure.slug}) }}" title="Ajouter une nouvelle tarification">
-                <i class='fas fa-plus'></i> Ajouter
-            </a>
-        </li>
-    </ul>
-    {{ mopa_bootstrap_menu('parameter') }}
+<a class="btn btn-primary" href="{{ path('core_fee_new', {'slug': structure.slug}) }}" title="Ajouter une nouvelle tarification">
+    <i class='fas fa-plus'></i> Ajouter
+</a>
+{{ mopa_bootstrap_menu('parameter') }}
 {% endblock %}
 
 {% block content %}
-    <ul class="entities fees list-group card">
-        {% for fee in fees %}
-            <li class="entity fee list-group-item row">
-                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STRUCTURE') %}
-                    <span class="float-right">
-                        <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown"><i class='fas fa-bars'></i> <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li class="action">
-                                <a href="{{ path('core_fee_edit', {'slug': structure.slug, 'id': fee.id}) }}" title="Modifier la tarification '{{ fee }}'" class="edit">
-                                    <i class='fas fa-pencil-alt'></i> Modifier
-                                </a>
-                            </li>
-                            <li class="action">
-                                <a href="{{ path('core_fee_delete', {'slug': structure.slug, 'id': fee.id}) }}" title="Supprimer la tarification '{{ fee }}'" class="confirm delete" confirm="Attention, vous allez supprimer la tarification et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
-                                    <i class='fas fa-trash'></i> Supprimer
-                                </a>
-                            </li>
-                        </ul>
-                    </span>
-                {% endif %}
-
-                <div class="">
-                    <span class="title">{{ fee.title }}</span>
-                    ({{ fee.amount(1) }})
-                </div>
-                <div class="">{{ fee.help }}</div>
-            </li>
-        {% else %}
-            <li class="noentity fee list-group-item">
+{% for fee in fees %}
+    <div class="card mb-2">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-euro-sign"></i>
+            {{ fee.title }} : {{ fee.amount(1) }}
+            {% if fee.isDefault == true %}
+                <span class="badge badge-warning ml-3">par défaut</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ fee.help }}</p>
+        </div>
+        <div class="card-footer text-center">
+            <a class="edit btn btn-primary btn-sm" href="{{ path('core_fee_edit', {'slug': structure.slug, 'id': fee.id}) }}" title="Modifier la tarification '{{ fee }}'">
+                <i class='fas fa-pencil-alt'></i> Modifier
+            </a>
+            <a class="confirm delete btn btn-primary btn-sm" href="{{ path('core_fee_delete', {'slug': structure.slug, 'id': fee.id}) }}" title="Supprimer la tarification '{{ fee }}'" confirm="Attention, vous allez supprimer la tarification et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
+                <i class='fas fa-trash'></i> Supprimer
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-header">
                 Aucune tarification enregistrée. <a href="{{ path('core_fee_new', {'slug': structure.slug}) }}" title="Ajouter une tarification">Ajouter une tarification</a>.
-            </li>
-        {% endfor %}
-    </ul>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('bundles/pigasscore/js/confirm.js') }}" type="text/javascript"></script>
+        </div>
+    </div>
+{% endfor %}
 {% endblock %}

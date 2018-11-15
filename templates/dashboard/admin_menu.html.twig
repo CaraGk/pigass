@@ -1,0 +1,23 @@
+<a class="btn btn-primary" href="{{ path('core_structure_edit', {'slug': slug}) }}" title="Modifier la structure">
+    <i class='fas fa-pencil-alt'></i> Modifier la structure
+</a>
+<a class="btn btn-primary" href="{{ path('parameter_admin_index', {'slug': slug}) }}" title="Gérer les paramètres du site">
+    <i class='fas fa-cog'></i> Paramètres du site
+</a>
+<a class="btn btn-primary" href="{{ path('user_payment_index', {'slug': slug}) }}" title="Gérer les moyens de paiement">
+    <i class='fas fa-credit-card'></i> Moyens de paiement
+</a>
+<a class="btn btn-primary" href="{{ path('core_fee_index', {'slug': slug}) }}" title="Gérer les tarifs d'adhésion">
+    <i class='fas fa-euro-sign'></i> Tarifs d'adhésion
+</a>
+<a class="btn btn-primary" href="{{ path('core_receipt_index', {'slug': slug}) }}" title="Gérer les signataires de reçus fiscaux">
+    <i class='fas fa-edit'></i> Reçus fiscaux
+</a>
+<a class="btn btn-primary" href="{{ path('user_register_question_index', {'slug': slug}) }}" title="Gérer les questions complémentaires">
+    <i class='fas fa-question-circle'></i> Questions complémentaires
+</a>
+{% if is_granted('ROLE_ADMIN') %}
+<a class="btn btn-danger confirm delete" href="{{ path('core_structure_delete', {'slug': slug}) }}" title="Supprimer la structure" confirm="Êtes-vous certain de vouloir supprimer la structure et tous les éléments qui s'y rapportent ?">
+    <i class='fas fa-trash'></i> Supprimer
+</a>
+{% endif %}

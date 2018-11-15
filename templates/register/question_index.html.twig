@@ -6,9 +6,11 @@
 
 {% block action %}
 <a class="btn btn-primary" href="{{ path('user_register_question_new', {'slug': slug}) }}" title="Ajouter une question">
-    <i class='fas fa-plus-sign'></i> Ajouter
+    <i class='fas fa-plus'></i> Ajouter
 </a>
-{% if slug != 'all' %}{{ mopa_bootstrap_menu('parameter') }}{% endif %}
+{% if slug != 'all' %}
+    {% include '/dashboard/admin_menu.html.twig' with {'slug': slug} %}
+{% endif %}
 {% endblock %}
 
 {% block content %}

@@ -31,21 +31,3 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    app.menu_builder:
-        class: App\Menu\MenuBuilder
-        arguments: ["@knp_menu.factory"]
-
-    app.menu.main:
-        class: Knp\Menu\MenuItem
-        factory: ["@app.menu_builder", 'createMainMenu']
-        arguments: ["@request_stack","@security.authorization_checker"]
-        tags:
-            - { name: knp_menu.menu, alias: main }
-
-    app.menu.parameter:
-        class: Knp\Menu\MenuItem
-        factory: ["@app.menu_builder", 'createParameterMenu']
-        arguments: ["@request_stack","@security.authorization_checker"]
-        tags:
-            - { name: knp_menu.menu, alias: parameter }
-

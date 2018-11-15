@@ -9,19 +9,10 @@
 {% endblock %}
 
 {% block action %}
-        {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-            <li class="card bg-primary">
-                <div class="card-header">Pour adhérer, veuillez cliquer sur la receipt de votre région, et vous enregistrer en 3 étapes : validation du formulaire, confirmation de l'adresse e-mail et paiement de la cotisation.</div>
-            </li>
-        {% endif %}
-
-        <li class="btn btn-primary">
-            <a href="{{ path('core_receipt_new', {'slug': structure.slug}) }}" title="Ajouter un nouvel émetteur de reçu fiscal">
-                <i class='fas fa-plus'></i> Ajouter
-            </a>
-        </li>
-    </ul>
-    {{ mopa_bootstrap_menu('parameter') }}
+<a class="btn btn-primary" href="{{ path('core_receipt_new', {'slug': structure.slug}) }}" title="Ajouter un nouvel émetteur de reçu fiscal">
+    <i class='fas fa-plus'></i> Ajouter
+</a>
+{% include '/dashboard/admin_menu.html.twig' with {'slug': structure.slug} %}
 {% endblock %}
 
 {% block content %}

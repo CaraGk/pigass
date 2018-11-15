@@ -104,8 +104,9 @@ class ReceiptController extends AbstractController
         }
 
         return array(
-            'form'      => $form->createView(),
-            'receipt'   => null,
+            'form'    => $form->createView(),
+            'receipt' => null,
+            'slug'    => $slug,
         );
     }
 
@@ -150,8 +151,9 @@ class ReceiptController extends AbstractController
         }
 
         return array(
-            'form'      => $form->createView(),
+            'form'    => $form->createView(),
             'receipt' => $receipt,
+            'slug'    => $slug,
         );
     }
 

@@ -12,7 +12,7 @@
 <a class="btn btn-primary" href="{{ path('user_payment_new', {'slug': structure.slug}) }}" title="Ajouter un nouveau moyen de paiement">
     <i class='fas fa-plus'></i> Ajouter un moyen de paiement
 </a>
-{{ mopa_bootstrap_menu('parameter') }}
+{% include '/dashboard/admin_menu.html.twig' with {'slug': structure.slug} %}
 {% endblock %}
 
 {% block content %}

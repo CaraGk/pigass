@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block action %}
-{{ mopa_bootstrap_menu('parameter') }}
+{% include '/dashboard/admin_menu.html.twig' with {'slug': structure.slug} %}
 {% endblock %}
 
 {% block content %}

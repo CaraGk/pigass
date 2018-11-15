@@ -105,6 +105,7 @@ class FeeController extends AbstractController
         return array(
             'form'  => $form->createView(),
             'fee'   => null,
+            'slug'  => $slug,
         );
     }
 
@@ -146,8 +147,9 @@ class FeeController extends AbstractController
         }
 
         return array(
-            'form'      => $form->createView(),
-            'fee' => $fee,
+            'form' => $form->createView(),
+            'fee'  => $fee,
+            'slug' => $slug,
         );
     }
 

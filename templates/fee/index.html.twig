@@ -12,7 +12,7 @@
 <a class="btn btn-primary" href="{{ path('core_fee_new', {'slug': structure.slug}) }}" title="Ajouter une nouvelle tarification">
     <i class='fas fa-plus'></i> Ajouter
 </a>
-{{ mopa_bootstrap_menu('parameter') }}
+{% include '/dashboard/admin_menu.html.twig' with {'slug': structure.slug} %}
 {% endblock %}
 
 {% block content %}

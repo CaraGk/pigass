@@ -5,7 +5,7 @@
 {% block headline %}Question - modifier{% endblock %}
 
 {% block action %}
-{{ mopa_bootstrap_menu('parameter') }}
+{% include '/dashboard/admin_menu.html.twig' with {'slug': slug} %}
 {% endblock %}
 
 {% block content %}

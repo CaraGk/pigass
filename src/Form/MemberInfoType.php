@@ -76,7 +76,6 @@ class MemberInfoType extends AbstractType
                     'input'        => 'string',
                     'widget'       => 'single_text',
                     'with_seconds' => false,
-                    'horizontal_input_wrapper_class' => 'col-lg-4',
                     'timepicker'   => true,
                     'required' => $question->isRequired()?true:false,
                     'label'        => $question->getName(),
@@ -86,7 +85,6 @@ class MemberInfoType extends AbstractType
                     'input'        => 'string',
                     'widget'       => 'single_text',
                     'html5'        => true,
-                    'horizontal_input_wrapper_class' => 'col-lg-4',
                     'required' => $question->isRequired()?true:false,
                     'label'        => $question->getName(),
                 ));

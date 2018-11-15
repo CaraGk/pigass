@@ -115,7 +115,6 @@ class MembershipType extends AbstractType
                         'widget'       => 'single_text',
                         'with_seconds' => false,
                         'html5'        => true,
-                        'horizontal_input_wrapper_class' => 'col-lg-4',
                         'required' => $this->admin?false:($question->isRequired()?true:false),
                         'label'        => $question->getName(),
                         'mapped'        => false,
@@ -185,7 +184,6 @@ class MembershipType extends AbstractType
                     'label'  => 'Date d\'encaissement ou de réception',
                     'widget' => 'single_text',
                     'html5'  => true,
-                    'horizontal_input_wrapper_class' => 'col-lg-4',
                 ])
                 ->add('ref', TextType::class, [
                     'label' => 'Référence du paiement',

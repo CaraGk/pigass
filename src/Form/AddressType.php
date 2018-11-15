@@ -67,7 +67,6 @@ class AddressType extends AbstractType
                 'multiple' => false,
                 'expanded' => false,
                 'required' => false,
-                'horizontal_input_wrapper_class' => 'col-lg-4',
             ))
             ->add('street', textType::class, array(
                 'label'    => 'Nom de voie',
@@ -79,7 +78,6 @@ class AddressType extends AbstractType
             ))
             ->add('code', IntegerType::class, array(
                 'label' => 'Code postal',
-                'horizontal_input_wrapper_class' => 'col-lg-4',
             ))
             ->add('city', TextType::class, array(
                 'label' => 'Ville',

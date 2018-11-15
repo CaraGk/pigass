@@ -74,7 +74,6 @@ class StructureType extends AbstractType
             ->add('phone')
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse postale',
-                'label_render' => false,
             ))
             ->add('logo', FileType::class, array(
                 'label'    => 'Logo (image)',

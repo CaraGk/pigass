@@ -69,7 +69,6 @@ class MembershipType extends AbstractType
                         'multiple' => false,
                         'expanded' => true,
                         'label'    => $question->getName(),
-                        'widget_type' => 'inline',
                         'mapped'        => false,
                      ));
                 } elseif($question->getType() == 2) {
@@ -88,7 +87,6 @@ class MembershipType extends AbstractType
                         'multiple' => true,
                         'expanded' => true,
                         'label'    => $question->getName(),
-                        'widget_type' => 'inline',
                         'mapped'        => false,
                     ));
                 } elseif ($question->getType() == 4) {
@@ -106,7 +104,6 @@ class MembershipType extends AbstractType
                         'multiple' => false,
                         'expanded' => true,
                         'label'    => $question->getName(),
-                        'widget_type' => 'inline',
                         'mapped'        => false,
                     ));
                 } elseif ($question->getType() == 6) {
@@ -126,7 +123,6 @@ class MembershipType extends AbstractType
                         'html5'        => true,
                         'required' => $this->admin?false:($question->isRequired()?true:false),
                         'label'        => $question->getName(),
-                        'help_block'   => 'En cas de souci lié à l\'utilisation de Safari ou d\'un navigateur ancien, indiquez la date au format "AAAA-MM-JJ"',
                         'mapped'        => false,
                     ));
                 } elseif ($question->getType() == 8) {

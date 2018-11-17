@@ -88,6 +88,7 @@ class MembershipType extends AbstractType
                         'expanded' => true,
                         'label'    => $question->getName(),
                         'mapped'        => false,
+                        'attr'     => ['class' => 'form-check-inline'],
                     ));
                 } elseif ($question->getType() == 4) {
                     $builder->add('question_' . $question->getId(), IntegerType::class, array(
@@ -105,6 +106,7 @@ class MembershipType extends AbstractType
                         'expanded' => true,
                         'label'    => $question->getName(),
                         'mapped'        => false,
+                        'attr'     => ['class' => 'form-check-inline'],
                     ));
                 } elseif ($question->getType() == 6) {
                     $builder->add('question_' . $question->getId(), TimeType::class, array(
@@ -133,7 +135,8 @@ class MembershipType extends AbstractType
                         'multiple' => false,
                         'expanded' => false,
                         'label'    => $question->getName(),
-                        'mapped'        => false,
+                        'mapped'   => false,
+                        'attr'     => ['class' => 'form-check-inline'],
                     ));
                 } elseif ($question->getType() == 9) {
                     $builder->add('question_' . $question->getId(), TextType::class, array(

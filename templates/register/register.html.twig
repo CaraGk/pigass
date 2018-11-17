@@ -38,7 +38,7 @@
                 <div class="col-4">{{ form_row(form.person.address.city) }}</div>
                 <div class="col-4">{{ form_row(form.person.address.country) }}</div>
                 {% for i in 0..100 if attribute(form, 'question_'~i) is defined %}
-                    <div class="col-4">{{ form_row(attribute(form, 'question_'~i)) }}</div>
+                    <div class="col-12">{{ form_row(attribute(form, 'question_'~i)) }}</div>
                 {% endfor %}
                 <div class="w-100"></div>
                 <div class="col">{{ form_row(form.fee) }}</div>

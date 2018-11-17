@@ -103,7 +103,7 @@ class MembershipType extends AbstractType
                         'choice_label' => function ($value, $key, $index) { return $value; },
                         'required' => $this->admin?false:($question->isRequired()?true:false),
                         'multiple' => false,
-                        'expanded' => true,
+                        'expanded' => (count($question->getMore()) > 4) ? false : true,
                         'label'    => $question->getName(),
                         'mapped'        => false,
                         'attr'     => ['class' => 'form-check-inline'],

@@ -56,13 +56,13 @@
 
                         <div class="float-right">
                             <div class="title">Le {{ "now"|date('d/m/Y') }}</div>
-                            <div><img src="{{ absolute_url(asset(vich_uploader_asset(receipt, 'image'))) }}" alt="signature électronique" class="sign"></div>
+                            <div><img src="{{ absolute_url(asset(vich_uploader_asset(receipt, 'imageFile'))) }}" alt="signature électronique" class="sign"></div>
                             <div>{{ receipt.person }}</div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer jumbotron row">
-                    <span class="float-right"><img src="{{ absolute_url(asset('uploads/' ~ membership.structure.logo)) }}" alt="Logo de {{ membership.structure.name }}" class="logo-large" /></span>
+                    <span class="float-right"><img src="{{ absolute_url(asset(vich_uploader_asset(membership.structure, 'logoFile'))) }}" alt="Logo de {{ membership.structure.name }}" class="logo-large" /></span>
                     {% if membership.structure.fullname is not null %}
                         {{ membership.structure.fullname }}
                     {% else %}

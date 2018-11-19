@@ -53,7 +53,7 @@
 
                     <div class="card-title text-center">
                         {% if structure.logo is not null %}
-                            <img src="{{ asset('uploads/' ~ structure.logo) }}" alt="{{ structure.logo }}" class="logo"/>
+                            <img src="{{ asset(vich_uploader_asset(structure, 'logoFile')) }}" alt="{{ structure.logo }}" class="logo"/>
                         {% endif %}
                         {{ structure.name }}
                     </div>

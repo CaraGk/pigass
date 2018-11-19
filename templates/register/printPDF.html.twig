@@ -27,7 +27,7 @@
         <div class="container">
             <div class="card">
                 <div class="card-header jumbotron row">
-                    <div class="col-xs-2"><img src="{{ membership.structure.logo }}" alt="Logo de {{ membership.structure.name }}" /></div>
+                    <div class="col-xs-2"><img src="{{ absolute_url(asset(vich_uploader_asset(membership.structure, 'logoFile'))) }}" alt="Logo de {{ membership.structure.name }}" /></div>
                     <h1 class="col-xs-10 centered">Adhésion à {{ membership.structure.name }}</h1>
                 </div>
                 <div class="card-body row">

@@ -14,6 +14,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * App\Entity\Structure
@@ -21,6 +23,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="structure")
  * @ORM\Entity(repositoryClass="App\Repository\StructureRepository")
  * @UniqueEntity(fields={"name"}, message="Une structure ayant ce nom-là existe déjà.")
+ * @Vich\Uploadable
  */
 class Structure
 {
@@ -102,12 +105,17 @@ class Structure
 
     /**
      * @ORM\Column(name="logo", type="string", length=255, nullable=true)
-     * @Assert\Image()
      *
-     * @var string $logo
+     * @var string $logoName
      */
-    private $logo;
+    private $logoName;
 
+    /**
+     * @Vich\UploadableField(mapping="structure_logo", fileNameProperty="logoName")
+     *
+     * @var File $logoFile
+     */
+    private $logoFile;
     /**
      * @ORM\OneToMany(targetEntity="\App\Entity\Parameter", mappedBy="structure")
      *
@@ -142,6 +150,13 @@ class Structure
      * @var EntityCollection $fees
      */
     private $fees;
+
+    /**
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+     *
+     * @var \DateTime $updatedAt
+     */
+    private $updatedAt;
 
     public function __construct()
     {
@@ -358,27 +373,27 @@ class Structure
     }
 
     /**
-     * Set logo
+     * Set logoName
      *
-     * @param string $logo
+     * @param string $logoName
      *
      * @return Structure
      */
-    public function setLogo($logo)
+    public function setLogoName(?string $logoName = null)
     {
-        $this->logo = $logo;
+        $this->logoName = $logoName;
 
         return $this;
     }
 
     /**
-     * Get logo
+     * Get logoName
      *
      * @return string
      */
-    public function getLogo()
+    public function getLogoName()
     {
-        return $this->logo;
+        return $this->logoName;
     }
 
     /**
@@ -611,5 +626,55 @@ class Structure
     public function getRole()
     {
         return 'ROLE_STRUCTURE_' . strtoupper($this->slug);
+    }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return Structure
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set logoFile
+     *
+     * @param File $logoFile
+     * @return Receipt
+     */
+    public function setLogoFile(?File $logoFile = null)
+    {
+        $this->logoFile = $logoFile;
+
+        if ($logoFile)
+            $this->updatedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    /**
+     * Get logoFile
+     *
+     * @return File
+     */
+    public function getLogoFile()
+    {
+        return $this->logoFile;
     }
 }

@@ -24,14 +24,12 @@ class StructureHandler
     private $form;
     private $request;
     private $em;
-    private $targetDir;
 
-    public function __construct(Form $form, Request $request, EntityManager $em, $targetDir)
+    public function __construct(Form $form, Request $request, EntityManager $em)
     {
         $this->form    = $form;
         $this->request = $request;
         $this->em      = $em;
-        $this->targetDir = $targetDir;
     }
 
     public function process()
@@ -51,15 +49,6 @@ class StructureHandler
 
     public function onSuccess(Structure $structure)
     {
-        if ($file = $structure->getLogo()) {
-            $fileName = $structure->getSlug() . '.' . $file->guessExtension();
-            $file->move(
-                $this->targetDir,
-                $fileName
-            );
-            $structure->setLogo($fileName);
-        }
-
         $uow = $this->em->getUnitOfWork();
         $metadata = $this->em->getClassMetadata('\App\Entity\Structure');
         $uow->recomputeSingleEntityChangeSet($metadata, $structure);

@@ -446,7 +446,7 @@ $(function(){
             "plot-region-22": (typeof areaMap.picardie !== 'undefined') ? {
                 plotsOn: "region-22",
                 type: "image",
-                url: "{{ asset('uploads/' ~ areaMap['picardie'].logo) }}",
+                url: areaMap.picardie.logo,
                 width: 40,
                 height: 40,
                 myPanel : areaMap.picardie.slug,

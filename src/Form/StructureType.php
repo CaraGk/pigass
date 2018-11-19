@@ -19,6 +19,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Form\AddressType;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 /**
  * StructureType
@@ -75,9 +76,12 @@ class StructureType extends AbstractType
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse postale',
             ))
-            ->add('logo', FileType::class, array(
+            ->add('logoFile', VichImageType::class, array(
                 'label'    => 'Logo (image)',
                 'required' => false,
+                'allow_delete'   => false,
+                'download_uri'   => false,
+                'image_uri'      => true,
             ))
             ->add('activated', CheckboxType::class, array(
                 'label'      => 'Activé ?',

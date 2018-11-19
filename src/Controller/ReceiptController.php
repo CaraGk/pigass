@@ -134,19 +134,12 @@ class ReceiptController extends AbstractController
             return $this->redirect($this->generateUrl('core_receipt_index', array('slug' => $slug)));
         }
 
-        if ($receipt->getImage()) {
-            $receipt->setImage(new File($this->getParameter('app.logo_dir') . '/signs/' . $receipt->getImageName()));
-        }
         $form = $this->createForm(ReceiptType::class, $receipt, array('structure' => $structure));
         $formHandler = new ReceiptHandler($form, $request, $this->em, $structure);
 
-        if ($oldName = $formHandler->process()) {
-            $parameters = $this->em->getRepository('App:Parameter')->getBySlug($oldName);
-
+        if ($formHandler->process()) {
             $this->em->flush();
-
             $this->session->getFlashBag()->add('notice', 'Receipt "' . $receipt . '" modifiée.');
-
             return $this->redirect($this->generateUrl('core_receipt_index', array('slug' => $slug)));
         }
 

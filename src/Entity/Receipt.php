@@ -70,11 +70,10 @@ class Receipt
      *
      * @var File $image
      */
-    private $image;
+    private $imageFile;
 
     /**
      * @ORM\Column(name="sign", type="string", length=255, nullable=true)
-     * @Assert\Image()
      *
      * @var string $imageName
      */
@@ -119,9 +118,9 @@ class Receipt
         return $this;
     }
 
-    public function setImageFile(File $image = null)
+    public function setImageFile(?File $image = null)
     {
-        $this->image = $image;
+        $this->imageFile = $image;
 
         if ($image)
             $this->updatedAt = new \DateTimeImmutable();
@@ -139,7 +138,7 @@ class Receipt
 
     public function getImageFile()
     {
-        return $this->image;
+        return $this->imageFile;
     }
 
     /**
@@ -231,7 +230,7 @@ class Receipt
      *
      * @return Receipt
      */
-    public function setImageName($imageName)
+    public function setImageName(?string $imageName = null)
     {
         $this->imageName = $imageName;
 

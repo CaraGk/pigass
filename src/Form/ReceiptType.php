@@ -55,11 +55,12 @@ class ReceiptType extends AbstractType
             ->add('position', TextType::class, array(
                 'label' => 'En qualité de'
             ))
-            ->add('image', VichImageType::class, array(
-                'label'         => 'Signature (image)',
-                'required'      => false,
-                'allow_delete'  => true,
-                'download_link' => false,
+            ->add('imageFile', VichImageType::class, array(
+                'label'          => 'Signature (image)',
+                'required'       => false,
+                'allow_delete'   => false,
+                'download_uri'   => false,
+                'image_uri'      => true,
             ))
             ->add('Enregistrer', SubmitType::class)
         ;

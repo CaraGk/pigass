@@ -52,6 +52,5 @@ class ReceiptHandler
         $receipt->setStructure($this->structure);
         $receipt->setUpdatedAt(new \DateTime('now'));
         $this->em->persist($receipt);
-        $this->em->flush();
     }
 }

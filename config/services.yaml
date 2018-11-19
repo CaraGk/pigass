@@ -6,7 +6,6 @@
 parameters:
     locale: 'fr'
     app.mailer_admin: '%env(MAILER_ADMIN)%'
-    app.logo_dir: '%kernel.project_dir%/public/uploads/'
 
 services:
     # default configuration for services in *this* file

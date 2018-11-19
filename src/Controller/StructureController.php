@@ -144,7 +144,7 @@ class StructureController extends AbstractController
 
         $structure = new Structure();
         $form = $this->createForm(StructureType::class, $structure);
-        $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('app.logo_dir'));
+        $formHandler = new StructureHandler($form, $request, $this->em);
 
         if ($formHandler->process()) {
             $slug = $structure->getSlug();
@@ -203,11 +203,8 @@ class StructureController extends AbstractController
             }
         }
 
-        if ($structure->getLogo()) {
-            $structure->setLogo(new File($this->getParameter('app.logo_dir') . '/' . $structure->getLogo()));
-        }
         $form = $this->createForm(StructureType::class, $structure);
-        $formHandler = new StructureHandler($form, $request, $this->em, $this->getParameter('app.logo_dir'));
+        $formHandler = new StructureHandler($form, $request, $this->em);
 
         if ($oldName = $formHandler->process()) {
             $parameters = $this->em->getRepository('App:Parameter')->getBySlug($oldName);

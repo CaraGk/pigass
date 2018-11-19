@@ -30,9 +30,9 @@
                 {{ structure.area }} : {{ structure.name }}
             </div>
             <div class="card-body">
-                {% if structure.logo is not null %}
+                {% if structure.logoName is not null %}
                     <div class="text-center w-100">
-                        <img class="logo-description" src="{{ asset('uploads/' ~ structure.logo) }}" alt="{{ structure.logo }}"/>
+                        <img class="logo-description" src="{{ asset(vich_uploader_asset(structure, 'logoFile')) }}" alt="{{ structure.logoName }}"/>
                     </div>
                 {% endif %}
                 {% if structure.fullname is not null %}
@@ -103,7 +103,7 @@
             data-id={{ key }}
             data-slug={{ region.slug }}
             data-name={{ region.name }}
-            data-logo={{ absolute_url(asset('uploads/' ~ region.logo)) }}
+            data-logo={{ absolute_url(asset(vich_uploader_asset(region, 'logoFile'))) }}
         ></div>
     {% endfor %}
 {% endblock %}

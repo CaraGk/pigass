@@ -28,7 +28,7 @@
         <div class="container">
             <div class="card">
                 <div class="card-header jumbotron row">
-                    <div class="col-xs-2"><img src="{{ absolute_url(asset('uploads/' ~ membership.structure.logo)) }}" alt="Logo de {{ membership.structure.name }}" class="logo-large" /></div>
+                    <div class="col-xs-2"><img src="{{ absolute_url(asset(vich_uploader_asset(membership.structure, 'logoFile'))) }}" alt="Logo de {{ membership.structure.name }}" class="logo-large" /></div>
                     {% if param('reg_' ~ membership.structure.slug ~ '_periodicity') == '+ 1 year' %}
                         {% set period = membership.expiredOn|date('Y') %}
                     {% elseif param('reg_' ~ membership.structure.slug ~ '_periodicity') == '+ 1 month' %}

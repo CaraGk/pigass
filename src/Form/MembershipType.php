@@ -120,12 +120,13 @@ class MembershipType extends AbstractType
                     ));
                 } elseif ($question->getType() == 7) {
                     $builder->add('question_' . $question->getId(), DateType::class, array(
-                        'input'        => 'string',
-                        'widget'       => 'single_text',
-                        'html5'        => true,
+                        'input'    => 'string',
+                        'widget'   => 'single_text',
+                        'html5'    => true,
                         'required' => $this->admin?false:($question->isRequired()?true:false),
-                        'label'        => $question->getName(),
-                        'mapped'        => false,
+                        'label'    => $question->getName(),
+                        'mapped'   => false,
+                        'help'     => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
                     ));
                 } elseif ($question->getType() == 8) {
                     $builder->add('question_' . $question->getId(), ChoiceType::class, array(
@@ -183,6 +184,7 @@ class MembershipType extends AbstractType
                     'label'  => 'Date d\'encaissement ou de réception',
                     'widget' => 'single_text',
                     'html5'  => true,
+                    'help'   => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
                 ])
                 ->add('ref', TextType::class, [
                     'label' => 'Référence du paiement',

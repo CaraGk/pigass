@@ -35,9 +35,11 @@ class ReceiptType extends AbstractType
         $builder
             ->add('begin', DateType::class, array(
                 'label' => 'Du',
+                'help'  => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
             ))
             ->add('end', DateType::class, array(
                 'label' => 'Au',
+                'help'  => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
             ))
             ->add('person', EntityType::class, array(
                 'label'         => 'Signataire',

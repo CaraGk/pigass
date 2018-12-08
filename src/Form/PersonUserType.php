@@ -46,7 +46,8 @@ class PersonUserType extends AbstractType
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
                 'html5'  => true,
-//                'help_block'   => 'En cas de souci lié à l\'utilisation de Safari ou d\'un navigateur ancien, indiquez la date au format "AAAA-MM-JJ"',
+                'placeholder' => 'AAAA-MM-JJ',
+                'help'   => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
             ))
             ->add('birthplace', TextType::class, array(
                 'label' => 'Lieu de naissance',

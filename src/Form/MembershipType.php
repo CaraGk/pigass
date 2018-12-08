@@ -127,6 +127,7 @@ class MembershipType extends AbstractType
                         'label'    => $question->getName(),
                         'mapped'   => false,
                         'help'     => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
+                        'attr'     => [ 'placeholder' => 'AAAA-MM-JJ' ],
                     ));
                 } elseif ($question->getType() == 8) {
                     $builder->add('question_' . $question->getId(), ChoiceType::class, array(

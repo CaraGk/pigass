@@ -20,10 +20,13 @@ use Symfony\Component\Form\AbstractType,
  */
 class UserType extends AbstractType
 {
-  public function buildForm(FormBuilderInterface $builder, array $options)
-  {
-    $builder->add('email', EmailType::class);
-  }
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add('email', EmailType::class, [
+            'label' => 'Adresse e-mail',
+            'attr'  => [ 'placeholder' => 'Adresse e-mail' ],
+        ]);
+    }
 
   public function getName()
   {

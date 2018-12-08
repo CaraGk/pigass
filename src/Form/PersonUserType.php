@@ -38,25 +38,29 @@ class PersonUserType extends AbstractType
             ))
             ->add('surname', TextType::class, array(
                 'label' => 'Nom',
+                'attr'   => [ 'placeholder' => 'Nom de famille' ],
             ))
             ->add('name', TextType::class, array(
                 'label' => 'Prénom',
+                'attr'   => [ 'placeholder' => 'Prénom' ],
             ))
             ->add('birthday', BirthdayType::class, array(
                 'label'  => 'Date de naissance',
                 'widget' => 'single_text',
                 'html5'  => true,
-                'placeholder' => 'AAAA-MM-JJ',
                 'help'   => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
+                'attr'   => [ 'placeholder' => 'AAAA-MM-JJ' ],
             ))
             ->add('birthplace', TextType::class, array(
                 'label' => 'Lieu de naissance',
+                'attr'   => [ 'placeholder' => 'Lieu de naissance (département)' ],
             ))
             ->add('user', UserType::class, array(
-                'label' => 'Identifiant',
+                'label' => '',
             ))
             ->add('phone', TextType::class, array(
                 'label' => 'Téléphone',
+                'attr'  => [ 'placeholder' => 'N° de téléphone' ],
             ))
             ->add('address', AddressType::class, array(
                 'label' => 'Adresse professionnelle :'

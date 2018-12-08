@@ -28,6 +28,7 @@ class AddressType extends AbstractType
         $builder
             ->add('number', TextType::class, array(
                 'label' => 'N°',
+                'attr'  => [ 'placeholder' => 'N°' ],
             ))
             ->add('type', ChoiceType::class, array(
                 'label' => 'Type de voie',
@@ -64,23 +65,28 @@ class AddressType extends AbstractType
                     'ter'       => 'ter',
                     'traverse'  => 'traverse',
                 ),
-                'multiple' => false,
-                'expanded' => false,
-                'required' => false,
+                'multiple'    => false,
+                'expanded'    => false,
+                'required'    => false,
+                'placeholder' => 'Type de voie',
             ))
             ->add('street', textType::class, array(
                 'label'    => 'Nom de voie',
                 'required' => false,
+                'attr'  => [ 'placeholder' => 'Nom de voie' ],
             ))
             ->add('complement', TextType::class, array(
                 'label'    => 'Complément d\'adresse',
                 'required' => false,
+                'attr'  => [ 'placeholder' => 'Complément d\' adresse' ],
             ))
             ->add('code', IntegerType::class, array(
                 'label' => 'Code postal',
+                'attr'  => [ 'placeholder' => '00000' ],
             ))
             ->add('city', TextType::class, array(
                 'label' => 'Ville',
+                'attr'  => [ 'placeholder' => 'Ville' ],
             ))
             ->add('country', CountryType::class, array(
                 'label' => 'Pays',

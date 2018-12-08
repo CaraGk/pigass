@@ -50,7 +50,7 @@
                         <form action="{{ path("fos_user_security_check") }}" method="post" class="form-inline align-items-center">
                             <input type="text" id="username" name="_username" required="required" class="col-sm-5 form-control-sm" placeholder="Adresse e-mail"/>
                             <input type="password" id="password" name="_password" required="required" class="col-sm-5 form-control-sm" placeholder="Mot de passe"/>
-                            <input type="submit" value="Ok" class="col-sm-auto btn btn-dark btn-sm"/>
+                            <button type="submit" class="col-sm-auto btn btn-dark btn-sm"><span class="fas fa-sign-in-alt"/></button>
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
                             <input type="hidden" id="remember_me" name="_remember_me" value="on"/>
                         </form>

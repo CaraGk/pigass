@@ -86,7 +86,7 @@ class RegisterController extends AbstractController
         }
         $limit = $request->query->get('limit', null);
         $structure = $this->em->getRepository('App:Structure')->findOneby(array('slug' => $slug));
-        $questions = $this->em->getRepository('App:MemberQuestion')->getAll($structure);
+        $questions = $this->em->getRepository('App:MemberQuestion')->getAll($structure, "('8', '3', '5', '1')", null);
         $fees = $this->em->getRepository('App:Fee')->getForStructure($structure);
 
         $filters = $this->session->get('user_register_filter', [

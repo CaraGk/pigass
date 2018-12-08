@@ -32,7 +32,7 @@ class MemberQuestionRepository extends EntityRepository
         return $query->getQuery()->getSingleScalarResult();
     }
 
-    public function getAll(Structure $structure = null, $exclude = null)
+    public function getAll(Structure $structure = null, $type = null, $exclude = null)
     {
         $query = $this->getBaseQuery();
 
@@ -40,6 +40,11 @@ class MemberQuestionRepository extends EntityRepository
             $query->where('q.structure is null OR q.structure = :structure_filter')
                 ->setParameter('structure_filter', $structure)
                 ->orderBy('q.structure', 'ASC')
+            ;
+        }
+
+        if ($type) {
+            $query->andWhere('q.type IN ' . $type)
             ;
         }
 
@@ -55,9 +60,9 @@ class MemberQuestionRepository extends EntityRepository
         ;
     }
 
-    public function getAllArray(Structure $structure = null, $exclude = null)
+    public function getAllArray(Structure $structure = null, $type = null, $exclude = null)
     {
-        $results = $this->getAll($structure, $exclude);
+        $results = $this->getAll($structure, $type, $exclude);
 
         foreach ($results as $result) {
             $array[$result->getId()] = $result;

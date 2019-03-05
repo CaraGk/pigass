@@ -61,7 +61,7 @@ class MembershipHandler
                 $info = $this->form->get('question_' . $question->getId())->getData();
                 if($question->getType() == 3) {
                     foreach($info as $item) {
-                        $this->setQuestionInfo($question, $item);
+                        $this->setQuestionInfo($membership, $question, $item);
                     }
                 } else {
                     $this->setQuestionInfo($membership, $question, $info);

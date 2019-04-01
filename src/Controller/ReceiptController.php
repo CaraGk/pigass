@@ -99,6 +99,7 @@ class ReceiptController extends AbstractController
         $formHandler = new ReceiptHandler($form, $request, $this->em, $structure);
 
         if ($formHandler->process()) {
+            $this->em->flush();
             $this->session->getFlashBag()->add('notice', 'Reçus fiscaux par "' . $receipt->getPerson() . '" enregistrés.');
             return $this->redirect($this->generateUrl('core_receipt_index', array('slug' => $structure->getSlug())));
         }

@@ -165,7 +165,7 @@ class ReceiptController extends AbstractController
         $this->em->flush();
 
         $this->session->getFlashBag()->add('notice', 'Session "' . $receipt . '" supprimée.');
-        return $this->redirect($this->generateUrl('core_receipt_index'));
+        return $this->redirect($this->generateUrl('core_receipt_index', ['slug' => $receipt->getStructure()->getSlug()]));
     }
 
     /**

@@ -74,15 +74,10 @@ class DashboardController extends AbstractController
             'valid' => false,
         ]));
         $periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
-        $date_now = $date->format("Y-m-d");
-        $date->modify($periodicity);
-        $date_next = $date->format("Y-m-d");
-        $date->modify('- ' . substr($periodicity, 1))->modify('- ' . substr($periodicity, 1));
-        $date_previous = $date->format("Y-m-d");
         $modules['adhesion']['date'] = [
-            'now'      => $date_now,
-            'previous' => $date_previous,
-            'next'     => $date_next,
+            'now'      => $date->format("Y-m-d"),
+            'next'     => $date->modify($periodicity)->format("Y-m-d"),
+            'previous' => $date->modify('- ' . substr($periodicity, 1))->modify('- ' . substr($periodicity, 1))->format("Y-m-d"),
         ];
 
         return [

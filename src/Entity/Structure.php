@@ -112,6 +112,11 @@ class Structure
 
     /**
      * @Vich\UploadableField(mapping="structure_logo", fileNameProperty="logoName")
+     * @Assert\File(
+     *     maxSize = "1000k",
+     *     mimeTypes = {"image/jpeg", "image/gif", "image/png"},
+     *     mimeTypesMessage = "Le fichier doit être une image (PNG, JPEG, GIF)"
+     * )
      *
      * @var File $logoFile
      */

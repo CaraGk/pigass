@@ -323,4 +323,9 @@ class Receipt
     {
         return $this->structure;
     }
+
+    public function getFilename()
+    {
+        return $this->structure->getSlug() . "_" . uniqid();
+    }
 }

@@ -27,9 +27,17 @@
             </p>
         </div>
         <div class="card-footer">
-            <a class="card-link btn btn-primary btn-sm" href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Voir la liste des adhérents">
-                <i class="fas fa-users"></i> Adhérents
-            </a>
+            <div class="btn-group">
+                <a class="card-link btn btn-primary btn-sm" href="{{ path('app_dashboard_admin', {'slug': structure.slug}) }}?date={{ modules.adhesion.date.previous }}" title="Voir la liste des adhérents">
+                    <i class="fas fa-caret-left"></i> &nbsp;
+                </a>
+                <a class="card-link btn btn-primary btn-sm" href="{{ path('user_register_index', {'slug': structure.slug}) }}?{{ app.request.queryString }}" title="Voir la liste des adhérents">
+                    <i class="fas fa-users"></i> Adhérents
+                </a>
+                <a class="card-link btn btn-primary btn-sm" href="{{ path('app_dashboard_admin', {'slug': structure.slug}) }}?date={{ modules.adhesion.date.next }}" title="Voir la liste des adhérents">
+                    &nbsp; <i class="fas fa-caret-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 {% endblock %}

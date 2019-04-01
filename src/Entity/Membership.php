@@ -409,4 +409,14 @@ class Membership
     {
         return $this->privacy;
     }
+
+    /**
+     * Is Rejoinable
+     *
+     * @return boolean
+     */
+    public function isRejoinable($date)
+    {
+        return ($this->status != 'registered' or $this->expiredOn <= $date)?true:false;
+    }
 }

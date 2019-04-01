@@ -67,7 +67,7 @@ class MembershipRepository extends EntityRepository
         ;
     }
 
-    public function getAllByStructureQuery($slug, $filter = null, $anticipated = null)
+    public function getByStructureQuery($slug, $expiration = null, $filter = null, $anticipated = null)
     {
         $query = $this->getBaseQuery();
         $query
@@ -81,6 +81,13 @@ class MembershipRepository extends EntityRepository
             $query
                 ->andWhere('s.slug = :slug')
                 ->setParameter('slug', $slug)
+            ;
+        }
+
+        if ($expiration != null) {
+            $query
+                ->andWhere('m.expiredOn = :expiration')
+                ->setParameter('expiration', $expiration)
             ;
         }
 
@@ -147,6 +154,18 @@ class MembershipRepository extends EntityRepository
         return $query;
     }
 
+    public function getByStructure($slug, $expiration = null, $filter = null, $anticipated = null)
+    {
+        return $this->getByStructureQuery($slug, $expiration, $filter, $anticipated)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getAllByStructureQuery($slug, $filter = null, $anticipated = null)
+    {
+        return $this->getByStructureQuery($slug, null, $filter, $anticipated);
+    }
 
     public function getAllByStructure($slug, $filter = null, $anticipated = null)
     {
@@ -177,22 +196,12 @@ class MembershipRepository extends EntityRepository
         ;
     }
 
-    public function getCurrentByStructureWithInfos($slug)
+    public function getByStructureWithInfos($slug, $expiration)
     {
-        $query = $this->getBaseQuery();
-        $query
-            ->where('s.slug = :slug')
-            ->setParameter('slug', $slug)
-            ->andWhere('m.expiredOn > :now')
-            ->setParameter('now', new \DateTime('now'))
-            ->andWhere('m.payedOn is not NULL')
-            ->addOrderBy('p.surname', 'asc')
-            ->addOrderBy('p.name', 'asc')
-        ;
-
-        return $query
+        return $this->getByStructureQuery($slug, $expiration, ['valid' => true], null)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 
     public function getCurrentForPersonArray()

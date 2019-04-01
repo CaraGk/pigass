@@ -50,26 +50,40 @@ class DashboardController extends AbstractController
     {
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
+        $date = new \DateTime($request->query->get('date', 'now'));
+        $expire = $this->getExpirationDate($structure, $date);
+
         $fees = $this->em->getRepository('App:Fee')->findByStructure($structure);
         foreach ($fees as $fee) {
-            $modules['adhesion']['count_validated']['fees'][$fee->getTitle()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+            $modules['adhesion']['count_validated']['fees'][$fee->getTitle()] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
                 'valid' => true,
                 'fee'   => $fee->getId(),
             ]));
         }
         $gateways = $this->em->getRepository('App:Gateway')->findByStructure($structure);
         foreach ($gateways as $gateway) {
-            $modules['adhesion']['count_validated']['gateways'][$gateway->getLabel()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+            $modules['adhesion']['count_validated']['gateways'][$gateway->getLabel()] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
                 'valid'   => true,
                 'gateway' => $gateway->getGatewayName(),
             ]));
         }
-        $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+        $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
             'valid' => true,
         ]));
-        $modules['adhesion']['count_unvalidated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+        $modules['adhesion']['count_unvalidated']['total'] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
             'valid' => false,
         ]));
+        $periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
+        $date_now = $date->format("Y-m-d");
+        $date->modify($periodicity);
+        $date_next = $date->format("Y-m-d");
+        $date->modify('- ' . substr($periodicity, 1))->modify('- ' . substr($periodicity, 1));
+        $date_previous = $date->format("Y-m-d");
+        $modules['adhesion']['date'] = [
+            'now'      => $date_now,
+            'previous' => $date_previous,
+            'next'     => $date_next,
+        ];
 
         return [
             'structure' => $structure,
@@ -109,5 +123,19 @@ class DashboardController extends AbstractController
             'me'      => $me,
             'modules' => $modules,
         ];
+    }
+
+    private function getExpirationDate(Structure $structure, \DateTime $date)
+    {
+        $init = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_date')->getValue();
+        $periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
+        $anticipated = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_anticipated')->getValue();
+        $expire = new \DateTime($init);
+        $expire->modify('- 1 day');
+        $date->modify($anticipated);
+        while ($expire <= $date) {
+            $expire->modify($periodicity);
+        }
+        return $expire;
     }
 }

@@ -34,6 +34,7 @@ use App\Entity\Membership,
     App\Entity\MemberInfo,
     App\Entity\User,
     App\Entity\Person,
+    App\Entity\Structure,
     App\Entity\Fee;
 use App\Form\FilterType,
     App\FormHandler\FilterHandler,
@@ -117,10 +118,13 @@ class RegisterController extends AbstractController
         $now = new \DateTime('now');
         $anticipated = $now->modify($reg_anticipated);
 
+        $date = new \DateTime($request->query->get('date', 'now'));
+        $expire = $this->getExpirationDate($structure, $date);
+
         if ($filters['search'])
-            $memberships = $this->em->getRepository('App:Membership')->getAllByStructure($slug, $filters, $anticipated);
+            $memberships = $this->em->getRepository('App:Membership')->getByStructure($slug, null, $filters, $anticipated);
         else
-            $memberships = $this->em->getRepository('App:Membership')->getCurrentByStructure($slug, $filters, $anticipated);
+            $memberships = $this->em->getRepository('App:Membership')->getByStructure($slug, $expire, $filters, $anticipated);
         $count = count($memberships);
 
         return array(
@@ -273,12 +277,15 @@ class RegisterController extends AbstractController
      *
      * @Route("/{slug}/members/export", name="user_register_export", requirements={"slug" = "\w+"})
      */
-    public function exportAction($slug)
+    public function exportAction(Structure $structure, Request $request)
     {
         if (!($this->security->isGranted('ROLE_STRUCTURE') or $this->security->isGranted('ROLE_ADMIN')))
             throw new AccessDeniedException();
 
-        $memberships = $this->em->getRepository('App:Membership')->getCurrentByStructureWithInfos($slug);
+        $date = new \DateTime($request->query->get('date', 'now'));
+        $expire = $this->getExpirationDate($structure, $date);
+
+        $memberships = $this->em->getRepository('App:Membership')->getByStructureWithInfos($structure->getSlug(), $expire);
         $memberquestions = $this->em->getRepository('App:MemberQuestion')->findAll();
         $memberinfos = $this->em->getRepository('App:MemberInfo')->getCurrentInArray();
 
@@ -685,7 +692,7 @@ class RegisterController extends AbstractController
                 /* test if person can rejoin at this time */
                 $now = new \DateTime('now');
                 $now->modify($options['anticipated']);
-                if (null !== $current_membership and ($current_membership->getExpiredOn() > $now and $current_membership->getStatus() != 'registered')) {
+                if (null !== $current_membership and !$current_membership->isRejoinable($now)) {
                     $this->session->getFlashBag()->add('error', 'Adhésion déjà à jour de cotisation.');
                     if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE') and $current_membership->getStructure()->getSlug() == $slug)) {
                         return $this->redirect($this->generateUrl('user_register_index', ["slug" => $slug]));
@@ -1106,5 +1113,19 @@ class RegisterController extends AbstractController
         }
 
         return $person;
+    }
+
+    private function getExpirationDate(Structure $structure, \DateTime $date)
+    {
+        $init = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_date')->getValue();
+        $periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
+        $anticipated = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_anticipated')->getValue();
+        $expire = new \DateTime($init);
+        $expire->modify('- 1 day');
+        $date->modify($anticipated);
+        while ($expire <= $date) {
+            $expire->modify($periodicity);
+        }
+        return $expire;
     }
 }

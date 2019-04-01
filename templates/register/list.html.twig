@@ -82,8 +82,8 @@
         {% for membership in memberships %}
             <li class="card">
                 <div class="card-header text-center">
-                    {% if membership.structure.logo is not null %}
-                        <img src="{{ asset(vich_uploader_asset(membership.structure, 'logoFile')) }}" alt="{{ membership.structure.logo }}" class="logo"/>
+                    {% if membership.structure.logoName is not null %}
+                        <img src="{{ asset(vich_uploader_asset(membership.structure, 'logoFile')) }}" alt="{{ membership.structure.logoName }}" class="logo"/>
                     {% endif %}
                     {{ membership.structure.name }}
                 </div>

@@ -14,7 +14,7 @@
             {{ count }} adhérents
         {% endif %}
     </div>
-        <a class="btn btn-primary" href="{{ path('user_register_export', {'slug': slug}) }}" title="Exporter la liste des adhérents à jour de cotisation">
+        <a class="btn btn-primary" href="{{ path('user_register_export', {'slug': slug}) }}?{{ app.request.queryString }}" title="Exporter la liste des adhérents à jour de cotisation">
             <i class='fas fa-download'></i> Exporter (xls)
         </a>
         <a class="btn btn-primary" href="{{ path('user_register_import', {'slug': slug}) }}" title="Importer une liste d'adhérents">

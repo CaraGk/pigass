@@ -230,6 +230,25 @@ class RegisterController extends AbstractController
     }
 
     /**
+     * Exclude a member
+     *
+     * @Route("/member/{id}/exclude", name="user_register_exclude", requirements={"slug" = "\w+", "id" = "\d+"})
+     */
+    public function excludeAction(Membership $membership, Request $request)
+    {
+        $user_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($this->em->getRepository('App:Person')->getByUser($this->getUser()));
+        $user_structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $user_membership->getStructure()->getSlug()]);
+        if (!$this->security->isGranted('ROLE_STRUCTURE') or $user_structure !== $membership->getStructure())
+            throw new AccessDeniedException();
+
+        $membership->setStatus('excluded');
+        $this->em->persist($membership);
+        $this->em->flush();
+
+        return $this->redirect($this->generateUrl('user_register_list', ['slug' => $user_structure->getSlug(), 'userid' => $membership->getPerson()->getUser()->getId()]));
+    }
+
+    /**
      * Delete membership
      *
      * @Route("/member/{id}/delete", name="user_register_delete", requirements={"id" = "\d+"})
@@ -245,11 +264,11 @@ class RegisterController extends AbstractController
         if (!$actualMembership) {
             $this->session->getFlashBag()->add('notice', 'Adhésion périmée. Veuillez réadhérer pour accéder aux fonctionnalités d\'administration.');
             return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
-	}
+        }
 
         if ($membership->getPerson()->getId() != $actualPerson->getId()) {
             if (!($this->security->isGranted('ROLE_ADMIN')) and
-                !($this->security->isGranted('ROLE_STRUCTURE') and $membership->getStructure()->getId() != $actualMembership->getId())
+                !($this->security->isGranted('ROLE_STRUCTURE') and $membership->getStructure() !== $actualMembership->getStructure())
             ) {
                 throw $this->createAccessDeniedException();
             }
@@ -257,7 +276,9 @@ class RegisterController extends AbstractController
         $view = $request->query->get('view', null);
         $userid = $request->query->get('userid', null);
 
-        if (!$membership or $membership->getPayedOn() != null)
+        if (!$membership or
+            ($membership->getPayedOn() != null and $membership->getStatus() != "excluded")
+        )
             throw $this->createNotFoundException('Unable to find Membership entity');
 
         $slug = $membership->getStructure()->getSlug();
@@ -670,12 +691,12 @@ class RegisterController extends AbstractController
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondant à "' . $slug . '"');
 
-        $options = array(
+        $options = [
             'payment'     => $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_payment')->getValue(),
             'date'        => $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_date')->getValue(),
             'periodicity' => $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_periodicity')->getValue(),
             'anticipated' => $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_anticipated')->getValue(),
-        );
+        ];
 
         $is_admin = false;
         if (!$checker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
@@ -689,6 +710,7 @@ class RegisterController extends AbstractController
                 $userid = $request->query->get('userid', null);
                 $person = $this->testAdminTakeOver($user, $userid);
                 $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
+                $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
                 /* test if person can rejoin at this time */
                 $now = new \DateTime('now');
                 $now->modify($options['anticipated']);
@@ -716,6 +738,9 @@ class RegisterController extends AbstractController
             if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE'))
                 $is_admin = true;
         }
+
+        if (isset($last_membership) and $last_membership->getStatus() == 'excluded')
+            throw new AccessDeniedException("Vous avez été exclu de " . $slug . ". Veuillez contacter un responsable.");
 
         if (isset($current_membership) and $current_membership->getStatus() == 'registered')
             $membership = $current_membership;
@@ -972,6 +997,7 @@ class RegisterController extends AbstractController
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
         $person = $this->testAdminTakeOver($user, $userid);
         $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
+        $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
         $reJoinable = false;
 
         /* Test memberships and rejoinability */
@@ -980,17 +1006,16 @@ class RegisterController extends AbstractController
             $slug = $membership->getStructure()->getSlug();
             $now = new \DateTime('now');
             $now->modify($this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_anticipated')->getValue());
-            if ($current_membership->getExpiredOn() <= $now) {
+            if ($current_membership->getExpiredOn() <= $now and $current_membership->getStatus() != 'excluded') {
                 $reJoinable = true;
             }
+        } elseif ($last_membership) {
+            $membership = $last_membership;
+            $slug = $membership->getStructure()->getSlug();
+            if ($last_membership->getStatus() != 'excluded')
+                $reJoinable = true;
         } else {
-            $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
-            if ($last_membership) {
-                $membership = $last_membership;
-                $slug = $membership->getStructure()->getSlug();
-            } else {
-                $slug = $request->get('slug', null);
-            }
+            $slug = $request->get('slug', null);
             $reJoinable = true;
         }
 
@@ -998,6 +1023,7 @@ class RegisterController extends AbstractController
 
         return [
             'memberships' => $memberships,
+            'current'     => $current_membership?$current_membership:$last_membership?$last_membership:false,
             'userid'      => $userid,
             'person'      => $person,
             'slug'        => $slug,

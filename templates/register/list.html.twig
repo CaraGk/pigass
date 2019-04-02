@@ -28,12 +28,16 @@
                     </a>
                 </li>
             {% endif %}
+        {% elseif current.status == "excluded" %}
+            <li class="btn btn-danger">
+                <i class='fas fa-skull-crossbones'></i>&nbsp; Adhésion révoquée &nbsp;<i class='fas fa-skull-crossbones'></i>
+            </li>
         {% else %}
             <li class="btn btn-warning">
                 Adhésion en cours
             </li>
         {% endif %}
-        {% if is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN') %}
+        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and current.status != "excluded" %}
             <li class="btn btn-primary">
                 {% if 'ROLE_STRUCTURE' in person.user.roles %}
                     <a href="{{ path('user_person_demote', {'id': person.id, 'slug': slug}) }}" title="Retirer les droits d'administration de la structure {{ slug }} à l'utilisateur">
@@ -116,7 +120,7 @@
                             <a class="btn btn-primary btn-sm" href="{{ path('core_receipt_build', {'id': membership.id}) }}" title="Télécharger le reçu fiscal">
                                 <i class='fas fa-edit'></i> Reçu fiscal
                             </a>
-                        {% else %}
+                        {% elseif current.status != 'excluded' %}
                             {% if is_granted('ROLE_STRUCTURE') %}
                                 <a class="btn btn-primary btn-sm" href="{{ path('user_register_edit', {'id': membership.id, 'userid': userid, 'slug': slug}) }}" title="Modifier l'adhésion">
                                     <i class='fas fa-pencil-alt'></i> Modifier
@@ -128,8 +132,8 @@
                                 </a>
                             {% endif %}
                         {% endif %}
-                        {% if membership.payedOn is null %}
-                            {% if is_granted('ROLE_ADMIN') %}
+                        {% if membership.payedOn is null or (membership.status == 'excluded' and is_granted('ROLE_STRUCTURE')) %}
+                            {% if is_granted('ROLE_ADMIN') and (membership.status != 'excluded' and is_granted('ROLE_STRUCTURE')) %}
                                 <a class="btn btn-primary btn-sm" href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">
                                     <i class='fas fa-check-circle'></i> Valider
                                 </a>
@@ -137,9 +141,14 @@
                             <a class="btn btn-primary btn-sm" href="{{ path('user_register_delete', {'id': membership.id, 'userid': userid}) }}" title="Supprimer cette adhésion">
                                 <i class='fas fa-times-circle'></i> Supprimer
                             </a>
-                        {% elseif membership.status == 'paid' %}
+                        {% elseif membership.status == 'paid' and current.status != 'excluded' %}
                             <a class="btn btn-primary btn-sm" href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception de la fiche signée pour cette adhésion">
                                 <i class='fas fa-check-circle'></i> Valider la fiche
+                            </a>
+                        {% endif %}
+                        {% if is_granted('ROLE_STRUCTURE') and current.status != 'excluded' %}
+                            <a class="btn btn-primary btn-sm" href="{{ path('user_register_exclude', {'slug': slug, 'id': membership.id, 'userid': userid}) }}" title="Exclure ce membre">
+                                <i class='fas fa-skull-crossbones'></i> Exclure
                             </a>
                         {% endif %}
                     </div>

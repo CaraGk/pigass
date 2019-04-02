@@ -141,6 +141,12 @@
                                 <i class='fas fa-pencil-alt'></i> Modifier le paiement
                             </a>
                         </li>
+                    {% elseif membership.status == 'excluded' %}
+                        <li class="btn btn-link btn-sm btn-block">
+                            <a href="{{ path('user_register_delete', {'id': membership.id, 'userid': membership.person.user.id, 'view': 'index'}) }}" title="Supprimer cette adhésion">
+                                <i class='fas fa-trash'></i> Supprimer
+                            </a>
+                        </li>
                     {% endif %}
                     <li class="btn btn-link btn-sm btn-block">
                         <a href="{{ path('user_register_list', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">
@@ -166,7 +172,11 @@
                 {% endif %}
                 </span>
             </div>
-            {% if membership.status == 'registered' and membership.payedOn is not null %}
+            {% if membership.status == 'excluded' %}
+                <div class="text-danger" title="Adhésion révoquée">
+                    <i class="fas fa-skull-crossbones"></i>&nbsp; Adhésion révoquée !!! &nbsp;<i class="fas fa-skull-crossbones"></i>
+                </div>
+            {% elseif membership.status == 'registered' and membership.payedOn is not null %}
                 <div class="text-danger" title="Adhésion incomplète : manque la validation du paiement">
                     <i class='fas fa-euro-sign'></i> Paiement par {{ membership.method.label|lower }} du {{ membership.payedOn|date('d/m/Y') }} non validé (tarif alternatif).
                 </div>

@@ -134,6 +134,9 @@
     "markbaker/complex": {
         "version": "1.4.7"
     },
+    "markbaker/matrix": {
+        "version": "1.1.4"
+    },
     "monolog/monolog": {
         "version": "1.23.0"
     },
@@ -319,6 +322,9 @@
     },
     "symfony/polyfill-intl-icu": {
         "version": "v1.9.0"
+    },
+    "symfony/polyfill-intl-idn": {
+        "version": "v1.11.0"
     },
     "symfony/polyfill-mbstring": {
         "version": "v1.9.0"

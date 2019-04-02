@@ -71,9 +71,9 @@ class MembershipHandler
 
         $expire = new \DateTime($this->options['date']);
         $expire->modify('- 1 day');
-        $now = new \DateTime('now');
-        $now->modify($this->options['anticipated']);
-        while ($expire <= $now) {
+        $date = $membership->getPayedOn()?$membership->getPayedOn():new \DateTime('now');
+        $date->modify($this->options['anticipated']);
+        while ($expire <= $date) {
             $expire->modify($this->options['periodicity']);
         }
 

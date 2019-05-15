@@ -75,14 +75,14 @@ class RegisterController extends AbstractController
 
         $session_slug = $this->session->get('slug', null);
         if (!$session_slug and !($this->security->isGranted('ROLE_ADMIN'))) {
-            $actualUser = $this->getUser();
-            $actualPerson = $this->em->getRepository('App:Person')->getByUser($actualUser);
-            $actualMembership = $this->em->getRepository('App:Membership')->getCurrentForPerson($actualPerson, true);
-            if (!$actualMembership) {
+            $connectedUser = $this->getUser();
+            $connectedPerson = $this->em->getRepository('App:Person')->getByUser($connectedUser);
+            $connectedMembership = $this->em->getRepository('App:Membership')->getCurrentForPerson($connectedPerson, true);
+            if (!$connectedMembership) {
                 $this->session->getFlashBag()->add('notice', 'Adhésion périmée. Veuillez réadhérer pour accéder aux fonctionnalités d\'administration.');
                 return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
             }
-            $slug = $actualMembership->getStructure()->getSlug();
+            $slug = $connectedMembership->getStructure()->getSlug();
             $this->session->set('slug', $slug);
         }
         $limit = $request->query->get('limit', null);
@@ -113,13 +113,25 @@ class RegisterController extends AbstractController
             $filters['fee'] = null;
         if (!isset($filters['search']))
             $filters['search'] = null;
+        if (!isset($filters['expiration']))
+            $filters['expiration'] = null;
         $this->session->set('user_register_filter', $filters);
         $reg_anticipated = $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_anticipated')->getValue();
         $now = new \DateTime('now');
         $anticipated = $now->modify($reg_anticipated);
 
-        $date = new \DateTime($request->query->get('date', 'now'));
-        $expire = $this->getExpirationDate($structure, $date);
+        if ($filters['expiration']) {
+            $expire = $filters['expiration'];
+        } else {
+            $date = new \DateTime($request->query->get('date', 'now'));
+            $expire = $this->getExpirationDate($structure, $date);
+        }
+
+        if (is_array($expire)) {
+            $expire_string = $expire[0]->format('Y-m-d') . '|' . $expire[1]->format('Y-m-d');
+        } else {
+            $expire_string = $this->getExpirationDate($structure, $date, true)->format('Y-m-d') . '|' . $expire->format('Y-m-d');
+        }
 
         if ($filters['search'])
             $memberships = $this->em->getRepository('App:Membership')->getByStructure($slug, null, $filters, $anticipated);
@@ -134,6 +146,7 @@ class RegisterController extends AbstractController
             'questions'   => $questions,
             'slug'        => $slug,
             'fees'        => count($fees)>1?$fees:null,
+            'expire'      => $expire_string,
         );
     }
 
@@ -258,20 +271,24 @@ class RegisterController extends AbstractController
         if (!($this->security->isGranted('ROLE_STRUCTURE') or $this->security->isGranted('ROLE_ADMIN') or $this->security->isGranted('ROLE_MEMBER')))
             throw new AccessDeniedException();
 
-        $actualUser = $this->getUser();
-        $actualPerson = $this->em->getRepository('App:Person')->getByUser($actualUser);
-        $actualMembership = $this->em->getRepository('App:Membership')->getCurrentForPerson($actualPerson, true);
-        if (!$actualMembership) {
+        $connectedPerson = $this->em->getRepository('App:Person')->getByUser($this->getUser());
+        $connectedMembership = $this->em->getRepository('App:Membership')->getCurrentForPerson($connectedPerson, true);
+        if (!$connectedMembership) {
             $this->session->getFlashBag()->add('notice', 'Adhésion périmée. Veuillez réadhérer pour accéder aux fonctionnalités d\'administration.');
             return $this->redirect($this->generateUrl('user_register_register', array('slug' => $slug)));
         }
 
-        if ($membership->getPerson()->getId() != $actualPerson->getId()) {
-            if (!($this->security->isGranted('ROLE_ADMIN')) and
-                !($this->security->isGranted('ROLE_STRUCTURE') and $membership->getStructure() !== $actualMembership->getStructure())
-            ) {
-                throw $this->createAccessDeniedException();
-            }
+        if (
+            $membership->getPerson()->getId() != $connectedPerson->getId()
+            and !(
+                $this->security->isGranted('ROLE_ADMIN')
+                or (
+                    $this->security->isGranted('ROLE_STRUCTURE')
+                    and $membership->getStructure() === $connectedMembership->getStructure()
+                )
+            )
+        ) {
+            throw new AccessDeniedException();
         }
         $view = $request->query->get('view', null);
         $userid = $request->query->get('userid', null);
@@ -288,7 +305,7 @@ class RegisterController extends AbstractController
         $this->session->getFlashBag()->add('notice', 'Adhésion supprimée !');
 
         if ($view == 'index')
-            return $this->redirect($this->generateUrl('user_register_index'));
+            return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
         else
             return $this->redirect($this->generateUrl('user_register_list', array('userid' => $userid, 'slug' => $slug)));
     }
@@ -630,12 +647,20 @@ class RegisterController extends AbstractController
             'user'      => null,
             'search'    => null,
             'fee'       => null,
+            'expiration' => null,
         ]);
 
-        if ($type == "valid" or $type == "ending" or $type == "fee")
+        if ($type == "valid" or $type == "ending" or $type == "fee") {
             $filters[$type] = $value;
-        else
+        } elseif ($type == "expiration") {
+            $value = explode('|', $value);
+            foreach ($value as &$date) {
+                $date = new \DateTime($date);
+            }
+            $filters[$type] = $value;
+        } else {
             $filters[$type][$id] = $value;
+        }
 
         $this->session->set('user_register_filter', $filters);
 
@@ -663,9 +688,10 @@ class RegisterController extends AbstractController
             'user'      => null,
             'search'    => null,
             'fee'       => null,
+            'expiration' => null,
         ]);
 
-        if ($type == "valid" or $type == "ending" or $type == "fee") {
+        if ($type == "valid" or $type == "ending" or $type == "fee" or $type == "expiration") {
             $filters[$type] = null;
         } else {
             if ($filters[$type][$id] != null) {
@@ -1119,20 +1145,19 @@ class RegisterController extends AbstractController
     private function testAdminTakeOver($user, $user_id = null)
     {
         if (($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) and $user_id != null) {
-            $user_took_over = $this->um->findUserBy(array(
+            $user_taken_over = $this->um->findUserBy(array(
                 'id' => $user_id,
             ));
 
-            if (!$user_took_over)
-                throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
+            if (!$user_taken_over)
+                throw $this->createAccessDeniedException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
 
-            $person = $this->em->getRepository('App:Person')->getByUsername($user_took_over->getUsername());
+            $person = $this->em->getRepository('App:Person')->getByUsername($user_taken_over->getUsername());
 
             if (!$user->hasRole('ROLE_ADMIN')) {
-                $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $this->session->get('slug')]);
-                $membership = $this->em->getRepository('App:Membership')->findOneBy(['person' => $person->getId(), 'structure' => $structure->getId()]);
-                if (!$membership)
-                    throw $this->createNotFoundException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
+                $membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
+                if ($membership and $membership->getStructure()->getSlug() != $this->session->get('slug'))
+                    throw $this->createAccessDeniedException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
             }
         } else {
             $person = $this->em->getRepository('App:Person')->getByUsername($user->getUsername());
@@ -1141,7 +1166,7 @@ class RegisterController extends AbstractController
         return $person;
     }
 
-    private function getExpirationDate(Structure $structure, \DateTime $date)
+    private function getExpirationDate(Structure $structure, \DateTime $date, $rev = false)
     {
         $init = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_date')->getValue();
         $periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
@@ -1152,6 +1177,8 @@ class RegisterController extends AbstractController
         while ($expire <= $date) {
             $expire->modify($periodicity);
         }
+        if ($rev)
+            $expire->modify("-$periodicity");
         return $expire;
     }
 }

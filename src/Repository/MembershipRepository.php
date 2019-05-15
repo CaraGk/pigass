@@ -84,10 +84,18 @@ class MembershipRepository extends EntityRepository
             ;
         }
 
-        if ($expiration != null) {
+        if (is_string($expiration)) {
             $query
                 ->andWhere('m.expiredOn = :expiration')
                 ->setParameter('expiration', $expiration)
+            ;
+        } elseif (is_array($expiration)) {
+            $query
+                ->join('p.memberships', 'n')
+                ->andWhere('n.expiredOn = :first')
+                ->setParameter('first', $expiration[0])
+                ->andWhere('n.expiredOn != :second')
+                ->setParameter('second', $expiration[1])
             ;
         }
 
@@ -228,9 +236,9 @@ class MembershipRepository extends EntityRepository
         ;
     }
 
-    public function getMailsByStructure($slug, $filters , $anticipated = null)
+    public function getMailsByStructure($slug, $expire = null, $filters = null, $anticipated = null)
     {
-        $query = $this->getCurrentByStructureQuery($slug, $filters, $anticipated);
+        $query = $this->getByStructureQuery($slug, $expire, $filters, $anticipated);
 
         $result= $query
             ->getQuery()

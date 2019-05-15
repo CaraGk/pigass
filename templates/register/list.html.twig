@@ -37,7 +37,7 @@
                 Adhésion en cours
             </li>
         {% endif %}
-        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and current.status != "excluded" %}
+        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (current == false or current.status != "excluded") %}
             <li class="btn btn-primary">
                 {% if 'ROLE_STRUCTURE' in person.user.roles %}
                     <a href="{{ path('user_person_demote', {'id': person.id, 'slug': slug}) }}" title="Retirer les droits d'administration de la structure {{ slug }} à l'utilisateur">
@@ -155,7 +155,7 @@
                 </div>
             </li>
         {% else %}
-            <li class="list-group-item">Aucune adhésion enregistrée.</li>
+            <li class="card">Aucune adhésion enregistrée.</li>
         {% endfor %}
     </ul>
     </div>

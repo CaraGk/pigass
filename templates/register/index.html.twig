@@ -39,32 +39,41 @@
                 </span>
             </div>
         </form>
-    {% if filters['valid'] is null %}
+        {% if filters['expiration'] is not null %}
+            <a class="btn btn-success btn-sm" href="{{ path('user_register_filter_remove', {'type': 'expiration', 'id': 0, 'slug': slug}) }}" title="Suprimer le filtre des perdus de vus">
+                Perdus de vue
+            </a>
+        {% else %}
+            <a class="btn btn-light btn-sm" href="{{ path('user_register_filter_add', {'type': 'expiration', 'id': 0, 'value': expire, 'slug': slug}) }}" title="Filtrer les perdus de vue">
+                Perdus de vue (non fonctionnel)
+            </a>
+        {% endif %}
+        {% if filters['valid'] is null %}
             <a class="btn btn-light btn-sm" href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion validée">
                 Validation ?
             </a>
-    {% elseif filters['valid'] == true %}
+        {% elseif filters['valid'] == true %}
             <a class="btn btn-success btn-sm" href="{{ path('user_register_filter_add', {'type': 'valid', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion non validée">
                 Validation : Oui
             </a>
-    {% elseif filters['valid'] == false %}
+        {% elseif filters['valid'] == false %}
             <a class="btn btn-danger btn-sm" href="{{ path('user_register_filter_remove', {'type': 'valid', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre par adhésion">
                 Validation : Non
             </a>
-    {% endif %}
-    {% if filters['ending'] is null %}
+        {% endif %}
+        {% if filters['ending'] is null %}
             <a class="btn btn-light btn-sm" href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 1, 'slug': slug}) }}" title="Filtrer par adhésion se terminant bientôt">
                 Péremption prochaine ?
             </a>
-    {% elseif filters['ending'] == true %}
+        {% elseif filters['ending'] == true %}
             <a class="btn btn-success btn-sm" href="{{ path('user_register_filter_add', {'type': 'ending', 'id': 0, 'value': 0, 'slug': slug}) }}" title="Filtrer par adhésion ne se terminant pas bientôt">
                 Adhésion arrivant à terme
             </a>
-    {% elseif filters['ending'] == false %}
+        {% elseif filters['ending'] == false %}
             <a class="btn btn-danger btn-sm" href="{{ path('user_register_filter_remove', {'type': 'ending', 'id': 0, 'slug': slug}) }}" title="Supprimer le filtre des adhésions se terminant bientôt">
                 Adhésion n'arrivant pas à terme
             </a>
-    {% endif %}
+        {% endif %}
     {% if fees is not null %}
         <div class="btn btn-sm btn-light btn-sm">
             <div class="title">Type d'adhésion</div>

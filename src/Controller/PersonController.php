@@ -217,7 +217,7 @@ class PersonController extends AbstractController
             return $this->redirect($this->generateUrl('user_register_join', array('slug' => $slug)));
         }
         if (!$adminUser->hasRole('ROLE_ADMIN') and $session_slug != $slug) {
-            $slug = $actualMembership->getStructure()->getSlug();
+            $slug = $adminMembership->getStructure()->getSlug();
             $this->session->set('slug', $slug);
         }
         $filters = $this->session->get('user_register_filter', [
@@ -226,8 +226,9 @@ class PersonController extends AbstractController
             'fee'       => null,
             'questions' => null,
             'search'    => null,
+            'expiration'=> null,
         ]);
-        $mails = $this->em->getRepository('App:Membership')->getMailsByStructure($slug, $filters);
+        $mails = $this->em->getRepository('App:Membership')->getMailsByStructure($slug, $filters['expiration'], $filters);
 
 
         return array(

@@ -88,10 +88,7 @@ class MembershipRepository extends EntityRepository
             $query
                 ->andWhere('m.expiredOn = :expiration')
                 ->setParameter('expiration', $filter['expiration'][0])
-//                ->andWhere('NOT EXISTS (SELECT 0 FROM \App\Entity\Membership q WHERE q.expiredOn = :filter)')
-//                ->andWhere('p.id NOT IN (SELECT IDENTITY(q.person) FROM \App\Entity\Membership q WHERE q.expiredOn = :filter)')
                 ->leftJoin('p.memberships', 'n', 'WITH', 'n.expiredOn = :filter')
-//                ->andWhere('n.expiredOn = :filter')
                 ->setParameter('filter', $filter['expiration'][1])
                 ->andWhere('n.person IS NULL')
             ;

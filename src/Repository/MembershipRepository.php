@@ -22,11 +22,11 @@ class MembershipRepository extends EntityRepository
     private function getBaseQuery()
     {
         return $this->createQueryBuilder('m')
-            ->join('m.person', 'p')
+            ->leftJoin('m.person', 'p')
             ->addSelect('p')
-            ->join('p.user', 'u')
+            ->leftJoin('p.user', 'u')
             ->addSelect('u')
-            ->join('m.structure', 's')
+            ->leftJoin('m.structure', 's')
             ->addSelect('s')
         ;
     }
@@ -84,18 +84,21 @@ class MembershipRepository extends EntityRepository
             ;
         }
 
-        if (is_string($expiration)) {
+        if (isset($filter['expiration']) and is_array($filter['expiration'])) {
+            $query
+                ->andWhere('m.expiredOn = :expiration')
+                ->setParameter('expiration', $filter['expiration'][0])
+//                ->andWhere('NOT EXISTS (SELECT 0 FROM \App\Entity\Membership q WHERE q.expiredOn = :filter)')
+//                ->andWhere('p.id NOT IN (SELECT IDENTITY(q.person) FROM \App\Entity\Membership q WHERE q.expiredOn = :filter)')
+                ->leftJoin('p.memberships', 'n', 'WITH', 'n.expiredOn = :filter')
+//                ->andWhere('n.expiredOn = :filter')
+                ->setParameter('filter', $filter['expiration'][1])
+                ->andWhere('n.person IS NULL')
+            ;
+        } elseif ($expiration) {
             $query
                 ->andWhere('m.expiredOn = :expiration')
                 ->setParameter('expiration', $expiration)
-            ;
-        } elseif (is_array($expiration)) {
-            $query
-                ->join('p.memberships', 'n')
-                ->andWhere('n.expiredOn = :first')
-                ->setParameter('first', $expiration[0])
-                ->andWhere('n.expiredOn != :second')
-                ->setParameter('second', $expiration[1])
             ;
         }
 

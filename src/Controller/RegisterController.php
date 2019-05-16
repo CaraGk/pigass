@@ -96,6 +96,7 @@ class RegisterController extends AbstractController
             'fee'       => null,
             'questions' => null,
             'search'    => null,
+            'expiration'=> null,
         ]);
 
         $filters['user'] = null;
@@ -120,15 +121,11 @@ class RegisterController extends AbstractController
         $now = new \DateTime('now');
         $anticipated = $now->modify($reg_anticipated);
 
-        if ($filters['expiration']) {
-            $expire = $filters['expiration'];
-        } else {
-            $date = new \DateTime($request->query->get('date', 'now'));
-            $expire = $this->getExpirationDate($structure, $date);
-        }
+        $date = new \DateTime($request->query->get('date', 'now'));
+        $expire = $this->getExpirationDate($structure, $date);
 
-        if (is_array($expire)) {
-            $expire_string = $expire[0]->format('Y-m-d') . '|' . $expire[1]->format('Y-m-d');
+        if (isset($filters['expiration']) and $filters['expiration']) {
+            $expire_string = $filters['expiration'][0]->format('Y-m-d') . '|' . $filters['expiration'][1]->format('Y-m-d');
         } else {
             $expire_string = $this->getExpirationDate($structure, $date, true)->format('Y-m-d') . '|' . $expire->format('Y-m-d');
         }
@@ -371,7 +368,7 @@ class RegisterController extends AbstractController
                 ->setCellValue('A'.$i, $membership->getPerson()->getTitle())
                 ->setCellValue('B'.$i, $membership->getPerson()->getSurname())
                 ->setCellValue('C'.$i, $membership->getPerson()->getName())
-                ->setCellValue('D'.$i, $membership->getPerson()->getBirthday())
+                ->setCellValue('D'.$i, $membership->getPerson()->getBirthday()->format("d-m-Y"))
                 ->setCellValue('E'.$i, $membership->getPerson()->getBirthplace())
                 ->setCellValue('F'.$i, $membership->getPerson()->getPhone())
                 ->setCellValue('G'.$i, $membership->getPerson()->getUser()->getEmail())
@@ -383,7 +380,7 @@ class RegisterController extends AbstractController
                 ->setCellValue('M'.$i, $address['city'])
                 ->setCellValue('N'.$i, $address['country'])
                 ->setCellValue($columns['Mode de paiement'].$i, $membership->getMethod()->getDescription())
-                ->setCellValue($columns['Date d\'adhésion'].$i, $membership->getPayedOn())
+                ->setCellValue($columns['Date d\'adhésion'].$i, $membership->getPayedOn()->format("d-m-Y"))
             ;
             $count = 0;
             if (isset($memberinfos[$membership->getId()])) {

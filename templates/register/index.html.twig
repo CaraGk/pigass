@@ -45,7 +45,7 @@
             </a>
         {% else %}
             <a class="btn btn-light btn-sm" href="{{ path('user_register_filter_add', {'type': 'expiration', 'id': 0, 'value': expire, 'slug': slug}) }}" title="Filtrer les perdus de vue">
-                Perdus de vue (non fonctionnel)
+                Perdus de vue
             </a>
         {% endif %}
         {% if filters['valid'] is null %}

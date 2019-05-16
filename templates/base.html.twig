@@ -32,17 +32,17 @@
 {% block body %}
     {% block navbar %}
     <nav id="menu" class="navbar navbar-expand-md sticky-top navbar-dark bg-dark">
-            {% block logo %}
-            <a href="{{ path('core_structure_map') }}" class="navbar-brand mr-2">
-                <img src="{{ asset('images/pigass_medium.png') }}" alt="logo PIGASS">
-            </a>
-            {% endblock logo %}
-            <p class="navbar-text m-0 mr-auto ml-auto">{% block headline %}Adhésions{% endblock headline %}</p>
-            <button class="navbar-toggler ml-2" type="button" data-toggle="collapse" data-target="#navbar-collapsable" aria-controls="navbar-collapsable" aria-expanded="false" aria-label="Afficher le menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        {% block logo %}
+        <a href="{{ path('core_structure_map') }}" class="navbar-brand mr-2">
+            <img src="{{ asset('images/pigass_medium.png') }}" alt="logo PIGASS">
+        </a>
+        {% endblock logo %}
+        <p class="navbar-text m-0 mr-auto ml-auto">{% block headline %}Adhésions{% endblock headline %}</p>
+        <button class="navbar-toggler ml-2" type="button" data-toggle="collapse" data-target="#navbar-collapsable" aria-controls="navbar-collapsable" aria-expanded="false" aria-label="Afficher le menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <div class="navbar-collapse collapse ml-2 flex-grow-0" id="navbar-collapsable">
+        <div class="navbar-collapse collapse ml-2 flex-grow-0" id="navbar-collapsable">
             <ul class="nav navbar-nav align-items-center ml-auto">
                 {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                     <li class="nav-item p-0">

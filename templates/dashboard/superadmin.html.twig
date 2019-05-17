@@ -14,16 +14,60 @@
     <div class="card">
         <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
-            <p class="card-text">
-                Nombre total d'adhésions validées : <span class="badge badge-danger">{{ modules.adhesion.count_validated.total }} / {{ modules.adhesion.count_unvalidated.total }}</span>
-            </p>
-            <p class="card-text">
+            <table class="col">
+                <thead>
+                    <tr>
+                        <th>
+                            Structure
+                        </th>
+                        <th class="text-center">
+                            Validées
+                        </th>
+                        <th class="text-center">
+                            Non validées
+                        </th>
+                        <th class="text-center">
+                            Non comptabilisées
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
             {% for structure_name, structure_count in modules.adhesion.count_validated.structures %}
-                <a class="btn btn-light" href="{{ path('app_dashboard_admin', {'slug': structure_name}) }}">
-                    {{ structure_name }} <span class="badge badge-secondary">{{ structure_count }} / {{ modules.adhesion.count_unvalidated.structures[structure_name] }}</span>
-                </a>
+                <tr>
+                    <td>
+                        <a class="btn btn-light" href="{{ path('app_dashboard_admin', {'slug': structure_name}) }}">
+                            {{ structure_name }}
+                        </a>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge badge-secondary">{{ structure_count }}</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge badge-secondary">{{ modules.adhesion.count_unvalidated.structures[structure_name] }}</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge badge-secondary">{{ modules.adhesion.count_uncounted.structures[structure_name] }}</span>
+                    </td>
+                </tr>
             {% endfor %}
-            </ul>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th class="text-danger">
+                        Totaux
+                    </th>
+                    <th class="text-center">
+                        <span class="badge badge-danger">{{ modules.adhesion.count_validated.total }}</span>
+                    </th>
+                    <th class="text-center">
+                        <span class="badge badge-danger">{{ modules.adhesion.count_unvalidated.total }}</span>
+                    </th>
+                    <th class="text-center">
+                        <span class="badge badge-danger">{{ modules.adhesion.count_uncounted.total }}</span>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 {% endblock %}

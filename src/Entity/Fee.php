@@ -71,6 +71,13 @@ class Fee
      */
     private $default;
 
+    /**
+     * @ORM\Column(name="is_counted", type="boolean")
+     *
+     * @var boolean $counted
+     */
+    private $counted;
+
     public function __toString()
     {
         return $this->title . ' - ' . number_format($this->amount / 100, 2,',',' ') . ' €';
@@ -209,5 +216,29 @@ class Fee
     public function isDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * Set counted
+     *
+     * @param boolean $counted
+     *
+     * @return Fee
+     */
+    public function setCounted($counted)
+    {
+        $this->counted = $counted;
+
+        return $this;
+    }
+
+    /**
+     * Is counted
+     *
+     * @return boolean
+     */
+    public function isCounted()
+    {
+        return $this->counted;
     }
 }

@@ -101,9 +101,9 @@ class MembershipRepository extends EntityRepository
 
         if (isset($filter['valid'])) {
             if ($filter['valid'])
-                $query->andWhere('m.payedOn is not NULL');
-            elseif ($filter['valid'] != null)
-                $query->andWhere('m.payedOn is NULL');
+                $query->andWhere('m.payedOn IS NOT NULL');
+            elseif ($filter['valid'] == false)
+                $query->andWhere('m.payedOn IS NULL');
         }
 
         if (isset($filter['ending']) and $anticipated) {
@@ -156,6 +156,14 @@ class MembershipRepository extends EntityRepository
                 ->andWhere('p.surname like :search OR p.name like :search OR u.email like :search')
                 ->setParameter('search', '%' . $filter['search'] . '%')
                 ->addOrderBy('m.expiredOn', 'desc')
+            ;
+        }
+
+        if (isset($filter['isCounted'])) {
+            $query
+                ->join('m.fee', 'f')
+                ->andWhere('f.counted = :isCounted')
+                ->setParameter('isCounted', $filter['isCounted'])
             ;
         }
 

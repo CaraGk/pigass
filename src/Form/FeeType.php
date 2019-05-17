@@ -33,21 +33,25 @@ class FeeType extends AbstractType
         $this->structure = $options['structure'];
 
         $builder
-            ->add('title', TextType::class, array(
+            ->add('title', TextType::class, [
                 'label' => 'Étiquette',
-            ))
-            ->add('amount', MoneyType::class, array(
+            ])
+            ->add('amount', MoneyType::class, [
                 'label'    => 'Montant',
                 'currency' => 'EUR',
                 'divisor'  => 100,
-            ))
-            ->add('help', TextareaType::class, array(
+            ])
+            ->add('help', TextareaType::class, [
                 'label' => 'Description',
-            ))
-            ->add('default', CheckboxType::class, array(
+            ])
+            ->add('default', CheckboxType::class, [
                 'label' => 'Montant par défaut',
                 'required' => false,
-            ))
+            ])
+            ->add('counted', CheckboxType::class, [
+                'label'    => 'Comptabilisé comme adhérent',
+                'required' => false,
+            ])
             ->add('Enregistrer', SubmitType::class)
         ;
     }
@@ -59,9 +63,9 @@ class FeeType extends AbstractType
 
     public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => 'App\Entity\Fee',
             'structure' => null,
-        ));
+        ]);
     }
 }

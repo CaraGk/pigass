@@ -13,7 +13,9 @@
         <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
             <p class="card-text">
-                Adhésions validées : <span class="badge badge-danger">{{ modules.adhesion.count_validated.total }} / {{ modules.adhesion.count_unvalidated.total }}</span>
+                <div class="btn btn-light">Adhésions validées <span class="badge badge-danger">{{ modules.adhesion.count_validated.total }}</span></div>
+                <div class="btn btn-light">Non validées <span class="badge badge-danger">{{ modules.adhesion.count_unvalidated.total }}</span></div>
+                <div class="btn btn-light">Non comptabilisées <span class="badge badge-danger">{{ modules.adhesion.count_uncounted.total }}</span></div>
             </p>
             <p class="card-text">
                 {% for fee_name, fee_count in modules.adhesion.count_validated.fees %}
@@ -26,7 +28,7 @@
                 {% endfor %}
             </p>
         </div>
-        <div class="card-footer">
+        <div class="card-footer text-center">
             <div class="btn-group">
                 <a class="card-link btn btn-primary btn-sm" href="{{ path('app_dashboard_admin', {'slug': structure.slug}) }}?date={{ modules.adhesion.date.previous }}" title="Voir la liste des adhérents">
                     <i class="fas fa-caret-left"></i> &nbsp;

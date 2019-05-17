@@ -69,9 +69,14 @@ class DashboardController extends AbstractController
         }
         $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
             'valid' => true,
+            'isCounted' => true,
         ]));
         $modules['adhesion']['count_unvalidated']['total'] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
             'valid' => false,
+            'isCounted' => true,
+        ]));
+        $modules['adhesion']['count_uncounted']['total'] = count($this->em->getRepository('App:Membership')->getByStructure($structure->getSlug(), $expire, [
+            'isCounted' => false,
         ]));
         $periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
         $modules['adhesion']['date'] = [
@@ -101,17 +106,27 @@ class DashboardController extends AbstractController
         $structures = $this->em->getRepository('App:Structure')->getAll(true);
         foreach ($structures as $structure) {
             $modules['adhesion']['count_validated']['structures'][$structure->getSlug()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
-                'valid' => true,
+                'valid'     => true,
+                'isCounted' => true,
             ]));
             $modules['adhesion']['count_unvalidated']['structures'][$structure->getSlug()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
-                'valid' => false,
+                'valid'     => false,
+                'isCounted' => true,
+            ]));
+            $modules['adhesion']['count_uncounted']['structures'][$structure->getSlug()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
+                'isCounted' => false,
             ]));
         }
         $modules['adhesion']['count_validated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure(null, [
-            'valid' => true,
+            'valid'     => true,
+            'isCounted' => true,
         ]));
         $modules['adhesion']['count_unvalidated']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure(null, [
-            'valid' => false,
+            'valid'     => false,
+            'isCounted' => true,
+        ]));
+        $modules['adhesion']['count_uncounted']['total'] = count($this->em->getRepository('App:Membership')->getCurrentByStructure(null, [
+            'isCounted' => false,
         ]));
 
         return [

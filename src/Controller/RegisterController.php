@@ -1101,7 +1101,7 @@ class RegisterController extends AbstractController
                 'gateway' => $membership->getMethod()->getGatewayName(),
                 'memberid' => $membership->getId(),
             ]));
-        }
+	}
 
         return array(
             'form'       => $form->createView(),

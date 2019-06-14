@@ -145,7 +145,8 @@ class DashboardController extends AbstractController
         $date->modify($anticipated);
         while ($expire <= $date) {
             $expire->modify($periodicity);
-        }
+	}
+	$date->modify('-' . $anticipated);
         return $expire;
     }
 }

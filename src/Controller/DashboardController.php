@@ -52,6 +52,9 @@ class DashboardController extends AbstractController
 
         $date = new \DateTime($request->query->get('date', 'now'));
         $expire = $this->getExpirationDate($structure, $date);
+        var_dump(new \DateTime('now'));
+        var_dump($date);
+        var_dump($request->query->get('date', 'now'));
 
         $fees = $this->em->getRepository('App:Fee')->findByStructure($structure);
         foreach ($fees as $fee) {
@@ -84,6 +87,7 @@ class DashboardController extends AbstractController
             'next'     => $date->modify($periodicity)->format("Y-m-d"),
             'previous' => $date->modify('- ' . substr($periodicity, 1))->modify('- ' . substr($periodicity, 1))->format("Y-m-d"),
         ];
+        var_dump($periodicity);
 
         return [
             'structure' => $structure,

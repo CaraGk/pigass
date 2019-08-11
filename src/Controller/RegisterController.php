@@ -805,7 +805,8 @@ class RegisterController extends AbstractController
                 $filter = $this->session->get('user_register_filter', []);
                 $filter['user'] = $membership->getPerson()->getUser()->getId();
                 $this->session->set('user_register_filter', $filter);
-            }
+	    }
+
             return $this->redirect($this->generateUrl('user_payment_prepare', [
                 'gateway'  => $membership->getMethod()->getGatewayName(),
                 'memberid' => $membership->getId(),
@@ -889,7 +890,7 @@ class RegisterController extends AbstractController
                 'config'     => $config,
                 'address'    => $address,
                 'payableTo'  => (isset($config['payableTo'])?$config['payableTo']:'non défini'),
-                'form'       => ($form?$form->createView():null),
+                'form'       => null,
                 'questions'  => $questions,
                 'infos'      => $infos,
                 'iban'       => (isset($config['iban'])?$config['iban']:null),
@@ -1100,7 +1101,7 @@ class RegisterController extends AbstractController
                 'gateway' => $membership->getMethod()->getGatewayName(),
                 'memberid' => $membership->getId(),
             ]));
-        }
+	}
 
         return array(
             'form'       => $form->createView(),

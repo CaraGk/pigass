@@ -60,7 +60,7 @@
                                 </li>
                             {% endif %}
                             <li class="action">
-                                <a href="{{ path('user_register_list', {'userid': person.user.id}) }}" title="Afficher les adhésions de '{{ person }}'">
+                                <a href="{{ path('app_dashboard_user(', {'userid': person.user.id}) }}" title="Afficher les adhésions de '{{ person }}'">
                                     <i class='fas fa-list'></i> Adhésions
                                     {% if members is not null and person.id in members %}
                                         <i class='fas fa-thumbs-up'></i>

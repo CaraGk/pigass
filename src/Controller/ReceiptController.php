@@ -189,7 +189,7 @@ class ReceiptController extends AbstractController
                 $person = $this->em->getRepository('App:Person')->findOneBy(['user' => $user->getId()]);
                 if ($membership->getPerson() !== $person) {
                     $this->session->getFlashBag()->add('error', 'Vous n\'avez pas les autorisations pour accéder à cette adhésion.');
-                    return $this->redirect($this->generateUrl('user_register_list'));
+                    return $this->redirect($this->generateUrl('app_dashboard_user('));
                 }
             }
 
@@ -197,7 +197,7 @@ class ReceiptController extends AbstractController
         $receipt = $this->em->getRepository('App:Receipt')->getOneByDate($membership->getStructure(), $membership->getExpiredOn());
         if (!$receipt) {
             $this->session->getFlashBag()->add('error', 'Aucun signataire de reçu fiscal défini. Contactez votre structure.');
-            return $this->redirect($this->generateUrl('user_register_list'));
+            return $this->redirect($this->generateUrl('app_dashboard_user('));
         }
 
         $html = $this->renderView(

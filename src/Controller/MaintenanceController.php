@@ -99,11 +99,11 @@ class MaintenanceController extends AbstractController
             $slug = $structure->getSlug();
             $now = new \DateTime('now');
             $parameters = array(
-                0 => array('setName' => 'reg_' . $slug . '_date', 'setValue' => $now->format('d-m-Y'), 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
-                1 => array('setName' => 'reg_' . $slug . '_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("1 mois" => "+ 1 month", "2 mois" => "+ 2 months", "6 mois" => "+ 6 months", "1 an" => "+ 1 year", "2 ans" => "+ 2 years", "3 ans" => "+ 3 years"), 'setStructure' => $structure),
-                2 => array('setName' => 'reg_' . $slug . '_payment', 'setValue' => 60, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
-                3 => array('setName' => 'reg_' . $slug . '_print', 'setValue' => false, 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Nécessité de retourner le bulletin d\'adhésion imprimé et signé', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("Oui" => true, "Non" => false), 'setStructure' => $structure),
-                4 => array('setName' => 'reg_' . $slug . '_anticipated', 'setValue' => '+ 3 months', 'setActive' => true, 'setActivatesAt' => $now, 'setLabel' => 'Adhésions anticipées de :', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("Pas d'adhésion anticipée" => "+ 0 day", "1 mois" => "+ 1 month", "2 mois" => "+ 2 months", "3 mois" => "+ 3 months", "4 mois" => "+ 4 months", "5 mois" => "+ 5 months", "6 mois" => "+ 6 months"), 'setStructure' => $structure),
+                0 => array('setName' => 'reg_' . $slug . '_date', 'setValue' => $now->format('d-m-Y'), 'setActive' => true, 'setLabel' => 'Date anniversaire des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                1 => array('setName' => 'reg_' . $slug . '_periodicity', 'setValue' => '+ 1 year', 'setActive' => true, 'setLabel' => 'Périodicité des adhésions', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("1 mois" => "+ 1 month", "2 mois" => "+ 2 months", "6 mois" => "+ 6 months", "1 an" => "+ 1 year", "2 ans" => "+ 2 years", "3 ans" => "+ 3 years"), 'setStructure' => $structure),
+                2 => array('setName' => 'reg_' . $slug . '_payment', 'setValue' => 60, 'setActive' => true, 'setLabel' => 'Montant de la cotisation (EUR)', 'setCategory' => 'Module Adhesion', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
+                3 => array('setName' => 'reg_' . $slug . '_print', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Nécessité de retourner le bulletin d\'adhésion imprimé et signé', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("Oui" => true, "Non" => false), 'setStructure' => $structure),
+                4 => array('setName' => 'reg_' . $slug . '_anticipated', 'setValue' => '+ 3 months', 'setActive' => true, 'setLabel' => 'Adhésions anticipées de :', 'setCategory' => 'Module Adhesion', 'setType' => 3, 'setMore' => array("Pas d'adhésion anticipée" => "+ 0 day", "1 mois" => "+ 1 month", "2 mois" => "+ 2 months", "3 mois" => "+ 3 months", "4 mois" => "+ 4 months", "5 mois" => "+ 5 months", "6 mois" => "+ 6 months"), 'setStructure' => $structure),
             );
 
             foreach ($parameters as $parameter) {
@@ -143,6 +143,7 @@ class MaintenanceController extends AbstractController
                 $fee->setTitle("Normal");
                 $fee->setStructure($structure);
                 $fee->setDefault(true);
+                $fee->setCounted(true);
                 $this->em->persist($fee);
                 $count++;
             }
@@ -175,6 +176,28 @@ class MaintenanceController extends AbstractController
         }
         $this->em->flush();
 
+        return $this->redirect($this->generateUrl('core_structure_map'));
+    }
+
+    /**
+     * Correct missing ROLE_MEMBER after migration from GESSEH
+     *
+     * @Route("/db/roles", name="core_maintenance_correct_db_roles")
+     */
+    public function correctDBRolesAction()
+    {
+        $count = 0;
+        $users = $this->em->getRepository('App:User')->findAll();
+        foreach ($users as $user) {
+            if($user->hasRole('ROLE_STUDENT') and !$user->hasRole('ROLE_MEMBER')) {
+                $user->addRole('ROLE_MEMBER');
+                $this->em->persist($user);
+                $count++;
+            }
+        }
+        $this->em->flush();
+
+        $this->session->getFlashBag()->add('notice', $count . ' droits corrigés en base de données.');
         return $this->redirect($this->generateUrl('core_structure_map'));
     }
 }

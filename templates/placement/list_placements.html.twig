@@ -1,0 +1,37 @@
+{% extends "layout.html.twig" %}
+
+{% block headline %}
+    Co-internes chez {{ placements[0].repartition.department }}
+{% endblock %}
+
+{% block action %}
+    <li class="btn btn-primary">
+        <a href="{{ path('app_dashboard_user', {'slug': structure.slug}) }}" title="Retour à la liste des stages">
+            <span class="fas fa-th-list"></span> Stages
+        </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <ul class="entities list-group">
+        {% for placement in placements %}
+            {% if placement.person.user.id != app.user.id %}
+                <li class="entity list-group-item d-flex justify-content-between align-items-center">
+                    <span class="title">{{ placement.person.surname }} {{ placement.person.name }}</span>
+                    {% if placement.person.phone %}
+                        <span class="">
+                            <span class="fas fa-phone"> <a class="btn btn-outline-primary" href="tel:{{ placement.person.phone }}">{{ placement.person.phone }}</a></span>
+                        </span>
+                    {% endif %}
+                    <span class="">
+                        <span class="fas fa-envelope">
+                            <a class="btn btn-outline-primary" href="mailto:{{ placement.person.user.email }}">{{ placement.person.user.email }}</a>
+                        </span>
+                    </span>
+                </li>
+            {% endif %}
+        {% else %}
+            <li class="noentity list-group-item">Vous n'avez pas de co-interne de médecine générale pour ce semestre.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -200,7 +200,7 @@ class PaymentController extends Controller
         } else {
              $this->addFlash('error', 'Le paiement a échoué ou a été annulé. En cas de problème, veuillez contacter l\'administrateur du site.');
         }
-        return $this->redirect($this->generateUrl('user_register_list'));
+        return $this->redirect($this->generateUrl('app_dashboard_user('));
     }
 
     /**

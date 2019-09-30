@@ -98,11 +98,39 @@ class Person
    */
   private $anonymous;
 
+  /**
+   * @ORM\ManyToOne(targetEntity="Grade", inversedBy="students")
+   * @ORM\JoinColumn(name="grade_id", referencedColumnName="id")
+   */
+  private $grade;
+
+  /**
+   * @var smallint $ranking
+   *
+   * @ORM\Column(name="ranking", type="smallint", nullable=true)
+   */
+  private $ranking;
+
+  /**
+   * @var smallint $graduate
+   *
+   * @ORM\Column(name="graduate", type="smallint", nullable=true)
+   */
+  private $graduate;
+
     /**
      * @ORM\OneToMany(targetEntity="Membership", mappedBy="person", cascade={"remove", "persist"}, orphanRemoval=true)
      * @ORM\OrderBy({"end" = "asc"})
      */
     private $memberships;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Entity\Structure", inversedBy="receipts", cascade={"persist"})
+     * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
+     *
+     * @var Structure $structure
+     */
+    private $structure;
 
     private function upperFirst($data)
     {
@@ -393,6 +421,90 @@ class Person
     public function getBirthplace()
     {
         return $this->upperFirst($this->birthplace);
+    }
+
+    /**
+     * Set grade
+     *
+     * @param App\Entity\Grade $grade
+     */
+    public function setGrade(\App\Entity\Grade $grade)
+    {
+        $this->grade = $grade;
+    }
+
+    /**
+     * Get grade
+     *
+     * @return App\Entity\Grade
+     */
+    public function getGrade()
+    {
+        return $this->grade;
+    }
+
+    /**
+     * Set ranking
+     *
+     * @param smallint $ranking
+     */
+    public function setRanking($ranking)
+    {
+        $this->ranking = $ranking;
+    }
+
+    /**
+     * Get ranking
+     *
+     * @return smallint
+     */
+    public function getRanking()
+    {
+        return $this->ranking;
+    }
+
+    /**
+     * Set graduate
+     *
+     * @param smallint $graduate
+     */
+    public function setGraduate($graduate)
+    {
+        $this->graduate = $graduate;
+    }
+
+    /**
+     * Get graduate
+     *
+     * @return smallint
+     */
+    public function getGraduate()
+    {
+        return $this->graduate;
+    }
+
+    /**
+     * Set structure
+     *
+     * @param \App\Entity\Structure $structure
+     *
+     * @return Fee
+     */
+    public function setStructure(\App\Entity\Structure $structure = null)
+    {
+        $this->structure = $structure;
+
+        return $this;
+    }
+
+    /**
+     * Get structure
+     *
+     * @return \App\Entity\Structure
+     */
+    public function getStructure()
+    {
+        return $this->structure;
     }
 
 }

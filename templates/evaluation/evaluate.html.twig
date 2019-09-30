@@ -1,0 +1,20 @@
+{% extends 'layout.html.twig' %}
+
+
+{% block content %}
+  {% if form is not null %}
+    <div class="card">
+        <div class="card-header text-center">
+            Évaluation du stage {{ placement.repartition.department.name }} à {{ placement.repartition.department.hospital.name }} du {{ placement.repartition.period.begin|date('d-m-Y') }} au {{ placement.repartition.period.end|date('d-m-Y') }}
+        </div>
+        <div class="card-body">
+            {{ form_start(form, {attr: {class: 'row'}}) }}
+            {% for i in 0..100000 if attribute(form, 'criteria_'~i) is defined %}
+                <div class="col-12">{{ form_row(attribute(form, 'criteria_'~i)) }}</div>
+            {% endfor %}
+            <div class="col-12 text-center"{{ form_end(form) }}</div>
+        </div>
+  {% else %}
+    <div>Il n'y a aucun formulaire d'évaluation défini pour ce stage. Veuillez contacter un administrateur.</div>
+  {% endif %}
+{% endblock %}

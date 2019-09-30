@@ -158,7 +158,7 @@
                         </li>
                     {% endif %}
                     <li class="btn btn-link btn-sm btn-block">
-                        <a href="{{ path('user_register_list', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">
+                        <a href="{{ path('app_dashboard_user(', {'userid': membership.person.user.id, 'slug': slug}) }}" title="Afficher les informations personnelles de l'adhérent">
                             <i class='fas fa-user'></i> Informations
                         </a>
                     </li>

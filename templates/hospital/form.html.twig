@@ -1,0 +1,12 @@
+{% extends 'layout.html.twig' %}
+
+{% block headline %}Ajouter/modifier un terrain de stage{% endblock %}
+
+{% block content %}
+    {{ form(hospital_form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/gessehcore/js/addSub.js') }}" type="text/javascript"></script>
+{% endblock %}

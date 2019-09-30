@@ -1,0 +1,213 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ parent() }} - Tableau de bord{% endblock %}
+
+{% block headline %}
+    {% if userid is not null %}
+        Utilisateur : {{ person }}
+    {% else %}
+        Mon tableau de bord
+    {% endif %}
+{% endblock %}
+
+{% block action %}
+    {% if userid is not null %}
+        <a class="btn btn-info text-white" href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Revenir à la liste des adhérents">
+            <i class="fas fa-arrow-left"></i> {{ person }}
+        </a>
+    {% endif %}
+    {% if structure.slug is not null %}
+        {% if modules.adhesion.rejoinable == true %}
+            <li class="btn btn-primary">
+                <a href="{{ path('user_register_register', {'slug': structure.slug, 'rejoin': true}) }}&{{ app.request.queryString }}">
+                    <i class='fas fa-euro-sign'></i> Ré-adhérer
+                </a>
+            </li>
+            {% if 'ROLE_STRUCTURE' not in person.user.roles %}
+                <li class="btn btn-primary">
+                    <a href="{{ path('core_structure_map') }}" title="Adhérer à une autre structure">
+                        <i class='fas fa-euro-sign'></i> Autre structure
+                    </a>
+                </li>
+            {% endif %}
+        {% elseif modules.adhesion.recent.status == "excluded" %}
+            <li class="btn btn-danger">
+                <i class='fas fa-skull-crossbones'></i>&nbsp; Adhésion révoquée &nbsp;<i class='fas fa-skull-crossbones'></i>
+            </li>
+        {% else %}
+            <li class="btn btn-warning">
+                Adhésion en cours
+            </li>
+        {% endif %}
+        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (modules.adhesion.recent == false or modules.adhesion.recent.status != "excluded") %}
+            <li class="btn btn-primary">
+                {% if 'ROLE_STRUCTURE' in person.user.roles %}
+                    <a href="{{ path('user_person_demote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                        <i class='fas fa-star'></i> Démettre
+                    </a>
+                {% else %}
+                    <a href="{{ path('user_person_promote', {'id': person.id, 'slug': structure.slug}) }}" title="Ajouter des droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                        <i class='fas fa-star-half'></i> Promouvoir
+                    </a>
+                {% endif %}
+            </li>
+        {% endif %}
+    {% else %}
+        <li class="btn btn-primary">
+            <a href="{{ path('core_structure_map') }}">
+                <i class='fas fa-euro-sign'></i> Adhérer
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header bg-primary text-white text-center">Informations personnelles</div>
+        <div class="card-body">
+            <p class="card-text p-0 m-0"><i class="fas fa-user"></i> {{ person.title }} {{ person.surname }} {{ person.name }}</p>
+            {% set age = date().diff(person.birthday) %}
+            <p class="card-text p-0 m-0"><i class="fas fa-birthday-cake"></i> {{ person.birthday|date('d/m/Y') }} à {{ person.birthplace }} ({{ (age.days/365)|round(0, 'floor') }} ans)</p>
+            <p class="card-text p-0 m-0 mt-2"><i class='fas fa-phone'></i> {{ person.phone }}</p>
+            <p class="card-text p-0 m-0"><i class='fas fa-home'></i> {% for item in person.address %} {{ item }} {% endfor %}</p>
+            <p class="card-text p-0 m-0"><i class='fas fa-envelope'></i> {{ person.user.email }}</p>
+        </div>
+        <div class="card-footer text-center">
+            <a class="btn btn-primary btn-sm" href="{{ path('user_person_edit_me') }}?{{ app.request.queryString }}" title="Modifier">
+                <i class='fas fa-pencil-alt'></i> Modifier
+            </a>
+            <a class="btn btn-primary btn-sm" href="{{ path('fos_user_change_password') }}?{{ app.request.queryString }}" title="Modifier le mot de passe">
+                <i class='fas fa-lock'></i> Mot de passe
+            </a>
+        </div>
+    </div>
+
+    {% if param('reg_' ~ structure.slug ~ '_active') %}
+    <div class="card mt-3">
+        <div class="card-header bg-primary text-white text-center">Adhésions</div>
+        <ul class="card-body card-columns">
+        {% for membership in modules.adhesion.memberships %}
+            <li class="card">
+                <div class="card-header text-center">
+                    {% if membership.structure.logoName is not null %}
+                        <img src="{{ asset(vich_uploader_asset(membership.structure, 'logoFile')) }}" alt="{{ membership.structure.logoName }}" class="logo"/>
+                    {% endif %}
+                    {{ membership.structure.name }}
+                </div>
+                <div class="card-body">
+                    <p class="card-text p-0 m-0"><i class="fas fa-calendar-times"></i> <i class="fas fa-long-arrow-alt-right"></i> {{ membership.expiredOn|date('d/m/Y') }}</p>
+                    <p class="card-text p-0 m-0"><i class="fas fa-euro-sign"></i> {{ (membership.amount/100)|number_format(2,',',' ') }} € par {{ membership.method.label|lower }}
+                    {% if membership.payedOn is not null %}
+                    le {{ membership.payedOn|date('d/m/Y') }}.</p>
+                    {% else %}
+                        . <span class="text-danger">La transaction na pas été validée.</span></p>
+                        {% if membership.method.config['address']['city'] is defined and membership.method.config['address']['city'] is not null %}
+                            <p class="card-text p-0 m-0" title="Chèque à l'ordre de {{ membership.method.config['payableTo'] }} ; {{ membership.method.config['address']['number'] }} {{ membership.method.config['address']['type'] }} {{ membership.method.config['address']['street'] }}, {{ membership.method.config['address']['complement'] }}, {{ membership.method.config['address']['code'] }} {{ membership.method.config['address']['city'] }}, {{ membership.method.config['address']['country'] }}">
+                                <i class='fas fa-globe'></i> Chèque à l'ordre de {{ membership.method.config['payableTo'] }} ; {{ membership.method.config['address']['number'] }} {{ membership.method.config['address']['type'] }} {{ membership.method.config['address']['street'] }}, {{ membership.method.config['address']['complement'] }}, {{ membership.method.config['address']['code'] }} {{ membership.method.config['address']['city'] }}, {{ membership.method.config['address']['country'] }}
+                            </p>
+                        {% endif %}
+                        {% if membership.method.config['iban'] is defined and not null %}
+                            <p class="card-text p-0 m-0" title="IBAN : {{ membership.method.config['iban'] }}">
+                                <i class='fas fa-comment'></i>IBAN : {{ membership.method.config['iban'] }}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="btn-group-vertical">
+                        <a class="btn btn-primary btn-sm" href="{{ path('user_register_infos', {'id': membership.id, 'userid': userid}) }}" title="Afficher les réponses aux questions complémentaires">
+                            <i class='fas fa-question-circle'></i> Questions
+                        </a>
+                        {% if membership.status == 'validated' %}
+                            <a class="btn btn-primary btn-sm" href="{{ path('core_receipt_build', {'id': membership.id}) }}" title="Télécharger le reçu fiscal">
+                                <i class='fas fa-edit'></i> Reçu fiscal
+                            </a>
+                        {% elseif modules.adhesion.recent.status != 'excluded' %}
+                            {% if is_granted('ROLE_STRUCTURE') %}
+                                <a class="btn btn-primary btn-sm" href="{{ path('user_register_edit', {'id': membership.id, 'userid': userid, 'slug': structure.slug}) }}" title="Modifier l'adhésion">
+                                    <i class='fas fa-pencil-alt'></i> Modifier
+                                </a>
+                            {% endif %}
+                            {% if param('reg_' ~ structure.slug ~ '_print') %}
+                                <a class="btn btn-primary btn-sm" href="{{ path('user_register_print', {'id': membership.id, 'userid': userid, 'slug': structure.slug}) }}" title="Fiche d'adhésion à retourner signée">
+                                    <i class='fas fa-list-alt'></i> Fiche d'adhésion
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        {% if membership.payedOn is null or (membership.status == 'excluded' and is_granted('ROLE_STRUCTURE')) %}
+                            {% if is_granted('ROLE_ADMIN') and (membership.status != 'excluded' and is_granted('ROLE_STRUCTURE')) %}
+                                <a class="btn btn-primary btn-sm" href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">
+                                    <i class='fas fa-check-circle'></i> Valider
+                                </a>
+                            {% endif %}
+                            <a class="btn btn-primary btn-sm" href="{{ path('user_register_delete', {'id': membership.id, 'userid': userid}) }}" title="Supprimer cette adhésion">
+                                <i class='fas fa-times-circle'></i> Supprimer
+                            </a>
+                        {% elseif membership.status == 'paid' and modules.adhesion.recent.status != 'excluded' %}
+                            <a class="btn btn-primary btn-sm" href="{{ path('user_register_validate', {'id': membership.id, 'userid': membership.person.user.id, view: 'index'}) }}" title="Valider la réception de la fiche signée pour cette adhésion">
+                                <i class='fas fa-check-circle'></i> Valider la fiche
+                            </a>
+                        {% endif %}
+                        {% if is_granted('ROLE_STRUCTURE') and modules.adhesion.recent.status != 'excluded' %}
+                            <a class="btn btn-primary btn-sm" href="{{ path('user_register_exclude', {'slug': structure.slug, 'id': membership.id, 'userid': userid}) }}" title="Exclure ce membre">
+                                <i class='fas fa-skull-crossbones'></i> Exclure
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li class="card">Aucune adhésion enregistrée.</li>
+        {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
+
+    {% if param('placement_' ~ structure.slug ~ '_active') %}
+    <div class="card mt-3">
+        <div class="card-header bg-primary text-white text-center">Stages</div>
+        <ul class="card-body ">
+        {% for placement in modules.stages.placements %}
+            <li class="field entity placement card">
+                <div class="card-header text-center">
+                    {{ placement.repartition.department.name }} à {{ placement.repartition.department.hospital }}
+                </div>
+                <div class="card-body">
+                    <div class="period">Période : {{ placement.repartition.period }}</div>
+                    <div class="department_sector">Agrément(s) :
+                        <ul class="">
+                            {% for accreditation in placement.repartition.department.accreditations %}
+                                <li class="label label-info">{{ accreditation.sector.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="btn-group">
+                        <a class="btn btn-primary" href="{{ path('app_placement_list', {'slug': structure.slug, 'id': placement.repartition.id })}}" title="Voir les autres étudiants">
+                            <span class="fas fa-user-friends"></span> Co-internes
+                        </a>
+                        {% if param('eval_' ~ structure.slug ~ '_active') == true %}
+                            {% if placement.id not in modules.stages.evaluated %}
+                                <a class="nonevaluated btn btn-warning" href="{{ path('GEval_DEval', {'slug': structure.slug, 'id': placement.id }) }}" title="Évaluer le stage">
+                                    <span class="fas fa-clipboard-list"></span> Évaluer
+                                </a>
+                            {% else %}
+                                <a class="evaluated btn btn-success" href="">
+                                    <span class="fas fa-clipboard-check"></span> Évalué
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li class="field noentity error card">
+                <div class="card-body">Aucun stage effectué</div>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+{% endblock %}

@@ -40,6 +40,61 @@ class DashboardController extends AbstractController
     }
 
     /**
+     * Person dashboard
+     *
+     * @Route("/{slug}/user", name="app_dashboard_user", requirements={"slug" = "\w+"})
+     * @Template
+     * @security("is_granted('ROLE_PERSON') or is_granted('ROLE_STUDENT')")
+     */
+    public function user(Structure $structure, Request $request)
+    {
+        $user = $this->getUser();
+        $filter = $this->session->get('user_register_filter', null);
+        $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
+        $person = $this->testAdminTakeOver($user, $userid);
+
+        /* Load recent memberships */
+        $modules['adhesion']['current'] = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
+        $modules['adhesion']['last'] = $this->em->getRepository('App:Membership')->getLastForPerson($person);
+        $modules['adhesion']['rejoinable'] = false;
+
+        /* Test memberships and rejoinability */
+        if ($modules['adhesion']['current']) {
+            $modules['adhesion']['recent'] = $modules['adhesion']['current'];
+            $structure = $modules['adhesion']['recent']->getStructure();
+            $now = new \DateTime('now');
+            $now->modify($this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_anticipated')->getValue());
+            if ($modules['adhesion']['current']->getExpiredOn() <= $now and $modules['adhesion']['current']->getStatus() != 'excluded') {
+                $modules['adhesion']['rejoinable'] = true;
+            }
+        } elseif ($modules['adhesion']['last']) {
+            $modules['adhesion']['recent'] = $modules['adhesion']['last'];
+            $structure = $modules['adhesion']['recent']->getStructure();
+            if ($modules['adhesion']['last']->getStatus() != 'excluded')
+                $modules['adhesion']['rejoinable'] = true;
+        } else {
+            $modules['adhesion']['rejoinable'] = true;
+        }
+
+        /* Load memberships */
+        $modules['adhesion']['memberships'] = $this->em->getRepository('App:Membership')->findBy(['person' => $person]);
+
+        /* Load placements */
+        $modules['stages']['placements'] = $this->em->getRepository('App:Placement')->getByPerson($person);
+        $modules['stages']['evaluated'] = array();
+        if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue())
+            $modules['stages']['evaluated'] = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array', $person);
+
+        return [
+            'structure'   => $structure,
+            'person'      => $person,
+            'userid'      => $userid,
+            'modules'     => $modules,
+        ];
+
+    }
+
+    /**
      * Admin dashboard
      *
      * @Route("/{slug}/admin", name="app_dashboard_admin", requirements={"slug" = "\w+"})
@@ -52,9 +107,6 @@ class DashboardController extends AbstractController
 
         $date = new \DateTime($request->query->get('date', 'now'));
         $expire = $this->getExpirationDate($structure, $date);
-        var_dump(new \DateTime('now'));
-        var_dump($date);
-        var_dump($request->query->get('date', 'now'));
 
         $fees = $this->em->getRepository('App:Fee')->findByStructure($structure);
         foreach ($fees as $fee) {
@@ -87,7 +139,6 @@ class DashboardController extends AbstractController
             'next'     => $date->modify($periodicity)->format("Y-m-d"),
             'previous' => $date->modify('- ' . substr($periodicity, 1))->modify('- ' . substr($periodicity, 1))->format("Y-m-d"),
         ];
-        var_dump($periodicity);
 
         return [
             'structure' => $structure,
@@ -137,6 +188,35 @@ class DashboardController extends AbstractController
             'me'      => $me,
             'modules' => $modules,
         ];
+    }
+
+    /**
+     * Test for admin take over function
+     *
+     * @return Person
+     */
+    private function testAdminTakeOver($user, $user_id = null)
+    {
+        if (($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) and $user_id != null) {
+            $user_taken_over = $this->um->findUserBy(array(
+                'id' => $user_id,
+            ));
+
+            if (!$user_taken_over)
+                throw $this->createAccessDeniedException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
+
+            $person = $this->em->getRepository('App:Person')->getByUsername($user_taken_over->getUsername());
+
+            if (!$user->hasRole('ROLE_ADMIN')) {
+                $membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
+                if ($membership and $membership->getStructure()->getSlug() != $this->session->get('slug'))
+                    throw $this->createAccessDeniedException('Vous n\'avez pas les autorisations pour accéder à cette fiche.');
+            }
+        } else {
+            $person = $this->em->getRepository('App:Person')->getByUsername($user->getUsername());
+        }
+
+        return $person;
     }
 
     private function getExpirationDate(Structure $structure, \DateTime $date)

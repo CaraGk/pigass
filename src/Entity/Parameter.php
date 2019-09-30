@@ -90,11 +90,6 @@ class Parameter
      */
     private $active;
 
-    public function __construct()
-    {
-      parent::__construct();
-    }
-
     public function __toString()
     {
       return $this->label;

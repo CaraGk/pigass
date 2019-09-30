@@ -60,9 +60,9 @@
                         </form>
                     </li>
                 {% else %}
-                    {% if is_granted('ROLE_MEMBER') %}
+                    {% if is_granted('ROLE_MEMBER') or is_granted('ROLE_STUDENT') %}
                         <li class="nav-item p-0">
-                            <a class="btn btn-dark btn-block" href="{{ path('user_register_list') }}" title="Mon tableau de bord">
+                            <a class="btn btn-dark btn-block" href="{{ path('app_dashboard_user', {'slug': app.session.get('slug')}) }}" title="Mon tableau de bord">
                                 <i class="fas fa-id-card"></i> {{ app.user.username }}
                             </a>
                         </li>

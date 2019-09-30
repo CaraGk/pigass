@@ -53,14 +53,20 @@
                         <a class="card-text" href="{{ structure.url }}" title="{{ structure.url }}"><i class='fas fa-globe'></i> {{ structure.url }}</a>
                     </p>
                 {% endif %}
-                {% if structure.address['city'] is not null and structure.address['city'] != '-' %}
+                {% if structure.address and structure.address['city'] is not null and structure.address['city'] != '-' %}
                     <p class="card-text m-0 p-0">
                         <a class="card-text" href="#" title="{{ structure.printableAddress }}"><i class='fas fa-home'></i> {{ structure.printableAddress }}</a>
                     </p>
                 {% endif %}
             </div>
             <div class="card-footer btn-group-vertical">
-                        {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                     {% if param('eval_' ~ structure.slug ~ '_active') %}
+                        <a class="btn btn-primary" href="{{ path('GCore_FSIndex', {'slug': structure.slug}) }}" title="Afficher les terrains de stage de {{ structure.name }}">
+                            <i class='fas fa-hospital'></i> Terrains de stage
+                        </a>
+                    {% endif %}
+                    {% if param('reg_' ~ structure.slug ~ '_active') and param('reg_' ~ structure.slug ~ '_auto') %}
+                    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                         <a class="btn btn-primary" href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">
                             <i class='fas fa-edit'></i> Adhérer
                         </a>
@@ -68,6 +74,7 @@
                         <a class="btn btn-primary" href="{{ path('user_register_join', {'slug': structure.slug, 'rejoin': true}) }}" title="Ré-dhérer à la structure {{ structure.name }}">
                             <i class='fas fa-edit'></i> Ré-adhérer
                         </a>
+                    {% endif %}
                     {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
                         <a class="btn btn-primary" href="{{ path('user_register_index', {'slug': structure.slug}) }}" title="Afficher les adhérents de la structure '{{ structure.name }}'" class="index">

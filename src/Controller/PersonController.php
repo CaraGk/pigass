@@ -172,7 +172,7 @@ class PersonController extends AbstractController
         $this->um->updateUser($user);
 
         $this->session->getFlashBag()->add('notice', 'Droits d\'administration donnés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
+        return $this->redirect($this->generateUrl('app_dashboard_user(', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**
@@ -193,7 +193,7 @@ class PersonController extends AbstractController
         $this->um->updateUser($user);
 
         $this->session->getFlashBag()->add('notice', 'Droits d\'administration retirés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('user_register_list', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
+        return $this->redirect($this->generateUrl('app_dashboard_user(', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**
@@ -251,14 +251,14 @@ class PersonController extends AbstractController
         $user = $this->getUser();
         $userid = $request->query->get('userid', null);
         $person = $this->testAdminTakeOver($user, $userid);
-        $redirect = $request->query->get('redirect', 'user_register_list');
+        $redirect = $request->query->get('redirect', 'app_dashboard_user');
         $slug = $request->query->get('slug');
 
         if (!$person)
             throw $this->createNotFoundException('Unable to find person entity.');
 
         if (!$slug) {
-            $membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
+            $membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
             if (!$membership)
                 throw $this->createNotFoundException('Unable to find membership entity.');
             $slug = $membership->getStructure()->getSlug();

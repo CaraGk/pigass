@@ -52,8 +52,8 @@
                 {% endif %}
 
                     <div class="card-title text-center">
-                        {% if structure.logo is not null %}
-                            <img src="{{ asset(vich_uploader_asset(structure, 'logoFile')) }}" alt="{{ structure.logo }}" class="logo"/>
+                        {% if structure.logoName is not null %}
+                            <img src="{{ asset(vich_uploader_asset(structure, 'logoFile')) }}" alt="{{ structure.logoName }}" class="logo"/>
                         {% endif %}
                         {{ structure.name }}
                     </div>
@@ -61,7 +61,7 @@
                     {% if structure.fullname is not null %}<p class="card-text">{{ structure.fullname }}</p>{% endif %}
                     {% if structure.area is not null %}<p class="card-text m-0 p-0"><i class="fas fa-flag"></i> {{ structure.area }}</p>{% endif %}
                     {% if structure.email is not null %}<a class="card-text" href="mailto:{{ structure.email }}" title="{{ structure.email }}"><i class='fas fa-envelope'></i> {{ structure.email }}</a>{% endif %}
-                    {% if structure.address['city'] is not null and structure.address['city'] != '-' %}<p class="card-link" href="#" title="{{ structure.printableAddress }}"><i class='fas fa-home'></i> {{ structure.printableAddress }}</p>{% endif %}
+                    {% if structure.address and structure.address['city'] is not null and structure.address['city'] != '-' %}<p class="card-link" href="#" title="{{ structure.printableAddress }}"><i class='fas fa-home'></i> {{ structure.printableAddress }}</p>{% endif %}
                 </div>
                 <div class="card-footer bg-default text-center">
                     <a class="btn btn-primary btn-sm" href="{{ path('user_register_join', {'slug': structure.slug}) }}" title="Adhérer à la structure {{ structure.name }}">Adhérer</a>

@@ -54,16 +54,17 @@ class StructureController extends AbstractController
         $user = $this->getUser();
         if ($user) {
             if ($slug = $this->session->get('slug', false)) {
-                return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
-            } elseif ($user->hasRole('ROLE_STRUCTURE')) {
+                return $this->redirect($this->generateUrl('app_dashboard_user', array('slug' => $slug)));
+            } elseif ($user->hasRole('ROLE_MEMBER') or $user->hasRole('ROLE_STRUCTURE')) {
                 $person = $this->em->getRepository('App:Person')->getByUsername($user->getUsername());
-                $membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
-                if (!$membership) {
+                $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
+                $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
+                if (!$last_membership) {
                     return $this->redirect($this->generateUrl('core_structure_map'));
                 } else {
-                    $slug = $membership->getStructure()->getSlug();
+                    $slug = $last_membership->getStructure()->getSlug();
                     $this->session->set('slug', $slug);
-                    return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
+                    return $this->redirect($this->generateUrl('app_dashboard_user', array('slug' => $slug)));
                 }
             }
 
@@ -72,7 +73,7 @@ class StructureController extends AbstractController
             }
 
             if ($user->hasRole('ROLE_MEMBER')) {
-                return $this->redirect($this->generateUrl('user_register_list'));
+                return $this->redirect($this->generateUrl('app_dashboard_user('));
             }
         } else {
             return $this->redirect($this->generateUrl('core_structure_map'));

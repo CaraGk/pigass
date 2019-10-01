@@ -170,7 +170,9 @@ class MembershipType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.structure = :structure_id')
-                        ->setParameter('structure_id', $this->structure->getId());
+                        ->setParameter('structure_id', $this->structure->getId())
+                        ->andWhere('u.active = true')
+                    ;
                 },
                 'required'      => true,
                 'multiple'      => false,

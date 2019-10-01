@@ -47,6 +47,13 @@ class Gateway extends BaseGatewayConfig
      */
     private $label;
 
+    /**
+     * @ORM\Column(name="active", type="boolean")
+     *
+     * @var boolean $active
+     */
+    private $active;
+
     public function __toString()
     {
         return $this->label;
@@ -123,5 +130,29 @@ class Gateway extends BaseGatewayConfig
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     *
+     * @return Gateway
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Is active?
+     *
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
     }
 }

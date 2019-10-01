@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
@@ -41,6 +42,10 @@ class GatewayType extends AbstractType
                 'label'   => 'Configuration',
                 'required' => false,
             ))
+            ->add('active', CheckboxType::class, [
+                'label' => 'Active ?',
+                'required' => false,
+            ])
             ->add('Enregistrer', SubmitType::class)
         ;
     }

@@ -18,9 +18,10 @@
 {% block content %}
 {% for gateway in gateways %}
     <div class="card mb-2">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header {% if gateway.active %}bg-primary text-white{% else %}bg-light text-muted font-italic{% endif %}">
             <i class="fas fa-credit-card"></i>
             {{ gateway.label }}
+            {% if not gateway.active %} (inactive){% endif %}
         </div>
         <div class="card-body">
             <p class="card-text">Nom machine : {{ gateway.gatewayName }}</p>

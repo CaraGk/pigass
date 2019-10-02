@@ -5,54 +5,46 @@
 {% block headline %}{{ department.name }} à {{ department.hospital.name }}{% endblock %}
 
 {% block action %}
-<ul class="nav nav-tabs nav-stacked btn-group">
-        <li class="btn btn-primary">
-            <a href="#description" data-toggle="tab">
+<div class="nav nav-tabs nav-stacked btn-group">
+            <a class="btn btn-primary" href="#description" data-toggle="tab">
                 <i class='fas fa-info-sign'></i> Description
             </a>
-        </li>
-        <li class="btn btn-primary">
-            <a href="#hopital" data-toggle="tab">
+            <a class="btn btn-primary" href="#hopital" data-toggle="tab">
                 <i class='fas fa-home'></i> Structure de soins
             </a>
-        </li>
-        <li class="btn btn-primary">
-            <a href="#agrement" data-toggle="tab">
+            <a class="btn btn-primary" href="#agrement" data-toggle="tab">
                 <i class='fas fa-certificate'></i> Agréments
             </a>
-        </li>
         {% if clusters is not null %}
-            <li class="btn btn-primary">
-                <a href="#cluster" data-toggle="tab">
+                <a class="btn btn-primary" href="#cluster" data-toggle="tab">
                     <i class='fas fa-link'></i> Stage couplé
                 </a>
-            </li>
         {% endif %}
-        {% if param('eval_' ~ department.hospital.structure.slug ~ '_active') == true and (is_granted('ROLE_STUDENT') or is_granted('ROLE_SUPERTEACHER') or (is_granted('ROLE_TEACHER') and isSupervisor)) %}
-            <li class="btn btn-primary">
-                <a href="{{ path('GEval_DShow', {'slug': department.hospital.structure.slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les évaluations pour ce service">
+        {% if param('eval_' ~ department.hospital.structure.slug ~ '_active') == true and (
+            (is_granted('ROLE_STUDENT') and param('eval_' ~ department.hospital.structure.slug ~ '_nonmember' == false)
+            or is_granted('ROLE_MEMBER')
+            or is_granted('ROLE_SUPERTEACHER')
+            or (
+                is_granted('ROLE_TEACHER')
+                and isSupervisor
+                )
+            ) %}
+                <a class="btn btn-primary" href="{{ path('GEval_DShow', {'slug': department.hospital.structure.slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les évaluations pour ce service">
                     <i class='fas fa-stats'></i> Evaluations
                 </a>
-            </li>
         {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
-            <li class="btn btn-primary">
-                <a href="{{ path('GCore_PAPlacementIndex', {'slug': department.hospital.structure.slug, 'limit': { 'type': 'd.id', 'value': department.id, 'description': department.name ~ ' à ' ~ department.hospital.name }}) }}" title="Afficher les stages associés au service '{{ department.name }}'">
+                <a class="btn btn-primary" href="{{ path('GCore_PAPlacementIndex', {'slug': department.hospital.structure.slug, 'limit': { 'type': 'd.id', 'value': department.id, 'description': department.name ~ ' à ' ~ department.hospital.name }}) }}" title="Afficher les stages associés au service '{{ department.name }}'">
                     <i class='fas fa-list-alt'></i> Stages
                 </a>
-            </li>
-            <li class="btn btn-primary">
-                <a href="{{ path('GCore_PARepartitionsDepartment', {'slug': department.hospital.structure.slug, 'department_id': department.id}) }}" title="Modifier la répartition du service '{{ department }}'">
+                <a class="btn btn-primary" href="{{ path('GCore_PARepartitionsDepartment', {'slug': department.hospital.structure.slug, 'department_id': department.id}) }}" title="Modifier la répartition du service '{{ department }}'">
                     <i class='fas fa-briefcase'></i> Postes
                 </a>
-            </li>
-            <li class="delete btn btn-error">
-                <a href="{{ path('GCore_FSADeleteDepartment', {'slug': department.hospital.structure.slug, 'id': department.id, 'limit': limit }) }}" title="Supprimer le service '{{ department.name }}'" class="confirm delete" confirm="Attention ! Supprimer ce terrain de stage suprimera également toutes les données qui s'y rapportent (stages, évaluations, etc). Confirmez-vous la suppression ?">
+                <a class="btn btn-danger" href="{{ path('GCore_FSADeleteDepartment', {'slug': department.hospital.structure.slug, 'id': department.id, 'limit': limit }) }}" title="Supprimer le service '{{ department.name }}'" class="confirm delete" confirm="Attention ! Supprimer ce terrain de stage suprimera également toutes les données qui s'y rapportent (stages, évaluations, etc). Confirmez-vous la suppression ?">
                     <i class='fas fa-trash'></i> Supprimer
                 </a>
-            </li>
         {% endif %}
-</ul>
+</div>
 {% endblock %}
 
 {% block content %}

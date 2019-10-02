@@ -223,7 +223,7 @@ class MembershipRepository extends EntityRepository
     public function getCurrentForPersonArray()
     {
         $query = $this->createQueryBuilder('m')
-                      ->join('m.person', 's')
+                      ->join('m.person', 'p')
                       ->where('m.expiredOn > :now')
                       ->setParameter('now', new \DateTime('now'))
                       ->andWhere('m.payedOn is not NULL')

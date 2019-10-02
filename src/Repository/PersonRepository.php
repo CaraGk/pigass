@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * PersonRepository
@@ -36,32 +37,35 @@ class PersonRepository extends EntityRepository
                  ->getSingleResult();
   }
 
-  public function getAll($slug, $search = null)
+  public function getAll(Structure $structure, $search = null)
   {
     $query = $this->getBaseQuery();
-    $query->addOrderBy('s.surname', 'asc');
+    $query->addOrderBy('s.surname', 'asc')
+        ->where('s.structure = :structure')
+        ->setParameter('structure', $structure)
+    ;
 
     if ($search != null) {
-        $query->where('s.surname like :search')
-              ->orWhere('s.name like :search')
-              ->orWhere('u.email like :search')
+        $query->andWhere('s.surname like :search OR s.name like :search OR u.email like :search')
               ->setParameter('search', '%'.$search.'%');
     }
 
     return $query->getQuery();
   }
 
-    public function countAll($active = true, $search = null)
+    public function countAll(Structure $structure, $active = true, $search = null)
     {
         $query=$this->createQueryBuilder('s')
-            ->select('COUNT(s)');
+            ->select('COUNT(s)')
+            ->join('s.user', 'u')
+            ->where('s.structure = :structure')
+            ->setParameter('structure', $structure)
+        ;
 
-      if ($search != null) {
-          $query->where('s.surname like :search')
-                ->orWhere('s.name like :search')
-                ->orWhere('u.email like :search')
-                ->setParameter('search', '%'.$search.'%');
-      }
+        if ($search != null) {
+            $query->andWhere('s.surname like :search OR s.name like :search OR u.email like :search')
+                  ->setParameter('search', '%'.$search.'%');
+        }
 
         return $query->getQuery()
             ->getSingleScalarResult();

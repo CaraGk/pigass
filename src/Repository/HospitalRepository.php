@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * HospitalRepository
@@ -97,20 +98,24 @@ class HospitalRepository extends EntityRepository
         ;
     }
 
-    public function countAll()
+    public function countAll(Structure $structure)
     {
         return $this->createQueryBuilder('h')
-                    ->select('COUNT(h.id)')
-                    ->getQuery()
-                    ->getSingleScalarResult()
+            ->select('COUNT(h.id)')
+            ->where('h.structure = :structure')
+            ->setParameter('structure', $structure)
+            ->getQuery()
+            ->getSingleScalarResult()
         ;
     }
 
-    public function getAll()
+    public function getAll(Structure $structure)
     {
         return $this->createQueryBuilder('h')
             ->leftJoin('h.departments', 'd')
             ->addSelect('d')
+            ->where('h.structure = :structure')
+            ->setParameter('structure', $structure)
             ->getQuery()
             ->getResult()
         ;

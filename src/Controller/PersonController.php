@@ -54,27 +54,32 @@ class PersonController extends AbstractController
      * @Route("/{slug}/persons", name="user_person_index", requirements={"slug" = "\w+"})
      * @Template()
      */
-    public function indexAction(Request $request, $slug)
+    public function indexAction(Structure $structure, Request $request)
     {
-        if (!$this->security->isGranted('ROLE_ADMIN'))
+        $user = $this->getUser();
+        $person = $this->em->getRepository('App:Person')->getByUser($user);
+        if (!(
+            ($this->security->isGranted('ROLE_STRUCTURE') and $person->getStructure() === $structure)
+            or $this->security->isGranted('ROLE_ADMIN')
+        ))
             throw new AccessDeniedException();
 
-        $user = $this->getUser();
         $search = $request->query->get('search', null);
-        $persons_query = $this->em->getRepository('App:Person')->getAll($slug, $search);
-        $persons_count = $this->em->getRepository('App:Person')->countAll(true, $slug, $search);
+        $persons_query = $this->em->getRepository('App:Person')->getAll($structure, $search);
+        $persons_count = $this->em->getRepository('App:Person')->countAll($structure, true, $search);
         $persons = $persons_query->getResult();
 
         $member_list = null;
-        foreach ($members = $this->em->getRepository('App:Membership')->getCurrentForPersonArray($slug) as $member) {
+        foreach ($members = $this->em->getRepository('App:Membership')->getCurrentForPersonArray($structure->getSlug()) as $member) {
             $member_list[] = $member['id'];
         }
 
-    return array(
-      'persons'        => $persons,
-      'persons_count'  => $persons_count,
-      'search'         => $search,
-      'members'        => $member_list,
+        return array(
+            'structure'      => $structure,
+            'persons'        => $persons,
+            'persons_count'  => $persons_count,
+            'search'         => $search,
+            'members'        => $member_list,
     );
   }
 
@@ -279,6 +284,206 @@ class PersonController extends AbstractController
             'form'   => $form->createView(),
             'userid' => $userid,
         );
+    }
+
+  /**
+   * Import persons from file into a grade
+   *
+   * @Route("/import", name="user_person_import")
+   * @Template()
+   */
+  public function importAction(Request $request)
+  {
+    $error = null;
+    $listUsers = $this->em->getRepository('App:User')->getAllEmail();
+    $form = $this->createForm(new ImportType());
+    $form->handleRequest($request);
+
+    if ($form->isValid()) {
+        $fileConstraint = new File();
+        $fileConstraint->mimeTypes = array(
+            'application/vnd.oasis.opendocument.spreadsheet',
+            'application/octet-stream',
+            'application/vnd.ms-excel',
+            'application/msexcel',
+            'application/x-msexcel',
+            'application/x-ms-excel',
+            'application/x-excel',
+            'application/x-dos_ms_excel',
+            'application/xls',
+            'application/x-xls',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-office',
+        );
+        $errorList = $this->get('validator')->validate($form['file']->getData(), $fileConstraint);
+
+        if(count($errorList) == 0) {
+            $objPHPExcel = $this->get('phpexcel')->createPHPExcelObject($form['file']->getData())->setActiveSheetIndex();
+            if ($form['first_row']->getData() == true)
+                $first_row = 2;
+            else
+                $first_row = 1;
+            $persons_count = $first_row;
+            $persons_error = 0;
+            $newUsers = array();
+
+            while ($objPHPExcel->getCellByColumnAndRow($form['surname']->getData(), $persons_count)->getValue()) {
+                $person = new Person();
+                if ($form['title']->getData() != null)
+                   $person->setTitle($objPHPExcel->getCellByColumnAndRow($form['title']->getData(), $persons_count)->getValue());
+                $person->setSurname($objPHPExcel->getCellByColumnAndRow($form['surname']->getData(), $persons_count)->getValue());
+                $person->setName($objPHPExcel->getCellByColumnAndRow($form['name']->getData(), $persons_count)->getValue());
+                if ($form['birthday']->getData() != null) {
+                    $date = $objPHPExcel->getCellByColumnAndRow($form['birthday']->getData(), $persons_count)->getValue();
+                    $birthday = \PHPExcel_Shared_Date::ExcelToPHPObject($date);
+                    $person->setBirthday($birthday);
+                }
+                if ($form['birthplace']->getData() != null)
+                    $person->setBirthplace($objPHPExcel->getCellByColumnAndRow($form['birthplace']->getData(), $persons_count)->getValue());
+                if ($form['phone']->getData() != null)
+                    $person->setPhone($objPHPExcel->getCellByColumnAndRow($form['phone']->getData(), $persons_count)->getValue());
+                if ($form['ranking']->getData() != null)
+                    $person->setRanking($objPHPExcel->getCellByColumnAndRow($form['ranking']->getData(), $persons_count)->getValue());
+                if ($form['graduate']->getData() != null)
+                    $person->setGraduate($objPHPExcel->getCellByColumnAndRow($form['graduate']->getData(), $persons_count)->getValue());
+                $person->setAnonymous(false);
+                $person->setGrade($form['grade']->getData());
+
+                $user = new User();
+                $this->um->createUser();
+                $user->setEmail($objPHPExcel->getCellByColumnAndRow($form['email']->getData(), $persons_count)->getValue());
+                $user->setUsername($user->getEmail());
+                $user->setConfirmationToken(null);
+                $user->setEnabled(true);
+                $user->addRole('ROLE_STUDENT');
+                $user->generatePassword();
+                $person->setUser($user);
+
+                if (!(in_array(array("emailCanonical" => $user->getEmail()), $listUsers) || in_array($user->getEmail(), $newUsers))) {
+                    $this->em->persist($person);
+                    $this->um->updateUser($user);
+                    $newUsers[] = $user->getEmail();
+                } else {
+                    $this->session->getFlashBag()->add('error', $person->getName() . ' ' . $person->getSurname() . ' (' . $person->getUser()->getEmail() . ') : l\'utilisateur existe déjà dans la base de données.');
+                    $persons_error++;
+                }
+                $persons_count++;
+            }
+
+            $this->em->flush();
+
+            if ($persons_count - $first_row > 1) {
+                $message = $persons_count - $first_row . " lignes ont été traitées. ";
+            } elseif ($persons_count - $first_row == 1) {
+                $message = "Une ligne a été traitée. ";
+            } else {
+                $message = "Aucune ligne n'a été traitée.";
+            }
+            if ($persons_error) {
+                if ($persons_count - $first_row - $persons_error > 1) {
+                    $message .= $persons_count - $first_row - $persons_error . " étudiants ont été enregistrés dans la base de données. ";
+                } elseif ($persons_count - $first_row - $persons_error == 1) {
+                    $message .= "Un étudiant a été enregistré dans la base de données. ";
+                } else {
+                    $message .= "Aucun étudiant n'a été enregistré dans la base de données. ";
+                }
+                if ($persons_error > 1) {
+                    $message .= $persons_error . " doublons n'ont pas été ajoutés.";
+                } else {
+                    $message .= "Un doublon n'a pas été ajouté.";
+                }
+            } else {
+                $message .= $persons_count - $first_row . " étudiants ont été enregistrés dans la base de données. Il n'y a pas de doublons traités.";
+            }
+            $this->session->getFlashBag()->add('notice', $message);
+
+            return $this->redirect($this->generateUrl('GUser_SAIndex'));
+        } else {
+            $error = $errorList[0]->getMessage();
+        }
+    }
+
+    return array(
+        'form'  => $form->createView(),
+        'error' => $error,
+    );
+  }
+
+    /**
+     * View and do merge for person
+     *
+     * @Route("/merge", name="user_person_merge")
+     * @Template()
+     */
+    public function doMergeAction(Request $request)
+    {
+        $mergeArray = $this->session->get('merge', null);
+
+        if (!$mergeArray or !$mergeArray['orig']) {
+            $this->session->getFlashBag()->add('error', 'Il n\'y a pas de fusion d\'étudiant en cours');
+            return $this->redirect($this->generateUrl('GUser_SAIndex'));
+        }
+
+        $person_orig = $this->em->getRepository('App:Person')->find($mergeArray['orig']);
+        $person_dest = $this->em->getRepository('App:Person')->find($mergeArray['dest']);
+
+        if ($request->get('confirm', false)) {
+            /* Placement */
+            $placements = $this->em->getRepository('App:Placement')->findBy(array('person' => $mergeArray['orig']));
+            foreach ($placements as $placement) {
+                $placement->setPerson($person_dest);
+                $this->em->persist($placement);
+            }
+
+            /* Membership */
+            $memberships = $this->em->getRepository('App:Membership')->findBy(array('person' => $mergeArray['orig']));
+            foreach ($memberships as $membership) {
+                $membership->setPerson($person_dest);
+                $this->em->persist($membership);
+            }
+
+            /* Simperson */
+            $simulation = $this->em->getRepository('App:Simulation')->findOneBy(array('person' => $mergeArray['orig']));
+            if (isset($simulation)) {
+                $simulation->setPerson($person_dest);
+                $this->em->persist($simulation);
+            }
+
+            $this->em->flush();
+
+            /* Delete person_orig */
+            $this->em->remove($person_orig);
+            $this->em->remove($person_orig->getUser());
+            $this->em->flush();
+
+            $mergeArray['orig'] = null;
+            $this->session->set('merge', $mergeArray);
+
+            return $this->redirect($this->generateUrl('GUser_SAIndex'));
+        }
+
+        return array(
+            'orig'  => $person_orig,
+            'dest'  => $person_dest,
+            'merge' => $mergeArray,
+        );
+    }
+
+    /**
+     * Cancel merging and delete session's flags
+     *
+     * @Route("/merge/cancel", name="user_person_cancel_merge")
+     */
+    public function cancelMergeAction()
+    {
+        $mergeArray = $this->session->remove('merge');
+
+        if (!$mergeArray)
+            $this->session->getFlashBag()->add('warning', 'Aucun jeton de fusion d\'étudiants retrouvés');
+        else
+            $this->session->getFlashBag()->add('notice', 'Jetons de fusion d\'étudiants supprimés.');
+
+        return $this->redirect($this->generateUrl('GUser_SAIndex'));
     }
 
     /**

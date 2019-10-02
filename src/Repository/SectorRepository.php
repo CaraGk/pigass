@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * SectorRepository
@@ -38,6 +39,17 @@ class SectorRepository extends EntityRepository
 
       return $query->getQuery()
                    ->getOneOrNullResult()
+      ;
+  }
+
+  public function getAll(Structure $structure)
+  {
+      return $this->createQueryBuilder('s')
+          ->where('s.structure = :structure')
+          ->setParameter('structure', $structure)
+          ->orderBy('s.id')
+          ->getQuery()
+          ->getResult()
       ;
   }
 }

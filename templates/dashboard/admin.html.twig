@@ -42,8 +42,16 @@
             </div>
         </div>
     </div>
-{% endblock %}
 
-{% block javascripts %}
-  {{ parent() }}
+    <div class="card mt-3">
+        <div class="card-header bg-primary text-white text-center">Stages</div>
+        <div class="card-body">
+            <p class="card-text">
+            <a class="btn btn-primary" href="{{ path('user_person_index', {'slug': structure.slug}) }}" title="Afficher les étudiants">
+                    {{ modules.stage.count }} étudiants
+                </a>
+            </p>
+            <p>
+                {{ modules.stage.sectors|length }} promotions : {% for sector in modules.stage.sectors %}{% if not loop.first %}, {% endif %}{{ sector }}{% endfor %}
+            </p>
 {% endblock %}

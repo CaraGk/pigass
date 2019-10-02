@@ -4,28 +4,26 @@
 
 {% block headline %}
     Étudiants ({{ persons_count }})
-    <span><a href="{{ path('user_person_new') }}?{{ app.request.queryString }}" title="Ajouter un nouvel étudiant"><img src="{{ asset('bundles/pigasscore/images/Add.png') }}" alt="Ajouter" /></a></span>
 {% endblock %}
 
 {% block action %}
     {% if is_granted('ROLE_ADMIN') %}
-        <li class="btn btn-primary">
-            <a href="{{ path('user_person_import') }}" title="Importer une promotion d'internes">
+            <a class="btn btn-primary" href="{{ path('user_person_new') }}?{{ app.request.queryString }}" title="Ajouter un nouvel étudiant">
+                <i class="fas fa-plus"></i> Ajouter
+            </a>
+            <a class="btn btn-primary" href="{{ path('user_person_import') }}" title="Importer une promotion d'internes">
                 <i class='fas fa-folder-open'></i> Importer
             </a>
-        </li>
-        <li class="btn btn-primary">
-            <a href="{{ path('user_register_index') }}">
+            <a class="btn btn-primary" href="{{ path('user_register_index', {'slug': structure.slug}) }}">
                 <i class='fas fa-euro-sign'></i> Adhérents
             </a>
-        </li>
     {% endif %}
-    <li class="btn">
+    <div class="btn">
       <form>
           <i class='fas fa-search'></i>
           <input type="text" id="search" name="search" value="{{ search }}" />
       </form>
-    </li>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -33,66 +31,21 @@
         {% for person in persons %}
             <li class="entity person list-group-item">
                 <span class="float-right">
-                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown"><i class='fas fa-bars'></i> <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li class="action">
-                            <a href="{{ path('user_person_edit', {'id': person.id}) }}?{{ app.request.queryString }}#person_{{ person.id }}" title="Modifier l'étudiant '{{ person }}'" class="edit">
-                                <i class='fas fa-pencil-alt'></i> Modifier
-                            </a>
-                        </li>
-                        <li class="action">
-                            <a href="{{ path('user_person_delete', {'id': person.id}) }}?{{ app.request.queryString }}" title="Supprimer l'étudiant '{{ person }}'" class="confirm delete" confirm="Attention, vous allez supprimer l'étudiant et toutes les informations s'y rapportant ! Voulez-vous continuer ?">
-                                <i class='fas fa-trash'></i> Supprimer
-                            </a>
-                        </li>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            {% if 'ROLE_ADMIN' in person.user.roles %}
-                                <li class="action">
-                                    <a href="{{ path('user_person_demote', {'id': person.id}) }}?{{ app.request.queryString }}#person_{{ person.id }}" title="Démettre l'étudiant '{{ person }}'">
-                                        <i class='fas fa-star'></i> Démettre
-                                    </a>
-                                </li>
-                            {% else %}
-                                <li class="action">
-                                    <a href="{{ path('user_person_promote', {'id': person.id}) }}?{{ app.request.queryString }}#person_{{ person.id }}" title="Promouvoir l'étudiant '{{ person }}'">
-                                        <i class='fas fa-star-empty'></i> Promouvoir
-                                    </a>
-                                </li>
-                            {% endif %}
-                            <li class="action">
-                                <a href="{{ path('app_dashboard_user(', {'userid': person.user.id}) }}" title="Afficher les adhésions de '{{ person }}'">
-                                    <i class='fas fa-list'></i> Adhésions
-                                    {% if members is not null and person.id in members %}
-                                        <i class='fas fa-thumbs-up'></i>
-                                    {% endif %}
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="action"><img src="{{ asset('bundles/pigasscore/images/File_List.png') }}" alt="Adhésions" title="{{ person }} est adhérent." /></li>
-                        {% endif %}
-                    </ul>
+                    <a class="btn btn-primary" href="{{ path('app_dashboard_user', {'slug': structure.slug, 'userid': person.user.id}) }}?{{ app.request.queryString }}#person_{{ person.id }}" title="Afficher le tableau de bord de l'étudiant '{{ person }}'">
+                        <i class='fas fa-eye'></i> Voir
+                    </a>
                 </span>
-                <div class="field">
-                    <div class="contact">
-                        <div class="entity_title person_name">{{ person.surname }} {{ person.name }}</div>
-                        <div class="entity_item person_email"><a href="mailto:{{ person.user.email }}" title="Envoyer un email à {{ person.name }} {{ person.surname }}">{{ person.user.email }}</a></div>
-                        <div class="entity_item person_phone"><a href="tel:{{ person.phone }}" title="Téléphoner à {{ person.name }} {{ person.surname }}">{{ person.phone }}</a></div>
-                    </div>
-                    <div class="studies">
-                        <div class="entity_item person_grade">{{ person.grade }}</div>
-                        {% if param('simul_active') == true %}
-                            <div class="entity_item person_rank">Classement ECN : {{ person.ranking }} | Année ECN : {{ person.graduate }}</div>
-                        {% endif %}
-                    </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    {% if members is not null and person.id in members %}
+                        <i class='fas fa-user-check'></i>
+                    {% endif %}
+                    <span>{{ person.surname }} {{ person.name }}</span>
+                    <span class="entity_item person_grade">{{ person.grade }}</span>
                 </div>
+                {% if param('simul_' ~ structure.slug ~ '_active') == true %}
+                    <div class="entity_item person_rank">Classement ECN : {{ person.ranking }} | Année ECN : {{ person.graduate }}</div>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
-    <div class="pagination text-center">{{ knp_pagination_render(persons) }}</div>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('bundles/pigasscore/js/confirm.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('bundles/pigasscore/js/actions.js') }}" type="text/javascript"></script>
 {% endblock %}

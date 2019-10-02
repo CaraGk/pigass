@@ -105,6 +105,7 @@ class DashboardController extends AbstractController
     {
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
+        /* Adhésions */
         $date = new \DateTime($request->query->get('date', 'now'));
         $expire = $this->getExpirationDate($structure, $date);
 
@@ -139,6 +140,11 @@ class DashboardController extends AbstractController
             'next'     => $date->modify($periodicity)->format("Y-m-d"),
             'previous' => $date->modify('- ' . substr($periodicity, 1))->modify('- ' . substr($periodicity, 1))->format("Y-m-d"),
         ];
+
+        /* Stages */
+        $modules['stage']['count'] = $this->em->getRepository('App:Person')->countAll($structure, true);
+        $modules['stage']['sectors'] = $this->em->getRepository('App:Sector')->getAll($structure);
+        $modules['stage']['hospitals'] = $this->em->getRepository('App:Hospital')->countAll($structure);
 
         return [
             'structure' => $structure,

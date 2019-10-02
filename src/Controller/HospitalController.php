@@ -28,6 +28,7 @@ use App\Entity\Hospital,
 use App\Entity\Department,
     App\Form\DepartmentDescriptionType,
     App\FormHandler\DepartmentHandler;
+use App\Entity\Structure;
 
 /**
  * Hospital controller.
@@ -48,7 +49,7 @@ class HospitalController extends AbstractController
    * @Route("/{slug}/hospital/list", name="GCore_FSIndex")
    * @Template()
    */
-  public function indexAction($slug, Request $request)
+  public function indexAction(Structure $structure, Request $request)
   {
     $user = $this->getUser();
 
@@ -84,10 +85,10 @@ class HospitalController extends AbstractController
     }
 
     $hospitals = $this->em->getRepository('App:Hospital')->getAllWithDepartments($arg);
-    $orphaneds = $this->em->getRepository('App:Hospital')->getAll();
+    $orphaneds = $this->em->getRepository('App:Hospital')->getAll($structure);
 
     return array(
-        'slug'      => $slug,
+        'structure' => $structure,
         'hospitals' => $hospitals,
         'sectors'   => $sectors,
         'limit'     => $arg['limit'],

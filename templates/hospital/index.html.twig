@@ -16,12 +16,12 @@
 
 {% block action %}
     {% if is_granted('ROLE_ADMIN') %}
-            <a class="btn btn-primary mb-3" href="{{ path('GCore_FSANewHospital', {'slug': slug, 'slug': slug, 'limit': limit }) }}" title="Ajouter un nouvel hôpital">
+            <a class="btn btn-primary mb-3" href="{{ path('GCore_FSANewHospital', {'slug': structure.slug, 'slug': structure.slug, 'limit': limit }) }}" title="Ajouter un nouvel hôpital">
                 <i class="fas fa-plus"></i> Ajouter
             </a>
     {% endif %}
     {% for sector in sectors %}
-            <a class="btn btn-primary" href="{{ path('GCore_FSIndex', {'slug': slug, 'limit': {'slug': slug, 'type': 's.id', 'value': sector.id, 'description': sector.name}}) }}" title="Afficher les terrains de la catégorie {{ sector }}">
+            <a class="btn btn-primary" href="{{ path('GCore_FSIndex', {'slug': structure.slug, 'limit': {'slug': structure.slug, 'type': 's.id', 'value': sector.id, 'description': sector.name}}) }}" title="Afficher les terrains de la catégorie {{ sector }}">
                 <i class='fas fa-filter'></i> {{ sector }}
             </a>
     {% endfor %}
@@ -31,7 +31,7 @@
         {% for hospital in hospitals %}
         <div class="card {% if not loop.first %}mt-3{% endif %}">
                 <h2 class="card-header text-center entity_title hospital_name">
-                    <a href="{{ path('GCore_FSIndex', {'slug': slug, 'limit': {'slug': slug, 'type': 'h.id', 'value': hospital.id, 'description': hospital.name}}) }}" title="Afficher les terrains de stage de l'hôpital '{{ hospital.name }}'">
+                    <a href="{{ path('GCore_FSIndex', {'slug': structure.slug, 'limit': {'slug': structure.slug, 'type': 'h.id', 'value': hospital.id, 'description': hospital.name}}) }}" title="Afficher les terrains de stage de l'hôpital '{{ hospital.name }}'">
                         {{ hospital }}
                     </a>
                 </h2>
@@ -42,7 +42,7 @@
                             {% if is_granted('ROLE_ADMIN') or repartition.number > 0 %}
                             <li class="row subentity department {% if repartition.number < 1 %}notactive{% endif %}">
                                 <div class="col-sm-3 field subentity_title department_name">
-                                    <a href="{{ path('GCore_FSShowDepartment', {'slug': slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les informations du service '{{ department.name }}'">
+                                    <a href="{{ path('GCore_FSShowDepartment', {'slug': structure.slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les informations du service '{{ department.name }}'">
                                         {{ department.name }}
                                     </a>
                                 </div>
@@ -58,12 +58,12 @@
                                 </ul>
                                 <ul class="col-sm-2 field subentity_item department_sector">
                                     {% for accreditation in department.accreditations %}
-                                        <li><a href="{{ path('GCore_FSIndex', {'slug': slug, 'limit': {'slug': slug, 'type': 's.id', value: accreditation.sector.id, description: accreditation.sector.name}}) }}" title="Afficher les terrains de la catégorie {{ accreditation.sector }}">{{ accreditation.sector }}</a></li>
+                                        <li><a href="{{ path('GCore_FSIndex', {'slug': structure.slug, 'limit': {'slug': structure.slug, 'type': 's.id', value: accreditation.sector.id, description: accreditation.sector.name}}) }}" title="Afficher les terrains de la catégorie {{ accreditation.sector }}">{{ accreditation.sector }}</a></li>
                                     {% endfor %}
                                 </ul>
-                                {% if param('simul_' ~ slug ~ '_active') == true and is_granted('ROLE_STUDENT') %}
+                                {% if param('simul_' ~ structure.slug ~ '_active') == true and is_granted('ROLE_STUDENT') %}
                                     {% if repartition.cluster is not null %}
-                                        <div class="col-sm-2 field subentity_item department_cluster"><a href="{{ path('GCore_FSIndex', {'slug': slug, 'limit': {'slug': slug, 'type': 'r.cluster', value: repartition.cluster, description: repartition.cluster }}) }}" title="Afficher les terrains du cluster {{ repartition.cluster }}">Stage couplé</a></div>
+                                        <div class="col-sm-2 field subentity_item department_cluster"><a href="{{ path('GCore_FSIndex', {'slug': structure.slug, 'limit': {'slug': structure.slug, 'type': 'r.cluster', value: repartition.cluster, description: repartition.cluster }}) }}" title="Afficher les terrains du cluster {{ repartition.cluster }}">Stage couplé</a></div>
                                     {% else %}
                                         <div class="col-sm-2"> </div>
                                     {% endif %}
@@ -84,13 +84,13 @@
                 </ul>
                 {% if is_granted('ROLE_ADMIN') %}
                 <div class="card-footer btn-group text-center">
-                                <a class="btn btn-primary" href="{{ path('GCore_FSAEditHospital', {'slug': slug, 'id': hospital.id, 'limit': limit }) }}" title="Modifier l'hôpital '{{ hospital.name }}'" class="edit">
+                                <a class="btn btn-primary" href="{{ path('GCore_FSAEditHospital', {'slug': structure.slug, 'id': hospital.id, 'limit': limit }) }}" title="Modifier l'hôpital '{{ hospital.name }}'" class="edit">
                                     <i class='fas fa-pencil'></i> Modifier
                                 </a>
-                                <a class="btn btn-primary" href="{{ path('GCore_PAPlacementIndex', {'slug': slug, 'limit': { 'type': 'h.id', 'value': hospital.id, 'description': hospital.name }}) }}" title="Afficher les stages dans l'hôpital '{{ hospital.name }}'">
+                                <a class="btn btn-primary" href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': { 'type': 'h.id', 'value': hospital.id, 'description': hospital.name }}) }}" title="Afficher les stages dans l'hôpital '{{ hospital.name }}'">
                                     <i class='fas fa-list-alt'></i> Stages
                                 </a>
-                                <a class="btn btn-danger" href="{{ path('GCore_FSADeleteHospital', {'slug': slug, 'id': hospital.id, 'limit': limit }) }}" title="Supprimer l'hôpital '{{ hospital.name }}'" class="confirm delete" confirm="Attention ! Supprimer cet hôpital supprimera également tous les terrains de stage qui lui sont liés ainsi que les données qui s'y rapportent. Confirmez-vous la suppression ?">
+                                <a class="btn btn-danger" href="{{ path('GCore_FSADeleteHospital', {'slug': structure.slug, 'id': hospital.id, 'limit': limit }) }}" title="Supprimer l'hôpital '{{ hospital.name }}'" class="confirm delete" confirm="Attention ! Supprimer cet hôpital supprimera également tous les terrains de stage qui lui sont liés ainsi que les données qui s'y rapportent. Confirmez-vous la suppression ?">
                                     <i class='fas fa-trash'></i> Supprimer
                                 </a>
                     </div>
@@ -107,17 +107,17 @@
                         <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                         <ul class="dropdown-menu">
                             <li class="edit">
-                                <a href="{{ path('GCore_FSAEditHospital', {'slug': slug, 'id': hospital.id, 'limit': limit }) }}" title="Modifier l'hôpital '{{ hospital.name }}'" class="edit">
+                                <a href="{{ path('GCore_FSAEditHospital', {'slug': structure.slug, 'id': hospital.id, 'limit': limit }) }}" title="Modifier l'hôpital '{{ hospital.name }}'" class="edit">
                                     <i class='fas fa-pencil-alt'></i> Modifier
                                 </a>
                             </li>
                             <li class="list">
-                                <a href="{{ path('GCore_PAPlacementIndex', {'slug': slug, 'limit': { 'type': 'h.id', 'value': hospital.id, 'description': hospital.name }}) }}" title="Afficher les stages dans l'hôpital '{{ hospital.name }}'">
+                                <a href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': { 'type': 'h.id', 'value': hospital.id, 'description': hospital.name }}) }}" title="Afficher les stages dans l'hôpital '{{ hospital.name }}'">
                                     <i class='fas fa-list-alt'></i> Stages
                                 </a>
                             </li>
                             <li class="delete">
-                                <a href="{{ path('GCore_FSADeleteHospital', {'slug': slug, 'id': hospital.id, 'limit': limit }) }}" title="Supprimer l'hôpital '{{ hospital.name }}'" class="confirm delete" confirm="Attention ! Supprimer cet hôpital supprimera également tous les terrains de stage qui lui sont liés ainsi que les données qui s'y rapportent. Confirmez-vous la suppression ?">
+                                <a href="{{ path('GCore_FSADeleteHospital', {'slug': structure.slug, 'id': hospital.id, 'limit': limit }) }}" title="Supprimer l'hôpital '{{ hospital.name }}'" class="confirm delete" confirm="Attention ! Supprimer cet hôpital supprimera également tous les terrains de stage qui lui sont liés ainsi que les données qui s'y rapportent. Confirmez-vous la suppression ?">
                                     <i class='fas fa-trash'></i> Supprimer
                                 </a>
                             </li>
@@ -128,7 +128,7 @@
                     {% for department in hospital.departments %}
                         <li class="row subentity department notactive">
                             <div class="col-sm-3 field subentity_title department_name">
-                                <a href="{{ path('GCore_FSShowDepartment', {'slug': slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les informations du service '{{ department.name }}'">
+                                <a href="{{ path('GCore_FSShowDepartment', {'slug': structure.slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les informations du service '{{ department.name }}'">
                                     {{ department.name }}
                                 </a>
                             </div>

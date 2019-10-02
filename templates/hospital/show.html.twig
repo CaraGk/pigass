@@ -21,7 +21,7 @@
                 </a>
         {% endif %}
         {% if param('eval_' ~ department.hospital.structure.slug ~ '_active') == true and (
-            (is_granted('ROLE_STUDENT') and param('eval_' ~ department.hospital.structure.slug ~ '_nonmember' == false)
+            (is_granted('ROLE_STUDENT') and param('eval_' ~ department.hospital.structure.slug ~ '_nonmember') == false)
             or is_granted('ROLE_MEMBER')
             or is_granted('ROLE_SUPERTEACHER')
             or (

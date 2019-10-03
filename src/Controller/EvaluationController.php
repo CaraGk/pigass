@@ -64,7 +64,7 @@ class EvaluationController extends AbstractController
     {
         /* Vérification des droits ROLE_STUDENT sinon sélection uniquement des EvalCriteria où isPrivate == false */
         $user = $this->getUser();
-        if ($user->hasRole('ROLE_STUDENT') or $user->hasRole('ROLE_ADMIN')) {
+        if ($user->hasRole('ROLE_STUDENT') or $user->hasRole('ROLE_MEMBER') or $user->hasRole('ROLE_ADMIN')) {
             $limit['role'] = false;
 
             /* Vérification de l'évaluation de tous ses stages (sauf le courant) par l'étudiant */
@@ -99,7 +99,7 @@ class EvaluationController extends AbstractController
 
         $eval = $this->em->getRepository('App:Evaluation')->getByDepartment($department->getId(), $limit);
         $count_eval = $this->em->getRepository('App:Evaluation')->countByDepartment($department->getId(), $limit);
-        if (!$user->hasRole('ROLE_STUDENT') and $count_eval < $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_min')->getValue()) {
+        if (!($user->hasRole('ROLE_STUDENT') or $user->hasRole('ROLE_MEMBER')) and $count_eval < $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_min')->getValue()) {
             $eval = null;
         }
 

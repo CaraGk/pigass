@@ -93,12 +93,20 @@ class EvaluationType extends AbstractType
                     ));
                 } elseif ($criteria->getType() == 7) {
                     $options = explode('|', $criteria->getMore());
-                    $legend = '<span class="col-sm-6">' . $options[1] . '</span><span class="col-sm-6 right">' . $options[2] . '</span>';
+                    $legend = '<span>' . $options[1] . '</span><span>' . $options[2] . '</span>';
                     $builder->add('criteria_' . $criteria->getId(), RangeType::class, array(
                         'required'   => $criteria->isRequired(),
                         'label'      => $label,
-                        'attr'       => array('min' => 0, 'max' => 100,),
+                        'attr'       => [
+                            'min' => 0,
+                            'max' => 100,
+                        ],
                         'data'       => $options[0],
+                        'help'       => $legend,
+                        'help_html'  => true,
+                        'help_attr'  => [
+                            'class' => 'd-flex justify-content-between align-items-center',
+                        ],
                     ));
                 }
             }

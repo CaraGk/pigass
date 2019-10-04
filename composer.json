@@ -31,7 +31,7 @@
         "symfony/translation": "*",
         "symfony/twig-bundle": "*",
         "symfony/validator": "*",
-        "symfony/webpack-encore-pack": "^1.0",
+        "symfony/webpack-encore-bundle": "^1.6",
         "symfony/yaml": "*",
         "twbs/bootstrap": "^4.1",
         "twig/extensions": "^1.5",
@@ -85,7 +85,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "4.1.*"
+            "require": "4.3.*"
         }
     }
 }

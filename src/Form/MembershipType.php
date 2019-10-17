@@ -75,7 +75,6 @@ class MembershipType extends AbstractType
                     $builder->add('question_' . $question->getId(), TextareaType::class, array(
                         'required' => $this->admin?false:($question->isRequired()?true:false),
                         'trim'       => true,
-                        'max_length' => 250,
                         'label'      => $question->getName(),
                         'mapped'        => false,
                     ));

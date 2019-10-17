@@ -44,7 +44,6 @@ class MemberInfoType extends AbstractType
                 $builder->add('value', TextareaType::class, array(
                     'required' => $question->isRequired()?true:false,
                     'trim'       => true,
-                    'max_length' => 250,
                     'label'      => $question->getName(),
                 ));
             } elseif ($question->getType() == 3) {

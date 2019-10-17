@@ -34,7 +34,6 @@ class QuestionType extends AbstractType
                 $builder->add('question_' . $question->getId(), 'textarea', array(
                     'required'   => true,
                     'trim'       => true,
-                    'max_length' => 250,
                     'label'      => $question->getName(),
                 ));
             } elseif ($question->getType() == 3) {

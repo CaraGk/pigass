@@ -113,8 +113,8 @@ class MaintenanceController extends AbstractController
                 11 => array('setName' => 'reg_' . $slug . '_auto', 'setValue' => true, 'setActive' => true, 'setLabel' => 'Autoriser l\'enrgistrement direct sur le site', 'setCategory' => 'Module Adhesion', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
                 12 => array('setName' => 'eval_' . $slug . '_nonmember', 'setValue' => true, 'setActive' => true, 'setLabel' => 'Interdire l\'affichage des évaluations aux non-membres', 'setCategory' => 'Module Evaluation', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
                 13 => array('setName' => 'eval_' . $slug . '_min', 'setValue' => 3, 'setActive' => true, 'setLabel' => 'Nombre d\'évaluations minimal pour l\'affichage aux étudiants et enseignants', 'setCategory' => 'Module Evaluation', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
-                14 => array('setName' => 'eval_' . $slug . '_teacher', 'setValue' => true, 'setActive' => true, 'setLabel' => 'Autoriser l\'affichage des évaluations aux enseignants', 'setCategory' => 'Module Evaluation', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
-                15 => array('setName' => 'placement_' . $slug . '_active', 'setValue' => true, 'setActive' => true, 'setLabel' => 'Activer le module de gestion des stages', 'setCategory' => 'Module Stage', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
+                14 => array('setName' => 'eval_' . $slug . '_teacher', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Autoriser l\'affichage des évaluations aux enseignants', 'setCategory' => 'Module Evaluation', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
+                15 => array('setName' => 'placement_' . $slug . '_active', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Activer le module de gestion des stages', 'setCategory' => 'Module Stage', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
             );
 
             foreach ($parameters as $parameter) {

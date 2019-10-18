@@ -12,7 +12,7 @@
     {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
         <div class="card">
             <div class="card-header bg-primary text-white">
-                Pour accéder aux coordonnées des structures et aux différents services proposés, veuillez d'abord cliquer sur la structure de votre région sur la carte ci-contre.
+                Pour accéder aux services proposés, veuillez d'abord cliquer sur la structure de votre région sur la carte ci-contre.
                 Si vous disposez déjà d'un compte, veuillez vous identifier (en haut) pour accéder à votre tableau de bord récapitulatif.
             </div>
         </div>
@@ -63,7 +63,7 @@
                 {% endif %}
             </div>
             <div class="card-footer btn-group-vertical">
-                     {% if param('eval_' ~ structure.slug ~ '_active') %}
+                     {% if param('placement_' ~ structure.slug ~ '_active') %}
                         <a class="btn btn-primary" href="{{ path('GCore_FSIndex', {'slug': structure.slug}) }}" title="Afficher les terrains de stage de {{ structure.name }}">
                             <i class='fas fa-hospital'></i> Terrains de stage
                         </a>

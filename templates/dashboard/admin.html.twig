@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+    {% if param('reg_' ~ structure.slug ~ '_active') %}
     <div class="card">
         <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
@@ -42,7 +43,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if param('placement_' ~ structure.slug ~ '_active') %}
     <div class="card mt-3">
         <div class="card-header bg-primary text-white text-center">Stages</div>
         <div class="card-body">
@@ -54,4 +57,7 @@
             <p>
                 {{ modules.stage.sectors|length }} promotions : {% for sector in modules.stage.sectors %}{% if not loop.first %}, {% endif %}{{ sector }}{% endfor %}
             </p>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

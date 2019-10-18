@@ -9,8 +9,16 @@
 {% endblock %}
 
 {% block content %}
-    {% if param('reg_' ~ structure.slug ~ '_active') %}
     <div class="card">
+        <div class="card-header bg-primary text-white text-center">Adminstrateurs de {{ structure.name }}</div>
+        <div class="card-body">
+            {% for admin in modules.users.structure %}
+            <a class="card-link" href="{{ path('app_dashboard_user', {'slug': structure.slug, 'userid': admin.user.id}) }}">{{ admin }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% if param('reg_' ~ structure.slug ~ '_active') %}
+    <div class="card mt-3">
         <div class="card-header bg-primary text-white text-center">Adhésions</div>
         <div class="card-body">
             <p class="card-text">

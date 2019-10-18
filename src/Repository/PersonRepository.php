@@ -138,4 +138,22 @@ class PersonRepository extends EntityRepository
         $str = str_replace('-', ' ', $str);
         return $str;
     }
+
+    public function getByRole($role, Structure $structure = null)
+    {
+        $query = $this->getBaseQuery()
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%' . $role . '%')
+        ;
+
+        if ($structure)
+            $query->andWhere('s.structure = :structure_id')
+                ->setParameter('structure_id', $structure->getId())
+            ;
+
+        return $query
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

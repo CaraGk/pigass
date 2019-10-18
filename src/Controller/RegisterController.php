@@ -184,7 +184,7 @@ class RegisterController extends AbstractController
                 if ($view == 'index')
                     return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
                 else
-                    return $this->redirect($this->generateUrl('app_dashboard_user(', array('slug' => $slug, 'userid' => $userid)));
+                    return $this->redirect($this->generateUrl('app_dashboard_user', array('slug' => $slug, 'userid' => $userid)));
         } else {
             $options = [
                 'payment'     => $this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_payment')->getValue(),
@@ -229,7 +229,7 @@ class RegisterController extends AbstractController
                 if ($view == 'index')
                     return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
                 else
-                    return $this->redirect($this->generateUrl('app_dashboard_user(', array('slug' => $slug, 'userid' => $userid)));
+                    return $this->redirect($this->generateUrl('app_dashboard_user', array('slug' => $slug, 'userid' => $userid)));
             }
         }
 
@@ -255,7 +255,7 @@ class RegisterController extends AbstractController
         $this->em->persist($membership);
         $this->em->flush();
 
-        return $this->redirect($this->generateUrl('app_dashboard_user(', ['slug' => $user_structure->getSlug(), 'userid' => $membership->getPerson()->getUser()->getId()]));
+        return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $user_structure->getSlug(), 'userid' => $membership->getPerson()->getUser()->getId()]));
     }
 
     /**
@@ -304,7 +304,7 @@ class RegisterController extends AbstractController
         if ($view == 'index')
             return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
         else
-            return $this->redirect($this->generateUrl('app_dashboard_user(', array('userid' => $userid, 'slug' => $slug)));
+            return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $userid, 'slug' => $slug)));
     }
 
     /**
@@ -742,7 +742,7 @@ class RegisterController extends AbstractController
                     if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE') and $current_membership->getStructure()->getSlug() == $slug)) {
                         return $this->redirect($this->generateUrl('user_register_index', ["slug" => $slug]));
                     } else {
-                        return $this->redirect($this->generateUrl('app_dashboard_user(', ["userid" => $userid]));
+                        return $this->redirect($this->generateUrl('app_dashboard_user', ["userid" => $userid]));
                     }
                 }
             } else {
@@ -837,7 +837,7 @@ class RegisterController extends AbstractController
 
         if(!$user->getConfirmationToken()) {
             $this->session->getFlashBag()->add('error', 'Cet utilisateur n\'a pas de jeton de confirmation défini. Est-il déjà validé ? Contactez un administrateur si nécessaire.');
-            return $this->redirect($this->generateUrl('app_dashboard_user('));
+            return $this->redirect($this->generateUrl('app_dashboard_user'));
         }
 
         $url = $this->generateUrl('fos_user_registration_confirm', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -861,7 +861,7 @@ class RegisterController extends AbstractController
         if ($adminUser = $this->getUser() and ($adminUser->hasRole('ROLE_ADMIN') or $adminUser->hasRole('ROLE_STRUCTURE')))
             return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
         else
-            return $this->redirect($this->generateUrl('app_dashboard_user('));
+            return $this->redirect($this->generateUrl('app_dashboard_user'));
     }
 
     /**
@@ -1011,7 +1011,7 @@ class RegisterController extends AbstractController
     /**
      * List own memberships action
      *
-     * @Route("/member/list", name="app_dashboard_user(")
+     * @Route("/member/list", name="app_register_list")
      * @Template()
      */
     public function listAction(Request $request)
@@ -1068,7 +1068,7 @@ class RegisterController extends AbstractController
 
         if (!$membership) {
             $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
-            return $this->redirect($this->generateUrl('app_dashboard_user('));
+            return $this->redirect($this->generateUrl('app_dashboard_user'));
         }
 
         if ($membership->getStatus() == "validated") {
@@ -1097,7 +1097,7 @@ class RegisterController extends AbstractController
             $filter['user'] = $membership->getPerson()->getUser()->getId();
             $this->session->set('user_register_filter', $filter);
 
-            return $this->redirect($this->generateUrl('app_dashboard_user(', [
+            return $this->redirect($this->generateUrl('app_dashboard_user', [
                 'gateway' => $membership->getMethod()->getGatewayName(),
                 'memberid' => $membership->getId(),
             ]));
@@ -1123,7 +1123,7 @@ class RegisterController extends AbstractController
 
         if (!$membership) {
             $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
-            return $this->redirect($this->generateUrl('app_dashboard_user('));
+            return $this->redirect($this->generateUrl('app_dashboard_user'));
         }
 
         $memberinfos = $this->em->getRepository('App:MemberInfo')->getByMembership($person, $membership);

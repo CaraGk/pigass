@@ -209,6 +209,28 @@ class MaintenanceController extends AbstractController
         $this->em->flush();
 
         $this->session->getFlashBag()->add('notice', $count . ' droits corrigés en base de données.');
+        return $this->redirect($this->generateUrl('core_maintenance_correct_db_persons'));
+    }
+
+    /**
+     * Correct missing structure for person
+     *
+     * @Route("/db/persons", name="core_maintenance_correct_db_persons")
+     */
+    public function correctDBPersonsAction()
+    {
+        $count = 0;
+        $persons = $this->em->getRepository('App:Person')->findBy(['structure' => null]);
+        foreach ($persons as $person) {
+            if ($membership = $this->em->getRepository('App:Membership')->getLastForPerson($person)) {
+                $person->setStructure($membership->getStructure());
+                $this->em->persist($person);
+                $count++;
+            }
+        }
+        $this->em->flush();
+
+        $this->session->getFlashBag()->add('notice', $count . ' utilisateurs corrigés en base de données.');
         return $this->redirect($this->generateUrl('core_structure_map'));
     }
 }

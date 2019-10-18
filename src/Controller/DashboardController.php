@@ -44,7 +44,7 @@ class DashboardController extends AbstractController
      *
      * @Route("/{slug}/user", name="app_dashboard_user", requirements={"slug" = "\w+"})
      * @Template
-     * @security("is_granted('ROLE_PERSON') or is_granted('ROLE_STUDENT')")
+     * @security("is_granted('ROLE_PERSON') or is_granted('ROLE_STUDENT') or is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')")
      */
     public function user(Structure $structure, Request $request)
     {
@@ -105,6 +105,10 @@ class DashboardController extends AbstractController
     {
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
+        /* Adminsitrateurs */
+        $modules['users']['superadmins'] = $this->em->getRepository('App:Person')->getByRole('ROLE_ADMIN', null);
+        $modules['users']['structure'] = $this->em->getRepository('App:Person')->getByRole('ROLE_STRUCTURE', $structure);
+
         /* Adhésions */
         $date = new \DateTime($request->query->get('date', 'now'));
         $expire = $this->getExpirationDate($structure, $date);
@@ -164,8 +168,12 @@ class DashboardController extends AbstractController
     {
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
+        $modules['users']['superadmins'] = $this->em->getRepository('App:Person')->getByRole('ROLE_ADMIN', null);
+
         $structures = $this->em->getRepository('App:Structure')->getAll(true);
         foreach ($structures as $structure) {
+            $modules['users']['structures'][$structure->getSlug()] = $this->em->getRepository('App:Person')->getByRole('ROLE_STRUCTURE', $structure);
+
             $modules['adhesion']['count_validated']['structures'][$structure->getSlug()] = count($this->em->getRepository('App:Membership')->getCurrentByStructure($structure->getSlug(), [
                 'valid'     => true,
                 'isCounted' => true,

@@ -177,7 +177,7 @@ class PersonController extends AbstractController
         $this->um->updateUser($user);
 
         $this->session->getFlashBag()->add('notice', 'Droits d\'administration donnés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('app_dashboard_user(', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
+        return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**
@@ -198,7 +198,7 @@ class PersonController extends AbstractController
         $this->um->updateUser($user);
 
         $this->session->getFlashBag()->add('notice', 'Droits d\'administration retirés à l\'individu "' . $person . '"');
-        return $this->redirect($this->generateUrl('app_dashboard_user(', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
+        return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**

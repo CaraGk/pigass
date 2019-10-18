@@ -66,7 +66,7 @@
         <div class="card-header bg-primary text-white text-center">Informations personnelles</div>
         <div class="card-body">
             <p class="card-text p-0 m-0"><i class="fas fa-user"></i> {{ person.title }} {{ person.surname }} {{ person.name }}</p>
-            {% set age = date().diff(person.birthday) %}
+            {% if person.birthday %}{% set age = date().diff(person.birthday) %}{% else %}{% set age = date().diff(date()) %}{% endif %}
             <p class="card-text p-0 m-0"><i class="fas fa-birthday-cake"></i> {{ person.birthday|date('d/m/Y') }} à {{ person.birthplace }} ({{ (age.days/365)|round(0, 'floor') }} ans)</p>
             <p class="card-text p-0 m-0 mt-2"><i class='fas fa-phone'></i> {{ person.phone }}</p>
             <p class="card-text p-0 m-0"><i class='fas fa-home'></i> {% for item in person.address %} {{ item }} {% endfor %}</p>

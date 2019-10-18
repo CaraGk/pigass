@@ -7,7 +7,7 @@
 {% block action %}
     {% if ato == true %}
         <li class="btn btn-primary">
-            <a href="{{ path('app_dashboard_user(', {'skip': true, 'userid': person.user.id}) }}" title="Passer cette étape">
+            <a href="{{ path('app_dashboard_user', {'skip': true, 'userid': person.user.id}) }}" title="Passer cette étape">
                 <i class='fas fa-fast-forward'></i> Passer
             </a>
         </li>

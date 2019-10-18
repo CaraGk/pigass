@@ -73,6 +73,22 @@ final class Version20190811173211 extends AbstractMigration
         $this->addSql('ALTER TABLE person ADD CONSTRAINT FK_34DCD1762534008B FOREIGN KEY (structure_id) REFERENCES structure (id)');
         $this->addSql('CREATE INDEX IDX_34DCD176FE19A1A8 ON person (grade_id)');
         $this->addSql('CREATE INDEX IDX_34DCD1762534008B ON person (structure_id)');
+        $this->addSql('ALTER TABLE parameter ADD activates_at DATETIME DEFAULT NULL, ADD expires_at DATETIME DEFAULT NULL');
+    }
+
+    public function postUp(Schema $schema)
+    {
+        $this->connection->exec('UPDATE fee SET is_counted = true WHERE 1');
+        $this->connection->exec("INSERT INTO parameter (name, value, active, label, category, type) VALUES ('general_title', 'Site d\'exemple', 1, 'Nom du site', 'General', 1)");
+        $this->connection->exec("INSERT INTO parameter (name, value, active, label, category, type, more) VALUES ('general_show', 'logo', 1, 'Afficher le logo ou le titre en entête ?', 'General', 3, 'a:4:{s:4:\"none\";s:5:\"Aucun\";s:4:\"logo\";s:4:\"Logo\";s:5:\"title\";s:5:\"Titre\";s:4:\"both\";s:8:\"Les deux\";}')");
+        $this->connection->exec("INSERT INTO parameter (name, value, active, label, category, type) VALUES ('general_color', '#000000', 1, 'Couleur de fond en entête ?', 'General', 1)");
+    }
+
+    public function preDown(Schema $schema)
+    {
+        $this->connection->exec("DELETE FROM parameter WHERE name='general_title'");
+        $this->connection->exec("DELETE FROM parameter WHERE name='general_show'");
+        $this->connection->exec("DELETE FROM parameter WHERE name='general_color'");
     }
 
     public function down(Schema $schema) : void
@@ -120,5 +136,6 @@ final class Version20190811173211 extends AbstractMigration
         $this->addSql('DROP INDEX IDX_34DCD1762534008B ON person');
         $this->addSql('ALTER TABLE person DROP grade_id, DROP structure_id, DROP ranking, DROP graduate');
         $this->addSql('ALTER TABLE structure CHANGE address address LONGTEXT NOT NULL COLLATE utf8_unicode_ci COMMENT \'(DC2Type:array)\'');
+        $this->addSql('ALTER TABLE parameter DROP activates_at, DROP expires_at');
     }
 }

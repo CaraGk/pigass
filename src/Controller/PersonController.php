@@ -256,7 +256,7 @@ class PersonController extends AbstractController
         $user = $this->getUser();
         $userid = $request->query->get('userid', null);
         $person = $this->testAdminTakeOver($user, $userid);
-        $redirect = $request->query->get('redirect', 'app_dashboard_user');
+        $redirect = $request->query->get('redirect', 'app_dashboard_user', ['slug' => $person->getStructure()->getSlug()]);
         $slug = $request->query->get('slug');
 
         if (!$person)

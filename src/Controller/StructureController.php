@@ -73,7 +73,7 @@ class StructureController extends AbstractController
             }
 
             if ($user->hasRole('ROLE_MEMBER')) {
-                return $this->redirect($this->generateUrl('app_dashboard_user'));
+                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
             }
         } else {
             return $this->redirect($this->generateUrl('core_structure_map'));

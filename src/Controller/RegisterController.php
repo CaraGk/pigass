@@ -742,7 +742,7 @@ class RegisterController extends AbstractController
                     if ($user->hasRole('ROLE_ADMIN') or ($user->hasRole('ROLE_STRUCTURE') and $current_membership->getStructure()->getSlug() == $slug)) {
                         return $this->redirect($this->generateUrl('user_register_index', ["slug" => $slug]));
                     } else {
-                        return $this->redirect($this->generateUrl('app_dashboard_user', ["userid" => $userid]));
+                        return $this->redirect($this->generateUrl('app_dashboard_user', ["userid" => $userid, 'slug' => $slug]));
                     }
                 }
             } else {
@@ -837,7 +837,7 @@ class RegisterController extends AbstractController
 
         if(!$user->getConfirmationToken()) {
             $this->session->getFlashBag()->add('error', 'Cet utilisateur n\'a pas de jeton de confirmation défini. Est-il déjà validé ? Contactez un administrateur si nécessaire.');
-            return $this->redirect($this->generateUrl('app_dashboard_user'));
+            return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
         }
 
         $url = $this->generateUrl('fos_user_registration_confirm', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -861,7 +861,7 @@ class RegisterController extends AbstractController
         if ($adminUser = $this->getUser() and ($adminUser->hasRole('ROLE_ADMIN') or $adminUser->hasRole('ROLE_STRUCTURE')))
             return $this->redirect($this->generateUrl('user_register_index', ['slug' => $slug]));
         else
-            return $this->redirect($this->generateUrl('app_dashboard_user'));
+            return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
     }
 
     /**
@@ -1068,7 +1068,7 @@ class RegisterController extends AbstractController
 
         if (!$membership) {
             $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
-            return $this->redirect($this->generateUrl('app_dashboard_user'));
+            return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $membership->getStructure()->getSlug()]));
         }
 
         if ($membership->getStatus() == "validated") {
@@ -1099,7 +1099,8 @@ class RegisterController extends AbstractController
 
             return $this->redirect($this->generateUrl('app_dashboard_user', [
                 'gateway' => $membership->getMethod()->getGatewayName(),
-                'memberid' => $membership->getId(),
+                    'memberid' => $membership->getId(),
+                'slug' => $membership->getStructure()->getSlug(),
             ]));
 	}
 
@@ -1123,7 +1124,7 @@ class RegisterController extends AbstractController
 
         if (!$membership) {
             $this->session->getFlashBag()->add('error', 'Adhésion inconnue.');
-            return $this->redirect($this->generateUrl('app_dashboard_user'));
+            return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $membership->getStructure()->getSlug()]));
         }
 
         $memberinfos = $this->em->getRepository('App:MemberInfo')->getByMembership($person, $membership);

@@ -61,9 +61,9 @@ class ParameterController extends AbstractController
         if (!$structure)
             throw $this->createNotFoundException('Impossible de trouver une structure correspondante.');
 
-        $parameters = $this->em->getRepository('App:Parameter')->findBy(['structure' => $structure->getId(), 'active' => true]);
+        $parameters = $this->em->getRepository('App:Parameter')->getBySlug($structure->getSlug());
 
-        $form = $this->createForm(ParametersType::class, $parameters, array('parameters' => $parameters));
+        $form = $this->createForm(ParametersType::class, $parameters, ['parameters' => $parameters]);
         $formHandler = new ParametersHandler($form, $request, $this->em, $parameters);
 
         if ( $formHandler->process() ) {

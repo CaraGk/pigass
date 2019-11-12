@@ -33,6 +33,9 @@ class ParameterRepository extends EntityRepository
         $query = $this->createQueryBuilder('p')
             ->where('p.name like :slug')
             ->setParameter('slug', '%' . $slug . '%')
+            ->addOrderBy('p.structure', 'asc')
+            ->addOrderBy('p.category', 'asc')
+            ->addOrderBy('p.name', 'asc')
             ;
 
         return $query->getQuery()

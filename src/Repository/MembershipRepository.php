@@ -93,10 +93,19 @@ class MembershipRepository extends EntityRepository
                 ->andWhere('n.person IS NULL')
             ;
         } elseif ($expiration) {
-            $query
-                ->andWhere('m.expiredOn = :expiration')
-                ->setParameter('expiration', $expiration)
-            ;
+            if (is_array($expiration))
+            {
+                $query
+                    ->andWhere('m.expiredOn = :expiration_first OR m.expiredOn = :expiration_second')
+                    ->setParameter('expiration_first', $expiration[0])
+                    ->setParameter('expiration_second', $expiration[1])
+                    ;
+            } else {
+                $query
+                    ->andWhere('m.expiredOn = :expiration')
+                    ->setParameter('expiration', $expiration)
+                ;
+            }
         }
 
         if (isset($filter['valid'])) {

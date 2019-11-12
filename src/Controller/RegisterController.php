@@ -130,10 +130,15 @@ class RegisterController extends AbstractController
             $expire_string = $this->getExpirationDate($structure, $date, true)->format('Y-m-d') . '|' . $expire->format('Y-m-d');
         }
 
-        if ($filters['search'])
+        $last_expire = clone $expire;
+        $reg_periodicity = $this->em->getRepository('App:Parameter')->findByName('reg_' . $structure->getSlug() . '_periodicity')->getValue();
+        if ($filters['search']) {
             $memberships = $this->em->getRepository('App:Membership')->getByStructure($slug, null, $filters, $anticipated);
-        else
+        } elseif (!$request->query->get('date', false) and $last_expire->modify(str_replace('+', '-', $reg_periodicity)) > new \DateTime('now')) {
+            $memberships = $this->em->getRepository('App:Membership')->getByStructure($slug, [clone $last_expire, $last_expire->modify($reg_periodicity)], $filters, $anticipated);
+        } else {
             $memberships = $this->em->getRepository('App:Membership')->getByStructure($slug, $expire, $filters, $anticipated);
+        }
         $count = count($memberships);
 
         return array(
@@ -1102,7 +1107,7 @@ class RegisterController extends AbstractController
                     'memberid' => $membership->getId(),
                 'slug' => $membership->getStructure()->getSlug(),
             ]));
-	}
+        }
 
         return array(
             'form'       => $form->createView(),

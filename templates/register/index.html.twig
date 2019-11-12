@@ -187,7 +187,9 @@
                 </div>
             {% elseif membership.status == 'registered' and membership.payedOn is not null %}
                 <div class="text-danger" title="Adhésion incomplète : manque la validation du paiement">
-                    <i class='fas fa-euro-sign'></i> Paiement par {{ membership.method.label|lower }} du {{ membership.payedOn|date('d/m/Y') }} non validé (tarif alternatif).
+                    <i class='fas fa-euro-sign'></i> Paiement par {{ membership.method.label|lower }} du {{ membership.payedOn|date('d/m/Y') }} non validé
+                    {% if membership.fee.default == false %} (tarif alternatif : {{membership.fee.title}}){% endif %}
+                    .
                 </div>
             {% elseif membership.status == 'registered' %}
                 <div class="text-danger" title="Adhésion incomplète : manque le paiement">

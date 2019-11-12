@@ -125,11 +125,13 @@ class PaymentController extends Controller
                 }
 
                 $this->addFlash('warning', 'L\'adhésion ne pourra être validée qu\'une fois le paiement reçu.');
-                $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount(true) . ' est à libeller à l\'ordre de ' . (isset($config['payableTo'])?$config['payableTo']:'non défini') . ' et à retourner à l\'adresse ' . $address . '.');
-                if (isset($config['iban'])) {
-                    $this->addFlash('notice', 'Pour un paiement par virement bancaire : l\'IBAN du compte est ' . $config['iban'] . '. N\'oubliez pas de préciser « Adhésion ' . $membership->getPerson()->getSurname() . ' ' . $membership->getPerson()->getName() . ' » en commentaire.');
-                } else {
-                    $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
+                if (!isset($config['external'])) {
+                    $this->addFlash('notice', 'Pour un paiement par chèque : le chèque de ' . $membership->getAmount(true) . ' est à libeller à l\'ordre de ' . (isset($config['payableTo'])?$config['payableTo']:'non défini') . ' et à retourner à l\'adresse ' . $address . '.');
+                    if (isset($config['iban'])) {
+                        $this->addFlash('notice', 'Pour un paiement par virement bancaire : l\'IBAN du compte est ' . $config['iban'] . '. N\'oubliez pas de préciser « Adhésion ' . $membership->getPerson()->getSurname() . ' ' . $membership->getPerson()->getName() . ' » en commentaire.');
+                    } else {
+                        $this->addFlash('notice', 'Pour un paiement par virement : veuillez contacter la structure pour effectuer le virement.');
+                    }
                 }
                 if ($toPrintParam) {
                     $this->addFlash('warning', 'Attention : pour que votre adhésion soit validée, il faut également que vous imprimiez la fiche d\'adhésion et que vous la retourniez signée à l\'adresse ' . $structure->getPrintableAddress() . '.');
@@ -190,6 +192,10 @@ class PaymentController extends Controller
                 ->setBody($this->renderView('payment/confirm_member.txt.twig', $params, 'text/plain'))
             ;
             $this->get('mailer')->send($sendmail);
+
+            if (isset($config['external'])) {
+                return $this->redirect($config['external']);
+            }
 
             if (!$this->checker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
                 $user = $membership->getPerson()->getUser();

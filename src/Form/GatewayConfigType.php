@@ -50,6 +50,11 @@ class GatewayConfigType extends AbstractType
         ->add('iban', TextType::class, array(
             'required' => false,
         ))
+        ->add('external', TextType::class, array(
+            'label'    => 'Lien de paiement externe',
+            'required' => false,
+            'help'     => 'https://lien-vers-le-site-de-paiement',
+        ))
         ;
     }
 

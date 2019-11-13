@@ -76,7 +76,15 @@
         {% endif %}
     {% if fees is not null %}
         <div class="btn btn-sm btn-light btn-sm">
-            <div class="title">Type d'adhésion</div>
+            <div class="title">
+                {% if filters['fee'] is not null %}
+                    <a href="{{ path('user_register_filter_remove', {'type': 'fee', 'id': 0, 'slug': slug}) }}" title="Suprimer le filtre d'adhésion : {{ fee.title }}">
+                        Type d'adhésion
+                    </a>
+                {% else %}
+                    Type d'adhésion
+                {% endif %}
+            </div>
             {% for fee in fees %}
                 {% if filters['fee'] == fee.id %}
                     <div class="item">
@@ -96,7 +104,15 @@
     {% endif %}
     {% for question in questions %}
         <div class="btn btn-sm btn-light btn-sm">
-            <div class="title">{{ question.short }}</div>
+            <div class="title">
+                {% if filters['question'][question.id] is defined %}
+                    <a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">
+                        {{ question.short }}
+                    </a>
+                {% else %}
+                    {{ question.short }}
+                {% endif %}
+            </div>
             {% if filters['questions'][question.id] is defined %}
             <div class="item">
                 <a href="{{ path('user_register_filter_remove', {'type': 'questions', 'id': question.id, 'slug': slug}) }}" title="Suprimer le filtre {{ question.name }} : {{ filters['questions'][question.id] }}">

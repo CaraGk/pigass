@@ -84,96 +84,96 @@ class MembershipRepository extends EntityRepository
             ;
         }
 
-        if (isset($filter['expiration']) and is_array($filter['expiration'])) {
-            $query
-                ->andWhere('m.expiredOn = :expiration')
-                ->setParameter('expiration', $filter['expiration'][0])
-                ->leftJoin('p.memberships', 'n', 'WITH', 'n.expiredOn = :filter')
-                ->setParameter('filter', $filter['expiration'][1])
-                ->andWhere('n.person IS NULL')
-            ;
-        } elseif ($expiration) {
-            if (is_array($expiration))
-            {
-                $query
-                    ->andWhere('m.expiredOn = :expiration_first OR m.expiredOn = :expiration_second')
-                    ->setParameter('expiration_first', $expiration[0])
-                    ->setParameter('expiration_second', $expiration[1])
-                    ;
-            } else {
-                $query
-                    ->andWhere('m.expiredOn = :expiration')
-                    ->setParameter('expiration', $expiration)
-                ;
-            }
-        }
-
-        if (isset($filter['valid'])) {
-            if ($filter['valid'])
-                $query->andWhere('m.payedOn IS NOT NULL');
-            elseif ($filter['valid'] == false)
-                $query->andWhere('m.payedOn IS NULL');
-        }
-
-        if (isset($filter['ending']) and $anticipated) {
-            if ($filter['ending'] == true) {
-                $query
-                    ->andWhere('m.expiredOn < :anticipated')
-                    ->setParameter('anticipated', $anticipated)
-                ;
-            } elseif($filter['ending'] == false) {
-                $query
-                    ->andWhere('m.expiredOn > :anticipated')
-                    ->setParameter('anticipated', $anticipated)
-                ;
-            }
-        }
-
-        if (isset($filter['fee']) and $filter['fee']) {
-            $query
-                ->andWhere('m.fee = :fee')
-                ->setParameter('fee', $filter['fee'])
-            ;
-        }
-
-        if (isset($filter['gateway']) and $filter['gateway']) {
-            $query
-                ->join('m.method', 'g')
-                ->addSelect('g')
-                ->andWhere('g.gatewayName = :gateway')
-                ->setParameter('gateway', $filter['gateway'])
-            ;
-        }
-
-        if (isset($filter['questions']) and $filter['questions']) {
-            $query
-                ->join('m.infos', 'i')
-                ->join('i.question', 'q')
-            ;
-            foreach ($filter['questions'] as $question_id => $value) {
-                $query
-                    ->andWhere('q.id = :question_id')
-                    ->setParameter('question_id', $question_id)
-                    ->andWhere('i.value = :info_value')
-                    ->setParameter('info_value', $value)
-                ;
-            }
-        }
-
         if (isset($filter['search']) and $filter['search']) {
             $query
                 ->andWhere('p.surname like :search OR p.name like :search OR u.email like :search')
                 ->setParameter('search', '%' . $filter['search'] . '%')
                 ->addOrderBy('m.expiredOn', 'desc')
             ;
-        }
+        } else {
+            if (isset($filter['expiration']) and is_array($filter['expiration'])) {
+                $query
+                    ->andWhere('m.expiredOn = :expiration')
+                    ->setParameter('expiration', $filter['expiration'][0])
+                    ->leftJoin('p.memberships', 'n', 'WITH', 'n.expiredOn = :filter')
+                    ->setParameter('filter', $filter['expiration'][1])
+                    ->andWhere('n.person IS NULL')
+                ;
+            } elseif ($expiration) {
+                if (is_array($expiration))
+                {
+                    $query
+                        ->andWhere('m.expiredOn = :expiration_first OR m.expiredOn = :expiration_second')
+                        ->setParameter('expiration_first', $expiration[0])
+                        ->setParameter('expiration_second', $expiration[1])
+                        ;
+                } else {
+                    $query
+                        ->andWhere('m.expiredOn = :expiration')
+                        ->setParameter('expiration', $expiration)
+                    ;
+                }
+            }
 
-        if (isset($filter['isCounted'])) {
-            $query
-                ->join('m.fee', 'f')
-                ->andWhere('f.counted = :isCounted')
-                ->setParameter('isCounted', $filter['isCounted'])
-            ;
+            if (isset($filter['valid'])) {
+                if ($filter['valid'])
+                    $query->andWhere('m.payedOn IS NOT NULL');
+                elseif ($filter['valid'] == false)
+                    $query->andWhere('m.payedOn IS NULL');
+            }
+
+            if (isset($filter['ending']) and $anticipated) {
+                if ($filter['ending'] == true) {
+                    $query
+                        ->andWhere('m.expiredOn < :anticipated')
+                        ->setParameter('anticipated', $anticipated)
+                    ;
+                } elseif($filter['ending'] == false) {
+                    $query
+                        ->andWhere('m.expiredOn > :anticipated')
+                        ->setParameter('anticipated', $anticipated)
+                    ;
+                }
+            }
+
+            if (isset($filter['fee']) and $filter['fee']) {
+                $query
+                    ->andWhere('m.fee = :fee')
+                    ->setParameter('fee', $filter['fee'])
+                ;
+            }
+
+            if (isset($filter['gateway']) and $filter['gateway']) {
+                $query
+                    ->join('m.method', 'g')
+                    ->addSelect('g')
+                    ->andWhere('g.gatewayName = :gateway')
+                    ->setParameter('gateway', $filter['gateway'])
+                ;
+            }
+
+            if (isset($filter['questions']) and $filter['questions']) {
+                $query
+                    ->join('m.infos', 'i')
+                    ->join('i.question', 'q')
+                ;
+                foreach ($filter['questions'] as $question_id => $value) {
+                    $query
+                        ->andWhere('q.id = :question_id')
+                        ->setParameter('question_id', $question_id)
+                        ->andWhere('i.value = :info_value')
+                        ->setParameter('info_value', $value)
+                    ;
+                }
+            }
+
+            if (isset($filter['isCounted'])) {
+                $query
+                    ->join('m.fee', 'f')
+                    ->andWhere('f.counted = :isCounted')
+                    ->setParameter('isCounted', $filter['isCounted'])
+                ;
+            }
         }
 
         return $query;

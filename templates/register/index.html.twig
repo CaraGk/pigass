@@ -78,7 +78,7 @@
         <div class="btn btn-sm btn-light btn-sm">
             <div class="title">
                 {% if filters['fee'] is not null %}
-                    <a href="{{ path('user_register_filter_remove', {'type': 'fee', 'id': 0, 'slug': slug}) }}" title="Suprimer le filtre d'adhésion : {{ fee.title }}">
+                    <a href="{{ path('user_register_filter_remove', {'type': 'fee', 'id': 0, 'slug': slug}) }}" title="Suprimer le filtre d'adhésion">
                         Type d'adhésion
                     </a>
                 {% else %}

@@ -30,6 +30,10 @@
                     </a>
                 </li>
             {% endif %}
+        {% elseif modules.adhesion.recent is null %}
+            <li class="btn btn-danger">
+                <i class="fas fa-warning"></i> Aucune adhésion
+            </li>
         {% elseif modules.adhesion.recent.status == "excluded" %}
             <li class="btn btn-danger">
                 <i class='fas fa-skull-crossbones'></i>&nbsp; Adhésion révoquée &nbsp;<i class='fas fa-skull-crossbones'></i>

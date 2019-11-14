@@ -43,7 +43,7 @@
                 Adhésion en cours
             </li>
         {% endif %}
-        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (modules.adhesion.recent == false or modules.adhesion.recent.status != "excluded") %}
+        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (modules.adhesion.recent is null or modules.adhesion.recent.status != "excluded") %}
             <li class="btn btn-primary">
                 {% if 'ROLE_STRUCTURE' in person.user.roles %}
                     <a href="{{ path('user_person_demote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">

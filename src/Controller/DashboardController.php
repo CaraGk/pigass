@@ -74,6 +74,7 @@ class DashboardController extends AbstractController
                 $modules['adhesion']['rejoinable'] = true;
         } else {
             $modules['adhesion']['rejoinable'] = true;
+            $modules['adhesion']['recent'] = null;
         }
 
         /* Load memberships */

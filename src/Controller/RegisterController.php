@@ -253,7 +253,7 @@ class RegisterController extends AbstractController
     {
         $user_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($this->em->getRepository('App:Person')->getByUser($this->getUser()));
         $user_structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $user_membership->getStructure()->getSlug()]);
-        if (!$this->security->isGranted('ROLE_STRUCTURE') or $user_structure !== $membership->getStructure())
+        if (!($this->security->isGranted('ROLE_STRUCTURE') and ($user_structure == $membership->getStructure() or $membership->getStructure() == null)) and !$this->security->isGranted('ROLE_ADMIN'))
             throw new AccessDeniedException();
 
         $membership->setStatus('excluded');

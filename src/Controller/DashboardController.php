@@ -44,7 +44,7 @@ class DashboardController extends AbstractController
      *
      * @Route("/{slug}/user", name="app_dashboard_user", requirements={"slug" = "\w+"})
      * @Template
-     * @security("is_granted('ROLE_PERSON') or is_granted('ROLE_STUDENT') or is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')")
+     * @security("is_granted('ROLE_MEMBER') or is_granted('ROLE_STUDENT') or is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')")
      */
     public function user(Structure $structure, Request $request)
     {

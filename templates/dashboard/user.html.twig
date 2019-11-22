@@ -16,61 +16,14 @@
             <i class="fas fa-arrow-left"></i> {{ person }}
         </a>
     {% endif %}
-    {% if structure.slug is not null %}
-        {% if modules.adhesion.rejoinable == true %}
-            <li class="btn btn-primary">
-                <a href="{{ path('user_register_register', {'slug': structure.slug, 'rejoin': true}) }}&{{ app.request.queryString }}">
-                    <i class='fas fa-euro-sign'></i> Ré-adhérer
-                </a>
-            </li>
-            {% if 'ROLE_STRUCTURE' not in person.user.roles %}
-                <li class="btn btn-primary">
-                    <a href="{{ path('core_structure_map') }}" title="Adhérer à une autre structure">
-                        <i class='fas fa-euro-sign'></i> Autre structure
-                    </a>
-                </li>
-            {% endif %}
-        {% elseif modules.adhesion.recent is null %}
-            <li class="btn btn-danger">
-                <i class="fas fa-warning"></i> Aucune adhésion
-            </li>
-        {% elseif modules.adhesion.recent.status == "excluded" %}
-            <li class="btn btn-danger">
-                <i class='fas fa-skull-crossbones'></i>&nbsp; Adhésion révoquée &nbsp;<i class='fas fa-skull-crossbones'></i>
-            </li>
-        {% else %}
-            <li class="btn btn-warning">
-                Adhésion en cours
-            </li>
-        {% endif %}
-        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (modules.adhesion.recent is null or modules.adhesion.recent.status != "excluded") %}
-            <li class="btn btn-primary">
-                {% if 'ROLE_STRUCTURE' in person.user.roles %}
-                    <a href="{{ path('user_person_demote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
-                        <i class='fas fa-star'></i> Démettre
-                    </a>
-                {% else %}
-                    <a href="{{ path('user_person_promote', {'id': person.id, 'slug': structure.slug}) }}" title="Ajouter des droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
-                        <i class='fas fa-star-half'></i> Promouvoir
-                    </a>
-                {% endif %}
-            </li>
-        {% endif %}
-    {% else %}
-        <li class="btn btn-primary">
-            <a href="{{ path('core_structure_map') }}">
-                <i class='fas fa-euro-sign'></i> Adhérer
-            </a>
-        </li>
-    {% endif %}
 {% endblock %}
 
 {% block content %}
     <div class="card">
         <div class="card-header bg-primary text-white text-center">
             Informations personnelles
-            {% if (is_granted("ROLE_STRUCTURE") or is_granted("ROLE_ADMIN")) and person.user.enabled == 0 %}
-            <span class="float-right badge badge-warning badge-sm">inactif</span>
+            {% if person.user.enabled == 0 %}
+                <span class="float-right badge badge-warning badge-sm">inactif</span>
             {% endif %}
         </div>
         <div class="card-body">
@@ -79,7 +32,16 @@
             <p class="card-text p-0 m-0"><i class="fas fa-birthday-cake"></i> {{ person.birthday|date('d/m/Y') }} à {{ person.birthplace }} ({{ (age.days/365)|round(0, 'floor') }} ans)</p>
             <p class="card-text p-0 m-0 mt-2"><i class='fas fa-phone'></i> {{ person.phone }}</p>
             <p class="card-text p-0 m-0"><i class='fas fa-home'></i> {% for item in person.address %} {{ item }} {% endfor %}</p>
-            <p class="card-text p-0 m-0"><i class='fas fa-envelope'></i> {{ person.user.email }}</p>
+            {% if person.user.enabled == 0 %}
+                <p class="card-text text-muted p-0 m-0">
+                    <i class='fas fa-envelope'></i> {{ person.user.email }}
+                    <a class="btn btn-sm btn-warning float-right" href="{{ path('user_register_confirmation_send', {'email': person.user.email, 'slug': structure.slug}) }}" title="Compte non activé : renvoyer l'email d'activation">
+                        Adresse non confirmée
+                    </a>
+                </p>
+            {% else %}
+                <p class="card-text p-0 m-0"><i class='fas fa-envelope'></i> {{ person.user.email }}</p>
+            {% endif %}
         </div>
         <div class="card-footer text-center">
             <a class="btn btn-primary btn-sm" href="{{ path('user_person_edit_me') }}?{{ app.request.queryString }}" title="Modifier">
@@ -93,35 +55,80 @@
 
     {% if param('reg_' ~ structure.slug ~ '_active') %}
     <div class="card mt-3">
-        <div class="card-header bg-primary text-white text-center">Adhésions</div>
+        <div class="card-header bg-primary text-white text-center">
+            Adhésions
+            {% if modules.adhesion.recent is null %}
+                <span class="badge badge-sm badge-danger float-right">
+                    <i class="fas fa-exclamation-circle"></i> Aucune adhésion
+                </span>
+            {% elseif modules.adhesion.recent.status == "excluded" %}
+                <span class="badge badge-sm badge-danger float-right">
+                    <i class='fas fa-skull-crossbones'></i>&nbsp; Adhésion révoquée &nbsp;<i class='fas fa-skull-crossbones'></i>
+                </span>
+            {% elseif modules.adhesion.recent.status != "validated" %}
+                <span class="badge badge-sm badge-danger float-right">
+                    <i class="fas fa-exclamation-triangle"></i> Adhésion incomplète
+                </span>
+            {% elseif modules.adhesion.rejoinable == true %}
+                <span class="badge badge-sm badge-warning float-right">
+                    <i class='fas fa-skull-hourglass-end'></i> Fin de validité
+                </span>
+            {% else %}
+                <li class="badge badge-sm badge-success float-right">
+                    Adhésion en cours
+                </li>
+            {% endif %}
+        </div>
         <ul class="card-body card-columns">
         {% for membership in modules.adhesion.memberships %}
             <li class="card">
                 <div class="card-header text-center">
                     {% if membership.structure.logoName is not null %}
-                        <img src="{{ asset(vich_uploader_asset(membership.structure, 'logoFile')) }}" alt="{{ membership.structure.logoName }}" class="logo"/>
+                        <img src="{{ asset(vich_uploader_asset(membership.structure, 'logoFile')) }}" alt="{{ membership.structure.logoName }}" class="logo" title="{{ membership.structure.name }}"/>
+                    {% else %}
+                        {{ membership.structure.name }}
                     {% endif %}
-                    {{ membership.structure.name }}
                 </div>
                 <div class="card-body">
-                    <p class="card-text p-0 m-0"><i class="fas fa-calendar-times"></i> <i class="fas fa-long-arrow-alt-right"></i> {{ membership.expiredOn|date('d/m/Y') }}</p>
-                    <p class="card-text p-0 m-0"><i class="fas fa-euro-sign"></i> {{ (membership.amount/100)|number_format(2,',',' ') }} € par {{ membership.method.label|lower }}
                     {% if membership.payedOn is not null %}
-                    le {{ membership.payedOn|date('d/m/Y') }}.</p>
-                    {% else %}
-                        . <span class="text-danger">La transaction na pas été validée.</span></p>
+                        <p class="card-text p-0 m-0" title="Adhésion enregistrée le {{ membership.payedOn|date('d/m/Y') }}">
+                            <i class="fas fa-calendar-check"></i> <i class="fas fa-long-arrow-alt-left"></i> {{ membership.payedOn|date('d/m/Y') }}.
+                        </p>
+                    {% endif %}
+                    <p class="card-text p-0 m-0" title="Fin d'adhésion le {{ membership.expiredOn|date('d/m/Y') }}">
+                        <i class="fas fa-calendar-times"></i> <i class="fas fa-long-arrow-alt-right"></i> {{ membership.expiredOn|date('d/m/Y') }}
+                    </p>
+                    <p class="card-text p-0 m-0">
+                        <i class="fas fa-euro-sign"></i> {{ (membership.amount/100)|number_format(2,',',' ') }} €
+                    </p>
+                    <p class="card-text p-0 m-0">
+                        <i class="fas fa-money-bill-wave"></i>
+                        {% if membership.method is not null %}
+                            {{ membership.method.label|lower }}
+                        {% else %}
+                            un moyen de paiement inconnu
+                        {% endif %}
+                    </p>
+                    {% if membership.status == "registered" %}
+                        <p class="card-text text-danger p-0 m-0">
+                            <i class="fas fa-exclamation-triangle"></i> La transaction na pas été validée.
+                        </p>
                         {% if membership.method.config['address']['city'] is defined and membership.method.config['address']['city'] is not null %}
                             <p class="card-text p-0 m-0" title="Chèque à l'ordre de {{ membership.method.config['payableTo'] }} ; {{ membership.method.config['address']['number'] }} {{ membership.method.config['address']['type'] }} {{ membership.method.config['address']['street'] }}, {{ membership.method.config['address']['complement'] }}, {{ membership.method.config['address']['code'] }} {{ membership.method.config['address']['city'] }}, {{ membership.method.config['address']['country'] }}">
                                 <i class='fas fa-globe'></i> Chèque à l'ordre de {{ membership.method.config['payableTo'] }} ; {{ membership.method.config['address']['number'] }} {{ membership.method.config['address']['type'] }} {{ membership.method.config['address']['street'] }}, {{ membership.method.config['address']['complement'] }}, {{ membership.method.config['address']['code'] }} {{ membership.method.config['address']['city'] }}, {{ membership.method.config['address']['country'] }}
                             </p>
                         {% endif %}
-                        {% if membership.method.config['iban'] is defined and not null %}
+                        {% if membership.method.config['iban'] is defined and membership.method.config['iban'] is not null %}
                             <p class="card-text p-0 m-0" title="IBAN : {{ membership.method.config['iban'] }}">
                                 <i class='fas fa-comment'></i>IBAN : {{ membership.method.config['iban'] }}
                             </p>
                         {% endif %}
+                        {% if membership.method.config['external'] is defined and membership.method.config['external'] is not null %}
+                            <a class="card-link p-0 m-0" href="{{ membership.method.config['external'] }}" title="Payer via le lien externe">
+                                <i class="fas fa-euro-sign"></i> Payer maintenant
+                            </a>
+                        {% endif %}
                     {% endif %}
-                    </p>
                 </div>
                 <div class="card-footer text-center">
                     <div class="btn-group-vertical">
@@ -205,7 +212,23 @@
         {% else %}
             <li class="card">Aucune adhésion enregistrée.</li>
         {% endfor %}
-    </ul>
+        </ul>
+        <div class="card-footer text-center">
+            {% if modules.adhesion.rejoinable == true %}
+                <a class="btn btn-primary" href="{{ path('user_register_register', {'slug': structure.slug, 'rejoin': true}) }}&{{ app.request.queryString }}">
+                    <i class='fas fa-euro-sign'></i> Ré-adhérer
+                </a>
+                {% if 'ROLE_STRUCTURE' not in person.user.roles %}
+                    <a class="btn btn-primary" href="{{ path('core_structure_map') }}" title="Adhérer à une autre structure">
+                        <i class='fas fa-euro-sign'></i> Autre structure
+                    </a>
+                {% endif %}
+            {% elseif modules.adhesion.recent is null %}
+                <a class="btn btn-primary btn-sm" href="{{ path('core_structure_map') }}">
+                    <i class='fas fa-euro-sign'></i> Adhérer
+                </a>
+            {% endif %}
+        </div>
     </div>
     {% endif %}
 
@@ -267,6 +290,19 @@
             {% else %}
             Aucun rôle enregistré.
             {% endfor %}
+        </div>
+        <div class="card-footer text-center">
+            {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (modules.adhesion.recent is null or modules.adhesion.recent.status != "excluded") %}
+                {% if 'ROLE_STRUCTURE' in person.user.roles %}
+                    <a class="btn btn-primary btn-sm" href="{{ path('user_person_demote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                            <i class='fas fa-star'></i> Démettre
+                    </a>
+                {% else %}
+                    <a class="btn btn-primary btn-sm" href="{{ path('user_person_promote', {'id': person.id, 'slug': structure.slug}) }}" title="Ajouter des droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                        <i class='fas fa-star-half'></i> Promouvoir
+                    </a>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
     {% endif %}

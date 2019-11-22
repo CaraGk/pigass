@@ -158,9 +158,10 @@
                                 <i class='fas fa-skull-crossbones'></i> Exclure
                             </a>
                         {% endif %}
-                        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and membership.payment is not null %}
+                        {% if is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN') %}
+                            {% if membership.payment is not null %}
                             <a class="btn btn-primary btn-sm" href="#" data-toggle="modal" data-target="#payment_{{ membership.id }}" title="Afficher le détail du paiement">
-                                <i class="fas fa-euro-sign"></i>Détails
+                                <i class="fas fa-euro-sign"></i> Détails
                             </a>
                             <div class="modal fade" id="payment_{{ membership.id }}" tabindex="-1" role="dialog" aria-labelledby="payment_{{ membership.id }}_label" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -187,6 +188,11 @@
                                     </div>
                                 </div>
                             </div>
+                            {% else %}
+                            <a class="btn btn-primary btn-sm" href="#" title="Aucune information concernant le paiement">
+                                <i class="fas fa-euro-sign"></i> Aucun détail
+                            </a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

@@ -158,6 +158,36 @@
                                 <i class='fas fa-skull-crossbones'></i> Exclure
                             </a>
                         {% endif %}
+                        {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and membership.payment is not null %}
+                            <a class="btn btn-primary btn-sm" href="#" data-toggle="modal" data-target="#payment_{{ membership.id }}" title="Afficher le détail du paiement">
+                                <i class="fas fa-euro-sign"></i>Détails
+                            </a>
+                            <div class="modal fade" id="payment_{{ membership.id }}" tabindex="-1" role="dialog" aria-labelledby="payment_{{ membership.id }}_label" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">{{ membership.payment.description }}</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <ul class="list-group">
+                                                {% for id,detail in membership.payment.details %}
+                                                    {% if "Completed" in detail or "Valid" in detail or "Success" in detail or "Confirmed" in detail %}
+                                                        <li class="list-group-item list-group-item-success">{{ id }} : {{ detail }}</li>
+                                                    {% elseif "Error" in detail or "false" in detail %}
+                                                        <li class="list-group-item list-group-item-danger">{{ id }} : {{ detail }}</li>
+                                                    {% else %}
+                                                        <li class="list-group-item">{{ id }} : {{ detail }}</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </li>
@@ -229,4 +259,9 @@
         </div>
     </div>
     {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent()  }}
+
 {% endblock %}

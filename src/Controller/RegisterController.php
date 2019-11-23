@@ -141,6 +141,17 @@ class RegisterController extends AbstractController
         }
         $count = count($memberships);
 
+        $mails = "";
+        $last_mail = "";
+        foreach ($memberships as $membership) {
+            $current_mail = $membership->getPerson()->getUser()->getEmail();
+            if ($last_mail != $current_mail) {
+                $mails .= $current_mail . ', ';
+                $last_mail = $current_mail;
+            }
+        }
+        $mails = substr($mails, 0, -2);
+
         return array(
             'memberships' => $memberships,
             'filters'     => $filters,
@@ -149,6 +160,7 @@ class RegisterController extends AbstractController
             'slug'        => $slug,
             'fees'        => count($fees)>1?$fees:null,
             'expire'      => $expire_string,
+            'mails'       => $mails,
         );
     }
 

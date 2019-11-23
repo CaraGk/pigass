@@ -23,9 +23,9 @@
         <a class="btn btn-primary" href="{{ path('user_register_register', {'slug': slug}) }}" title ="Ajouter un adhérent">
             <i class='fas fa-user-plus'></i> Ajouter
         </a>
-        <a class="btn btn-primary" href="{{ path('user_person_export', {'slug': slug}) }}" title="Afficher la liste des e-mails">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#mailExport">
             <i class='fas fa-envelope'></i> Liste des e-mails
-        </a>
+        </button>
         <form class="btn btn-light">
             <div class="input-group">
                 <span class="input-group-addon">
@@ -232,9 +232,34 @@
         <li class="list-group-item">Aucune adhésion enregistrée.</li>
     {% endfor %}
     </ul>
+
+    <div class="modal fade" id="mailExport" tabindex="-1" role="dialog" aria-labelledby="mailExportTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mailExportTitle">Export des adresse e-mail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="showlist" class="export">{{ mails }}</textarea>
+                </div>
+                <div class="modal-footer text-center">
+                    Séparateur :
+                    <select id="separator" class="">
+                        <option value=", " selected>,</option>
+                        <option value=" ; ">;</option>
+                        <option value="retour">À la ligne</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('bundles/pigassregister/js/filter.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/pigassuser/js/switchSeparator.js') }}" type="text/javascript"></script>
 {% endblock %}

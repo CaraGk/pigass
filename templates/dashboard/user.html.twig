@@ -294,12 +294,23 @@
         <div class="card-footer text-center">
             {% if (is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')) and (modules.adhesion.recent is null or modules.adhesion.recent.status != "excluded") %}
                 {% if 'ROLE_STRUCTURE' in person.user.roles %}
-                    <a class="btn btn-primary btn-sm" href="{{ path('user_person_demote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
-                            <i class='fas fa-star'></i> Démettre
+                    <a class="btn btn-danger btn-sm" href="{{ path('user_person_demote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                            <i class='fas fa-trash'></i> Administration
                     </a>
                 {% else %}
                     <a class="btn btn-primary btn-sm" href="{{ path('user_person_promote', {'id': person.id, 'slug': structure.slug}) }}" title="Ajouter des droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
-                        <i class='fas fa-star-half'></i> Promouvoir
+                        <i class='fas fa-star'></i> Administration
+                    </a>
+                {% endif %}
+            {% endif %}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% if 'ROLE_ADMIN' in person.user.roles %}
+                    <a class="btn btn-danger btn-sm" href="{{ path('user_person_superdemote', {'id': person.id, 'slug': structure.slug}) }}" title="Retirer les droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                            <i class='fas fa-trash'></i> Superadmin
+                    </a>
+                {% else %}
+                    <a class="btn btn-warning btn-sm" href="{{ path('user_person_superpromote', {'id': person.id, 'slug': structure.slug}) }}" title="Ajouter des droits d'administration de la structure {{ structure.slug }} à l'utilisateur">
+                        <i class='fas fa-jedi'></i> Superadmin
                     </a>
                 {% endif %}
             {% endif %}

@@ -74,7 +74,7 @@
     <div class="card mt-3">
         <div class="card-header bg-primary text-white text-center">Adminstrateurs</div>
         <ul class="list-group list-goup-flush">
-            <li class="list-group-item"><i class="fas fa-jedi"> </i>Superadmins : {% for admin in modules.users.superadmins %}<a class="card-link" href="{{ path('app_dashboard_user', {'slug': 'none', 'userid': admin.user.id}) }}">{{ admin }}</a>{% endfor %}</li>
+            <li class="list-group-item"><i class="fas fa-jedi"> </i>Superadmins : {% for admin in modules.users.superadmins %}<a class="card-link" href="{{ path('app_dashboard_user', {'slug': admin.structure.slug, 'userid': admin.user.id}) }}">{{ admin }}</a>{% endfor %}</li>
             {% for structure_name, structure_admins in modules.users.structures %}
             <li class="list-group-item"><i class="fas fa-star"> </i>{{ structure_name }} : {% for admin in structure_admins %}<a class="card-link" href="{{ path('app_dashboard_user', {'slug': structure_name, 'userid': admin.user.id}) }}">{{ admin }}</a>{% endfor %}</li>
             {% endfor %}

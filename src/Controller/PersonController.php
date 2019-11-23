@@ -162,7 +162,7 @@ class PersonController extends AbstractController
     }
 
     /**
-     * Promote a person to higher rights
+     * Promote a person to local admin rights
      *
      * @Route("/{slug}/person/{id}/promote", name="user_person_promote", requirements={"slug" = "\w+", "id" = "\d+"})
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
@@ -176,12 +176,12 @@ class PersonController extends AbstractController
 
         $this->um->updateUser($user);
 
-        $this->session->getFlashBag()->add('notice', 'Droits d\'administration donnés à l\'individu "' . $person . '"');
+        $this->session->getFlashBag()->add('notice', 'Droits d\'administration locale donnés à l\'individu "' . $person . '"');
         return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 
     /**
-     * Demote a person to lower rights
+     * Demote a person from local admin rights
      *
      * @Route("/{slug}/person/{id}/demote", name="user_person_demote", requirements={"slug" = "\w+", "id" = "\d+"})
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
@@ -197,7 +197,43 @@ class PersonController extends AbstractController
 
         $this->um->updateUser($user);
 
-        $this->session->getFlashBag()->add('notice', 'Droits d\'administration retirés à l\'individu "' . $person . '"');
+        $this->session->getFlashBag()->add('notice', 'Droits d\'administration locale retirés à l\'individu "' . $person . '"');
+        return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
+    }
+
+    /**
+     * Promote a person to global admin rights
+     *
+     * @Route("/{slug}/person/{id}/superpromote", name="user_person_superpromote", requirements={"slug" = "\w+", "id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
+     * @Security("is_granted('ROLE_ADMIN')")
+     */
+    public function superPromoteAction(Structure $structure, Person $person, Request $request)
+    {
+        $user = $person->getUser();
+        $user->addRole('ROLE_ADMIN');
+
+        $this->um->updateUser($user);
+
+        $this->session->getFlashBag()->add('warning', 'Droits d\'administration globale donnés à l\'individu "' . $person . '"');
+        return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
+    }
+
+    /**
+     * Demote a person from global admin rights
+     *
+     * @Route("/{slug}/person/{id}/superdemote", name="user_person_superdemote", requirements={"slug" = "\w+", "id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
+     * @Security("is_granted('ROLE_ADMIN')")
+     */
+    public function superDemoteAction(Structure $structure, Person $person, Request $request)
+    {
+        $user = $person->getUser();
+        $user->removeRole('ROLE_ADMIN');
+
+        $this->um->updateUser($user);
+
+        $this->session->getFlashBag()->add('notice', 'Droits d\'administration globale retirés à l\'individu "' . $person . '"');
         return $this->redirect($this->generateUrl('app_dashboard_user', array('userid' => $user->getId(), 'slug' => $structure->getSlug())));
     }
 

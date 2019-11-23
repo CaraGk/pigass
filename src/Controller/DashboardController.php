@@ -169,8 +169,10 @@ class DashboardController extends AbstractController
     {
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
+        /* Administrateurs */
         $modules['users']['superadmins'] = $this->em->getRepository('App:Person')->getByRole('ROLE_ADMIN', null);
 
+        /* Adhésions */
         $structures = $this->em->getRepository('App:Structure')->getAll(true);
         foreach ($structures as $structure) {
             $modules['users']['structures'][$structure->getSlug()] = $this->em->getRepository('App:Person')->getByRole('ROLE_STRUCTURE', $structure);

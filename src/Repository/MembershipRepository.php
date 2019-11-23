@@ -116,10 +116,14 @@ class MembershipRepository extends EntityRepository
             }
 
             if (isset($filter['valid'])) {
-                if ($filter['valid'])
-                    $query->andWhere('m.payedOn IS NOT NULL');
-                elseif ($filter['valid'] == false)
-                    $query->andWhere('m.payedOn IS NULL');
+                if ($filter['valid']) {
+                    $query
+                        ->andWhere('m.payedOn IS NOT NULL')
+                        ->andWhere('m.status = \'validated\' OR m.status = \'paid\'')
+                    ;
+                } elseif ($filter['valid'] == false) {
+                    $query->andWhere('m.payedOn IS NULL OR (m.status != \'validated\' AND m.status != \'paid\')');
+                }
             }
 
             if (isset($filter['ending']) and $anticipated) {
@@ -187,14 +191,9 @@ class MembershipRepository extends EntityRepository
         ;
     }
 
-    public function getAllByStructureQuery($slug, $filter = null, $anticipated = null)
-    {
-        return $this->getByStructureQuery($slug, null, $filter, $anticipated);
-    }
-
     public function getAllByStructure($slug, $filter = null, $anticipated = null)
     {
-        $query = $this->getAllByStructureQuery($slug, $filter, $anticipated);
+        $query = $this->getByStructureQuery($slug, null, $filter, $anticipated);
 
         return $query
             ->getQuery()
@@ -204,7 +203,7 @@ class MembershipRepository extends EntityRepository
 
     public function getCurrentByStructureQuery($slug, $filter = null, $anticipated = null)
     {
-        $query = $this->getAllByStructureQuery($slug, $filter, $anticipated);
+        $query = $this->getByStructureQuery($slug, null, $filter, $anticipated);
         $query
             ->andWhere('m.expiredOn > :now')
             ->setParameter('now', new \DateTime('now'))

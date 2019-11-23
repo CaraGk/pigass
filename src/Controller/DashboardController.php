@@ -48,6 +48,10 @@ class DashboardController extends AbstractController
      */
     public function user(Structure $structure, Request $request)
     {
+        if (null == $this->session->get('slug', null)) {
+            $this->session->getFlashBag()->add('notice', 'Session réinitalisée.');
+            return $this->redirect($this->generateUrl('app_structure_redirect'));
+        }
         $user = $this->getUser();
         $filter = $this->session->get('user_register_filter', null);
         $userid = isset($filter['user'])?$filter['user']:$request->query->get('userid');
@@ -104,6 +108,10 @@ class DashboardController extends AbstractController
      */
     public function admin(Structure $structure, Request $request)
     {
+        if (null == $this->session->get('slug', null)) {
+            $this->session->getFlashBag()->add('notice', 'Session réinitalisée.');
+            return $this->redirect($this->generateUrl('app_structure_redirect'));
+        }
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
         /* Adminsitrateurs */
@@ -167,6 +175,10 @@ class DashboardController extends AbstractController
      */
     public function superadmin(Request $request)
     {
+        if (null == $this->session->get('slug', null)) {
+            $this->session->getFlashBag()->add('notice', 'Session réinitalisée.');
+            return $this->redirect($this->generateUrl('app_structure_redirect'));
+        }
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
         /* Administrateurs */
@@ -246,8 +258,18 @@ class DashboardController extends AbstractController
         $date->modify($anticipated);
         while ($expire <= $date) {
             $expire->modify($periodicity);
-	}
-	$date->modify('-' . $anticipated);
+        }
+        $date->modify('-' . $anticipated);
         return $expire;
+    }
+
+    private function renewSession()
+    {
+        if (null == $this->session->get('slug', null)) {
+            $this->session->getFlashBag()->add('notice', 'Session réinitalisée.');
+            return $this->redirect($this->generateUrl('app_structure_redirect'));
+        } else {
+            return false;
+        }
     }
 }

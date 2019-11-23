@@ -1,4 +1,4 @@
-<a class="btn btn-primary" href="{{ path('core_structure_edit', {'slug': slug}) }}" title="Modifier la structure">
+<a class="btn btn-primary" href="{{ path('app_structure_edit', {'slug': slug}) }}" title="Modifier la structure">
     <i class='fas fa-pencil-alt'></i> Modifier la structure
 </a>
 <a class="btn btn-primary" href="{{ path('parameter_admin_index', {'slug': slug}) }}" title="Gérer les paramètres du site">
@@ -17,7 +17,7 @@
     <i class='fas fa-question-circle'></i> Questions complémentaires
 </a>
 {% if is_granted('ROLE_ADMIN') %}
-<a class="btn btn-danger confirm delete" href="{{ path('core_structure_delete', {'slug': slug}) }}" title="Supprimer la structure" confirm="Êtes-vous certain de vouloir supprimer la structure et tous les éléments qui s'y rapportent ?">
+<a class="btn btn-danger confirm delete" href="{{ path('app_structure_delete', {'slug': slug}) }}" title="Supprimer la structure" confirm="Êtes-vous certain de vouloir supprimer la structure et tous les éléments qui s'y rapportent ?">
     <i class='fas fa-trash'></i> Supprimer
 </a>
 {% endif %}

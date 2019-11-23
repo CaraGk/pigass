@@ -23,7 +23,7 @@
             </li>
             {% if 'ROLE_STRUCTURE' not in person.user.roles %}
                 <li class="btn btn-primary">
-                    <a href="{{ path('core_structure_map') }}" title="Adhérer à une autre structure">
+                    <a href="{{ path('app_structure_map') }}" title="Adhérer à une autre structure">
                         <i class='fas fa-euro-sign'></i> Autre structure
                     </a>
                 </li>
@@ -52,7 +52,7 @@
         {% endif %}
     {% else %}
         <li class="btn btn-primary">
-            <a href="{{ path('core_structure_map') }}">
+            <a href="{{ path('app_structure_map') }}">
                 <i class='fas fa-euro-sign'></i> Adhérer
             </a>
         </li>

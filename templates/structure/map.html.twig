@@ -17,7 +17,7 @@
             </div>
         </div>
     {% elseif is_granted('ROLE_ADMIN') %}
-            <a class="btn btn-primary" href="{{ path('core_structure_new') }}" title="Ajouter une nouvelle structure">
+            <a class="btn btn-primary" href="{{ path('app_structure_new') }}" title="Ajouter une nouvelle structure">
                 <i class='fas fa-plus'></i> Ajouter
             </a>
             <a class="btn btn-primary" href="#" title="Afficher les structures désactivées">
@@ -96,7 +96,7 @@
             <div class="noentity structure">
                 Aucune structure enregistrée.
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('core_structure_new') }}" title="Ajouter une structure">Ajouter une structure</a>.
+                    <a href="{{ path('app_structure_new') }}" title="Ajouter une structure">Ajouter une structure</a>.
                 {% else %}
                     Contactez un administrateur.
                 {% endif %}
@@ -106,7 +106,7 @@
 
 {% block content %}
     <div class="structures">
-        <div class="map">Ce site a besoin du JavaScript pour fonctionner. Merci de l'activer ou rendez-vous sur <a href="{{ path('core_structure_map') }}">la page statique</a>.</div>
+        <div class="map">Ce site a besoin du JavaScript pour fonctionner. Merci de l'activer ou rendez-vous sur <a href="{{ path('app_structure_map') }}">la page statique</a>.</div>
     </div>
     {% for key, region in areaMap %}
         <div class="area-map"

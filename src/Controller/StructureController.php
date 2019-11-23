@@ -47,7 +47,7 @@ class StructureController extends AbstractController
     /**
      * Redirect to the right action
      *
-     * @Route("/", name="core_structure_redirect")
+     * @Route("/", name="app_structure_redirect")
      */
     public function redirectAction()
     {
@@ -60,7 +60,7 @@ class StructureController extends AbstractController
                 $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
                 $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
                 if (!$last_membership) {
-                    return $this->redirect($this->generateUrl('core_structure_map'));
+                    return $this->redirect($this->generateUrl('app_structure_map'));
                 } else {
                     $slug = $last_membership->getStructure()->getSlug();
                     $this->session->set('slug', $slug);
@@ -69,21 +69,21 @@ class StructureController extends AbstractController
             }
 
             if ($user->hasRole('ROLE_ADMIN')) {
-                return $this->redirect($this->generateUrl('core_structure_map'));
+                return $this->redirect($this->generateUrl('app_structure_map'));
             }
 
             if ($user->hasRole('ROLE_MEMBER')) {
                 return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
             }
         } else {
-            return $this->redirect($this->generateUrl('core_structure_map'));
+            return $this->redirect($this->generateUrl('app_structure_map'));
         }
     }
 
     /**
      * List the structures
      *
-     * @Route("/structure", name="core_structure_index")
+     * @Route("/structure", name="app_structure_index")
      * @Template()
      */
     public function indexAction()
@@ -104,7 +104,7 @@ class StructureController extends AbstractController
     /**
      * Map the structures
      *
-     * @Route("/map", name="core_structure_map")
+     * @Route("/map", name="app_structure_map")
      * @Template()
      */
     public function mapAction()
@@ -135,7 +135,7 @@ class StructureController extends AbstractController
     /**
      * Add a new structure
      *
-     * @Route("/structure/new", name="core_structure_new")
+     * @Route("/structure/new", name="app_structure_new")
      * @Template("structure/edit.html.twig")
      */
     public function newAction(Request $request)
@@ -174,7 +174,7 @@ class StructureController extends AbstractController
             $this->em->flush();
 
             $this->session->getFlashBag()->add('notice', 'Structure "' . $structure . '" enregistrée.');
-            return $this->redirect($this->generateUrl('core_structure_map'));
+            return $this->redirect($this->generateUrl('app_structure_map'));
         }
 
         return array(
@@ -186,7 +186,7 @@ class StructureController extends AbstractController
     /**
      * Edit a structure
      *
-     * @Route("/structure/{slug}/edit", name="core_structure_edit", requirements={"slug" = "\w+"})
+     * @Route("/structure/{slug}/edit", name="app_structure_edit", requirements={"slug" = "\w+"})
      * @Template("structure/edit.html.twig")
      */
     public function editAction(Structure $structure, Request $request)
@@ -200,7 +200,7 @@ class StructureController extends AbstractController
             $structure = $this->em->getRepository('App:Structure')->findOneBy(array('slug' => $slug));
             if (!$structure) {
                 $this->session->getFlashBag()->add('error', 'La structure n\'existe pas ou vous n\'y avez pas accès.');
-                return $this->redirect($this->generateUrl('core_structure_edit', array('slug' => $slug)));
+                return $this->redirect($this->generateUrl('app_structure_edit', array('slug' => $slug)));
             }
         }
 
@@ -227,7 +227,7 @@ class StructureController extends AbstractController
 
             $this->session->getFlashBag()->add('notice', 'Structure "' . $structure . '" modifiée.');
             if ($user->hasRole('ROLE_ADMIN'))
-                return $this->redirect($this->generateUrl('core_structure_map'));
+                return $this->redirect($this->generateUrl('app_structure_map'));
             else
                 return $this->redirect($this->generateUrl('user_register_index', array('slug' => $slug)));
         }
@@ -241,7 +241,7 @@ class StructureController extends AbstractController
     /**
      * Delete a structure
      *
-     * @Route("/structure/{slug}/delete", name="core_structure_delete", requirements={"id" = "\d+"})
+     * @Route("/structure/{slug}/delete", name="app_structure_delete", requirements={"id" = "\d+"})
      */
     public function deleteAction($slug)
     {
@@ -254,6 +254,6 @@ class StructureController extends AbstractController
         $this->em->flush();
 
         $this->session->getFlashBag()->add('notice', 'Session "' . $structure . '" supprimée.');
-        return $this->redirect($this->generateUrl('core_structure_map'));
+        return $this->redirect($this->generateUrl('app_structure_map'));
     }
 }

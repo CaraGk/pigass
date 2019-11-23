@@ -308,7 +308,8 @@ class RegisterController extends AbstractController
         $userid = $request->query->get('userid', null);
 
         if (!$membership or
-            ($membership->getPayedOn() != null and $membership->getStatus() != "excluded")
+            $membership->getStatus() == "paid" or
+            $membership->getStatus() == "validated"
         )
             throw $this->createNotFoundException('Unable to find Membership entity');
 

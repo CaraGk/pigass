@@ -17,7 +17,7 @@
 
     {% if is_granted('ROLE_ADMIN') %}
         <li class="btn btn-primary">
-            <a href="{{ path('core_structure_new') }}" title="Ajouter une nouvelle structure">
+            <a href="{{ path('app_structure_new') }}" title="Ajouter une nouvelle structure">
                 <i class='fas fa-plus'></i> Ajouter
             </a>
         </li>
@@ -74,7 +74,7 @@
             <li class="noentity structure">
                 Aucune structure enregistrée.
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('core_structure_new') }}" title="Ajouter une structure">Ajouter une structure</a>.
+                    <a href="{{ path('app_structure_new') }}" title="Ajouter une structure">Ajouter une structure</a>.
                 {% else %}
                     Contactez un administrateur.
                 {% endif %}

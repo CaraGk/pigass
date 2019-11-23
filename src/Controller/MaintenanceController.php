@@ -187,7 +187,7 @@ class MaintenanceController extends AbstractController
         }
         $this->em->flush();
 
-        return $this->redirect($this->generateUrl('core_structure_map'));
+        return $this->redirect($this->generateUrl('app_structure_map'));
     }
 
     /**
@@ -231,6 +231,6 @@ class MaintenanceController extends AbstractController
         $this->em->flush();
 
         $this->session->getFlashBag()->add('notice', $count . ' utilisateurs corrigés en base de données.');
-        return $this->redirect($this->generateUrl('core_structure_map'));
+        return $this->redirect($this->generateUrl('app_structure_map'));
     }
 }

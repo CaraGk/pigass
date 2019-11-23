@@ -151,10 +151,10 @@
                                 </a>
                             {% endif %}
                         {% endif %}
-                        {% if membership.payedOn is null or (membership.status == 'excluded' and is_granted('ROLE_STRUCTURE')) %}
-                            {% if is_granted('ROLE_ADMIN') and (membership.status != 'excluded' and is_granted('ROLE_STRUCTURE')) %}
+                        {% if membership.status == 'registered'  or (membership.status == 'excluded' and is_granted('ROLE_STRUCTURE')) %}
+                            {% if is_granted('ROLE_STRUCTURE') and membership.status != 'excluded' %}
                                 <a class="btn btn-primary btn-sm" href="{{ path('user_register_validate', {'id': membership.id, 'userid': userid}) }}" title="Valider la réception du paiement pour cette adhésion">
-                                    <i class='fas fa-check-circle'></i> Valider
+                                    <i class='fas fa-check-circle'></i> Paiement reçu
                                 </a>
                             {% endif %}
                             <a class="btn btn-primary btn-sm" href="{{ path('user_register_delete', {'id': membership.id, 'userid': userid}) }}" title="Supprimer cette adhésion">
@@ -219,12 +219,12 @@
                     <i class='fas fa-euro-sign'></i> Ré-adhérer
                 </a>
                 {% if 'ROLE_STRUCTURE' not in person.user.roles %}
-                    <a class="btn btn-primary" href="{{ path('core_structure_map') }}" title="Adhérer à une autre structure">
+                    <a class="btn btn-primary" href="{{ path('app_structure_map') }}" title="Adhérer à une autre structure">
                         <i class='fas fa-euro-sign'></i> Autre structure
                     </a>
                 {% endif %}
             {% elseif modules.adhesion.recent is null %}
-                <a class="btn btn-primary btn-sm" href="{{ path('core_structure_map') }}">
+                <a class="btn btn-primary btn-sm" href="{{ path('app_structure_map') }}">
                     <i class='fas fa-euro-sign'></i> Adhérer
                 </a>
             {% endif %}

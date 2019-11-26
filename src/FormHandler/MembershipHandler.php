@@ -99,7 +99,7 @@ class MembershipHandler
                     return 'disabled';
             }
         }
-        $membership->getPerson()->setStructure($this->structure());
+        $membership->getPerson()->setStructure($this->structure);
 
         $this->em->persist($membership);
         $this->em->flush();

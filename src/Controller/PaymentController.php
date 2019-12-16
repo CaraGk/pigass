@@ -203,10 +203,11 @@ class PaymentController extends Controller
                 $this->container->get('security.token_storage')->setToken($token);
                 return $this->redirect($this->generateUrl('user_register_confirmation_send', ['email' => $user->getUsername(), 'slug' => $structure->getSlug()]));
             }
+            return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $membership->getStructure()->getSlug()]));
         } else {
-             $this->addFlash('error', 'Le paiement a échoué ou a été annulé. En cas de problème, veuillez contacter l\'administrateur du site.');
+            $this->addFlash('error', 'Le paiement a échoué ou a été annulé. En cas de problème, veuillez contacter l\'administrateur du site.');
         }
-        return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $membership->getStructure()->getSlug()]));
+        return $this->redirect($this->generateUrl('app_structure_map'));
     }
 
     /**

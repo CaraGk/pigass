@@ -62,9 +62,23 @@
                     {{ modules.stage.count }} étudiants
                 </a>
             </p>
-            <p>
-                {{ modules.stage.sectors|length }} promotions : {% for sector in modules.stage.sectors %}{% if not loop.first %}, {% endif %}{{ sector }}{% endfor %}
+            <p class="card-text">
+                {{ modules.stage.sectors|length }} catégories de stage : {% for sector in modules.stage.sectors %}{% if not loop.first %}, {% endif %}<span class="badge badge-info">{{ sector }}</span>{% endfor %}
             </p>
+            <p class="card-text">
+                {{ modules.stage.periods|length }} périodes de stage : {% for period in modules.stage.periods %}{% if not loop.first %}, {% endif %}<span class="badge badge-info">{{ period }}</span>{% endfor %}
+            </p>
+            <p class="card-text">
+            <a class="btn btn-primary" href={{ path('GCore_FSIndex', {'slug': structure.slug}) }} title="Afficher les terrains de stage">
+                {{ modules.stage.departments }} terrains de stage
+            </a>
+            dans {{ modules.stage.hospitals }} établissements.
+            </p>
+        </div>
+        <div class="card-footer text-center">
+            <a class="card-link btn btn-primary btn-sm" href="{{ path('app_placement_period', {'slug': structure.slug}) }}" title="Ajouter une période de stage">
+                <i class="fas fa-plus"></i> Nouvelle période
+            </a>
         </div>
     </div>
     {% endif %}

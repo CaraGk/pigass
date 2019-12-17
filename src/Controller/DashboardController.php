@@ -114,7 +114,7 @@ class DashboardController extends AbstractController
         }
         $me = $this->em->getRepository('App:Person')->getByUser($this->getUser());
 
-        /* Adminsitrateurs */
+        /* Administrateurs */
         $modules['users']['superadmins'] = $this->em->getRepository('App:Person')->getByRole('ROLE_ADMIN', null);
         $modules['users']['structure'] = $this->em->getRepository('App:Person')->getByRole('ROLE_STRUCTURE', $structure);
 
@@ -158,6 +158,10 @@ class DashboardController extends AbstractController
         $modules['stage']['count'] = $this->em->getRepository('App:Person')->countAll($structure, true);
         $modules['stage']['sectors'] = $this->em->getRepository('App:Sector')->getAll($structure);
         $modules['stage']['hospitals'] = $this->em->getRepository('App:Hospital')->countAll($structure);
+        $modules['stage']['departments'] = $this->em->getRepository('App:Department')->countAll($structure);
+        $modules['stage']['periods'] = $this->em->getRepository('App:Period')->findBy(['structure' => $structure]);
+
+        $modules['evaluation']['total'] = null;
 
         return [
             'structure' => $structure,

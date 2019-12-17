@@ -1,0 +1,74 @@
+                <h2 class="card-header text-center bg-primary text-white">
+                    <a class="text-white" href="{{ path('GCore_FSIndex', {'slug': structure.slug, 'limit': {'slug': structure.slug, 'type': 'h.id', 'value': hospital.id, 'description': hospital.name}}) }}" title="Afficher les terrains de stage de l'hôpital '{{ hospital.name }}'">
+                        {{ hospital }}
+                    </a>
+                </h2>
+                <div class="card-body list-group list-group-flush">
+                    {% for department in hospital.departments %}
+                        {% set isSupervisor = false %}
+                        {% for repartition in department.repartitions|slice(-1, 1) %}
+                            {% if is_granted('ROLE_ADMIN') or repartition.number > 0 %}
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between w-100 {% if repartition.number < 1 %}text-muted{% endif %}" href="{{ path('GCore_FSShowDepartment', {'slug': structure.slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les informations du service '{{ department.name }}'">
+                                <div class="">
+                                    <h3 class="h5">
+                                        <i class="fas fa-hospital"></i> {{ department.name }}
+                                    </h3>
+                                    <div class="">
+                                        {% set current = false %}
+                                        {% for accreditation in department.accreditations %}
+                                            {% if current != accreditation.supervisor %}
+                                                <i class="fas fa-user-md"></i> {{ accreditation.supervisor }}
+                                            {% endif %}
+                                            {% set current = accreditation.supervisor %}
+                                            {% if is_granted('ROLE_TEACHER') and accreditation.user.id == app.user.id %}{% set isSupervisor = true %}{% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="">
+                                    {% for accreditation in department.accreditations %}
+                                        <span class="badge badge-info">
+                                            {{ accreditation.sector }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                {% if param('simul_' ~ structure.slug ~ '_active') == true and is_granted('ROLE_STUDENT') %}
+                                <div class="">
+                                    {% if repartition.cluster is not null %}
+                                        <span class="badge badge-warning">
+                                            Stage couplé
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="">
+                                    {% if repartition.number > 1 %}
+                                        <span class="badge badge-success">{{ repartition.number }} postes</span>
+                                    {% elseif repartition.number == 1 %}
+                                        <span class="badge badge-success">1 poste</span>
+                                    {% else %}
+                                        <span class="badge badge-light">aucun poste</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <div class="list-group-item">
+                        <span class="badge badge-warning">Aucun service enregistré.</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if is_granted('ROLE_ADMIN') %}
+                <div class="card-footer btn-group text-center">
+                                <a class="btn btn-primary" href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': { 'type': 'h.id', 'value': hospital.id, 'description': hospital.name }}) }}" title="Afficher les stages dans l'hôpital '{{ hospital.name }}'">
+                                    <i class='fas fa-list-alt'></i> Stages
+                                </a>
+                                <a class="btn btn-warning" href="{{ path('GCore_FSAEditHospital', {'slug': structure.slug, 'id': hospital.id, 'limit': limit }) }}" title="Modifier l'hôpital '{{ hospital.name }}'" class="edit">
+                                    <i class='fas fa-pencil'></i> Modifier
+                                </a>
+                                <a class="btn btn-danger" href="{{ path('GCore_FSADeleteHospital', {'slug': structure.slug, 'id': hospital.id, 'limit': limit }) }}" title="Supprimer l'hôpital '{{ hospital.name }}'" class="confirm delete" confirm="Attention ! Supprimer cet hôpital supprimera également tous les terrains de stage qui lui sont liés ainsi que les données qui s'y rapportent. Confirmez-vous la suppression ?">
+                                    <i class='fas fa-trash'></i> Supprimer
+                                </a>
+                    </div>
+                {% endif %}
+

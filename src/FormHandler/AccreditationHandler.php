@@ -81,7 +81,7 @@ class AccreditationHandler
             $this->um->updateUser($user);
         }
 
-        $accreditation->setStructure($accreditation->getDepartment()->getStructure());
+        $accreditation->setStructure($accreditation->getDepartment()->getHospital()->getStructure());
 
         $this->em->persist($accreditation);
         $this->em->flush();

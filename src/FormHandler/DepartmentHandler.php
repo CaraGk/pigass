@@ -49,9 +49,6 @@ class DepartmentHandler
 
   public function onSuccess(Department $department)
   {
-      if (!$department->getStructure())
-          $department->setStructure($structure);
-
     $this->em->persist($department);
     $this->em->flush();
   }

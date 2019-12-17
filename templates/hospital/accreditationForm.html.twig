@@ -1,11 +1,11 @@
 {% extends 'layout.html.twig' %}
 
-{% block headline %}Ajouter/modifier un terrain de stage{% endblock %}
+{% block headline %}Ajouter/modifier un agrément{% endblock %}
 
 {% block content %}
     <div class="card">
         <div class="card-body">
-            {{ form(hospital_form) }}
+            {{ form(form) }}
         </div>
     </div>
 {% endblock %}
@@ -14,3 +14,4 @@
     {{ parent() }}
     <script src="{{ asset('bundles/gessehcore/js/addSub.js') }}" type="text/javascript"></script>
 {% endblock %}
+

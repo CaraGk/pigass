@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * DepartmentRepository
@@ -172,6 +173,17 @@ class DepartmentRepository extends EntityRepository
         return $this->createQueryBuilder('d')
             ->getQuery()
             ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+        ;
+    }
+    public function countAll(Structure $structure)
+    {
+        return $this->createQueryBuilder('d')
+            ->join('d.hospital', 'h')
+            ->select('COUNT(d.id)')
+            ->where('h.structure = :structure')
+            ->setParameter('structure', $structure)
+            ->getQuery()
+            ->getSingleScalarResult()
         ;
     }
 }

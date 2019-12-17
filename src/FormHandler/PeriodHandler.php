@@ -22,35 +22,34 @@ use App\Entity\Period,
  */
 class PeriodHandler
 {
-  private $form, $request, $em, $structure;
+    private $form, $request, $em, $structure;
 
-  public function __construct(Form $form, Request $request, EntityManager $em)
-  {
-    $this->form    = $form;
-    $this->request = $request;
-    $this->em      = $em;
-  }
-
-  public function process()
-  {
-    if ( $this->request->getMethod() == 'POST' ) {
-      $this->form->handleRequest($this->request);
-
-      if ($this->form->isValid()) {
-        $this->onSuccess(($this->form->getData()));
-
-        return true;
-      }
+    public function __construct(Form $form, Request $request, EntityManager $em, Structure $structure)
+    {
+        $this->form    = $form;
+        $this->request = $request;
+        $this->em      = $em;
+        $this->structure = $structure;
     }
 
-    return false;
-  }
+    public function process()
+    {
+        if ( $this->request->getMethod() == 'POST' ) {
+            $this->form->handleRequest($this->request);
 
-  public function onSuccess(Period $period)
-  {
-      if (!$period->getStructure())
-          $period->setStructure($this->structure);
-    $this->em->persist($period);
-    $this->em->flush();
-  }
+            if ($this->form->isValid()) {
+                $this->onSuccess(($this->form->getData()));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function onSuccess(Period $period)
+    {
+        if (!$period->getStructure())
+            $period->setStructure($this->structure);
+        $this->em->persist($period);
+        $this->em->flush();
+    }
 }

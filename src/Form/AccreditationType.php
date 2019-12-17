@@ -14,6 +14,9 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType,
     Symfony\Component\Form\FormBuilderInterface,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
+    Symfony\Component\Form\Extension\Core\Type\DateType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\TextareaType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Form\UserType;
 
@@ -24,19 +27,37 @@ class AccreditationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('begin')
-                ->add('end')
-                ->add('sector', EntityType::class, array(
-                    'required' => true,
-                    'label'    => 'Agrément',
-                    'class'    => 'App\Entity\Sector',
-                ))
-                ->add('supervisor')
-                ->add('user', new UserType('App\Entity\User'), array(
-                    'label' => ' ',
-                ))
-                ->add('comment')
-                ->add('Enregister', SubmitType::class)
+        $builder
+            ->add('begin', DateType::class, [
+                'label'  => 'Début de l\'agrément',
+                'help'   => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
+                'widget' => 'single_text',
+                'html5'  => true,
+                'attr'   => ['placeholder' => 'AAAA-MM-JJ'],
+            ])
+            ->add('end', DateType::class, [
+                'label'  => 'Fin de l\'agrèment',
+                'help'   => 'En l\'absence de calendrier, indiquez la date au format "AAAA-MM-JJ"',
+                'widget' => 'single_text',
+                'html5'  => true,
+                'attr'   => ['placeholder' => 'AAAA-MM-JJ'],
+            ])
+            ->add('sector', EntityType::class, array(
+                'required' => true,
+                'label'    => 'Type d\'agrément',
+                'class'    => 'App\Entity\Sector',
+            ))
+            ->add('supervisor', TextType::class, [
+                'label' => 'Nom du référent pédagogique',
+            ])
+            ->add('user', UserType::class, array(
+                'label' => ' ',
+            ))
+            ->add('comment', TextAreatype::class, [
+                'label' => 'Remarques diverses',
+                'required' => false,
+            ])
+            ->add('Enregister', SubmitType::class)
         ;
     }
 

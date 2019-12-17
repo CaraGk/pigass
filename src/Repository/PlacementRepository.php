@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * PlacementRepository
@@ -20,22 +21,23 @@ class PlacementRepository extends EntityRepository
 {
   public function getBaseQuery()
   {
-    return $this->createQueryBuilder('p')
-                ->join('p.person', 's')
-                ->join('p.repartition', 'r')
-                ->join('r.period', 'q')
-                ->join('r.department', 'd')
-                ->join('s.user', 'u')
-                ->join('d.hospital', 'h')
-                ->join('d.accreditations', 'a')
-                ->join('a.sector', 't')
-                ->addSelect('r')
-                ->addSelect('q')
-                ->addSelect('d')
-                ->addSelect('h')
-                ->addSelect('a')
-                ->addSelect('t')
-    ;
+      return $this
+          ->createQueryBuilder('p')
+          ->join('p.person', 's')
+          ->join('p.repartition', 'r')
+          ->join('r.period', 'q')
+          ->join('r.department', 'd')
+          ->join('s.user', 'u')
+          ->join('d.hospital', 'h')
+          ->join('d.accreditations', 'a')
+          ->join('a.sector', 't')
+          ->addSelect('r')
+          ->addSelect('q')
+          ->addSelect('d')
+          ->addSelect('h')
+          ->addSelect('a')
+          ->addSelect('t')
+      ;
   }
 
   public function getByUsername($user, $id = null)
@@ -93,22 +95,29 @@ class PlacementRepository extends EntityRepository
     ;
   }
 
-  public function getAll($limit = null)
+  public function getAll(Structure $structure, $limit = null)
   {
-    $query = $this->getBaseQuery();
-    $query->addOrderBy('q.begin', 'desc')
+      $query = $this
+          ->getBaseQuery()
+          ->where('h.structure = :structure')
+          ->setParameter('structure', $structure)
+          ->addOrderBy('q.begin', 'desc')
           ->addOrderBy('s.surname', 'asc')
           ->addOrderBy('s.name', 'asc')
           ->addOrderBy('h.name', 'asc')
           ->addOrderBy('d.name', 'asc')
-          ->addSelect('s');
+          ->addSelect('s')
+      ;
 
     if (null != $limit and preg_match('/^[p,q,s,t,h,d].id$/', $limit['type'])) {
-      $query->where($limit['type'] . ' = :value')
+      $query->andWhere($limit['type'] . ' = :value')
                ->setParameter('value', $limit['value']);
     }
 
-    return $query->getQuery();
+    return $query
+        ->getQuery()
+        ->getResult()
+    ;
   }
 
   public function getCountByPersonWithoutCurrentPeriod($person, $current_period = null)

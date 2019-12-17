@@ -4,45 +4,23 @@
 {% block headline %}{{ department.name }} à {{ department.hospital.name }} : évaluations{% endblock %}
 
 {% block action %}
-    <ul class="nav nav-pills">
-        <li class="btn btn-primary">
-            <a href="{{ path('GCore_FSShowDepartment', {'slug': department.hospital.structure.slug, 'id': department.id}) }}#description">
-                <i class='fas fa-info-sign'></i> Description
+            <a class="btn btn-primary" href="{{ path('GCore_FSShowDepartment', {'slug': department.hospital.structure.slug, 'id': department.id}) }}">
+                <i class='fas fa-hospital'></i> Terrain de stage
             </a>
-        </li>
-        <li class="btn btn-primary">
-            <a href="{{ path('GCore_FSShowDepartment', {'slug': department.hospital.structure.slug, 'id': department.id}) }}#hopital">
-                <i class='fas fa-home'></i> Structure de soins
+            <a class="btn btn-primary" href="#evaluation" title="Afficher les évaluations pour ce service">
+                <i class='fas fa-chart-bar'></i> Evaluations
             </a>
-        </li>
-        <li class="btn btn-primary">
-            <a href="{{ path('GCore_FSShowDepartment', {'slug': department.hospital.structure.slug, 'id': department.id}) }}#agrement">
-                <i class='fas fa-certificate'></i> Agréments
-            </a>
-        </li>
-        <li class="active btn btn-primary">
-            <a href="#evaluation" title="Afficher les évaluations pour ce service">
-                <i class='fas fa-stats'></i> Evaluations
-            </a>
-        </li>
         {% if is_granted('ROLE_ADMIN') %}
-            <li class="btn btn-primary">
-                <a href="{{ path('GCore_PAPlacementIndex', {'slug': department.hospital.structure.slug, 'limit': { 'type': 'd.id', 'value': department.id, 'description': department.name ~ ' à ' ~ department.hospital.name }}) }}" title="Afficher les stages associés au service '{{ department.name }}'">
+                <a class="btn btn-primary" href="{{ path('GCore_PAPlacementIndex', {'slug': department.hospital.structure.slug, 'limit': { 'type': 'd.id', 'value': department.id, 'description': department.name ~ ' à ' ~ department.hospital.name }}) }}" title="Afficher les stages associés au service '{{ department.name }}'">
                     <i class='fas fa-list-alt'></i> Stages
                 </a>
-            </li>
-            <li class="btn btn-primary">
-                <a href="{{ path('GCore_PARepartitionsDepartment', {'slug': department.hospital.structure.slug, 'department_id': department.id}) }}" title="Modifier la répartition du service '{{ department }}'">
+                <a class="btn btn-primary" href="{{ path('GCore_PARepartitionsDepartment', {'slug': department.hospital.structure.slug, 'department_id': department.id}) }}" title="Modifier la répartition du service '{{ department }}'">
                     <i class='fas fa-briefcase'></i> Postes
                 </a>
-            </li>
-            <li class="delete btn btn-danger">
-                <a href="{{ path('GCore_FSADeleteDepartment', {'slug': department.hospital.structure.slug, 'id': department.id }) }}" title="Supprimer le service '{{ department.name }}'" class="confirm delete" confirm="Attention ! Supprimer ce terrain de stage suprimera également toutes les données qui s'y rapportent (stages, évaluations, etc). Confirmez-vous la suppression ?">
+                <a class="btn btn-danger" href="{{ path('GCore_FSADeleteDepartment', {'slug': department.hospital.structure.slug, 'id': department.id }) }}" title="Supprimer le service '{{ department.name }}'" class="confirm delete" confirm="Attention ! Supprimer ce terrain de stage suprimera également toutes les données qui s'y rapportent (stages, évaluations, etc). Confirmez-vous la suppression ?">
                     <i class='fas fa-trash'></i> Supprimer
                 </a>
-            </li>
         {% endif %}
-    </ul>
 {% endblock %}
 
 {% block content %}

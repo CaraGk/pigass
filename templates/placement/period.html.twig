@@ -1,0 +1,20 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ parent() }} - {{ structure.name }} - {{ structure.name }} - Nouvelle session de stage{% endblock %}
+
+{% block headline %}{{ structure.name }} - Session de stage{% endblock %}
+
+{% block action %}
+{% include '/dashboard/admin_menu.html.twig' with {'slug': structure.slug} %}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit" title="Ajouter la session de stage" class="btn btn-primary btn-sm float-right">Suivant <i class="fas fa-arrow-right"></i></button>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

@@ -25,13 +25,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
 use App\Entity\Structure;
 use App\Entity\Period,
     App\Form\PeriodType,
-    App\Form\PeriodHandler;
+    App\FormHandler\PeriodHandler;
 use App\Entity\Placement,
     App\Form\PlacementType,
-    App\Form\PlacementHandler;
+    App\FormHandler\PlacementHandler;
 use App\Entity\Repartition,
     App\Form\RepartitionsType,
-    App\Form\RepartitionsHandler;
+    App\FormHandler\RepartitionsHandler;
 
 
 /**
@@ -80,17 +80,19 @@ class PlacementController extends AbstractController
     }
 
     /**
-     * @Route("/{slug}/period/new", name="GCore_PAPeriodNew")
-     * @Template("App:PlacementAdmin:period.html.twig")
+     * @Route("/{slug}/period/new", name="app_placement_period")
+     * @Template("placement/period.html.twig")
      */
-    public function newPeriodAction($slug, Request $request)
+    public function newPeriodAction(Structure $structure, Request $request)
     {
         $periods = $this->em->getRepository('App:Period')->findAll();
         $last_period = $this->em->getRepository('App:Period')->getLast();
 
         $period = new Period();
-        $form = $this->createForm(PeriodType::class, $period);
-        $formHandler = new PeriodHandler($form, $request, $this->em);
+        $form = $this->createForm(PeriodType::class, $period, [
+            'withSimul' => $this->em->getRepository('App:Parameter')->findByName('simul_' . $structure->getSlug() . '_active')->getValue(),
+        ]);
+        $formHandler = new PeriodHandler($form, $request, $this->em, $structure);
 
         if ( $formHandler->process() ) {
             $last_repartitions = $this->em->getRepository('App:Repartition')->getByPeriod($last_period);
@@ -106,13 +108,13 @@ class PlacementController extends AbstractController
 
           $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" enregistrée.');
 
-          return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+          return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
       }
 
       return array(
         'periods'        => $periods,
-        'period_id'      => null,
-        'period_form'    => $form->createView(),
+        'form'    => $form->createView(),
+        'structure'      => $structure,
       );
     }
 
@@ -122,7 +124,6 @@ class PlacementController extends AbstractController
      */
     public function editPeriodAction($slug, Request $request, Period $period)
     {
-      $paginator = $this->get('knp_paginator');
       $periods = $this->em->getRepository('App:Period')->findAll();
 
       $form = $this->createForm(PeriodType::class, $period);
@@ -155,19 +156,15 @@ class PlacementController extends AbstractController
     }
 
     /**
-     * @Route("/{slug}/placement", name="GCore_PAPlacementIndex")
+     * @Route("/{slug}/placement/", name="GCore_PAPlacementIndex")
      * @Template()
      */
-    public function placementAction($slug, Request $request)
+    public function placementAction(Structure $structure, Request $request)
     {
       $limit = $request->query->get('limit', null);
-      $paginator = $this->get('knp_paginator');
-      $placements_query = $this->em->getRepository('App:Placement')->getAll($limit);
-      $placements = $paginator->paginate( $placements_query, $request->query->get('page', 1), 20);
+      $placements = $this->em->getRepository('App:Placement')->getAll($structure, $limit);
 
-      $manager = $this->container->get('kdb_parameters.manager');
-      $mod_eval = $this->em->getRepository('App:Parameter')->findByName('eval_active');
-      if (true == $mod_eval->getValue()) { // Si les évaluations sont activées
+      if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue()) { // Si les évaluations sont activées
         $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array');
       } else {
           $evaluated = null;
@@ -179,7 +176,8 @@ class PlacementController extends AbstractController
         'placement_form' => null,
         'evaluated'      => $evaluated,
         'limit'          => $limit,
-      );
+        'structure'      => $structure,
+        );
     }
 
     /**
@@ -273,12 +271,10 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/period/{id}/repartitions", name="GCore_PARepartitionsPeriod", requirements={"id" = "\d+"})
-     * @Template("App:PlacementAdmin:repartitionsEdit.html.twig")
+     * @Template("placement/repartitions.html.twig")
      */
-    public function repartitionsForPeriodEditAction($slug, Request $request, Period $period)
+    public function repartitionsForPeriodEditAction(Structure $structure, Request $request, Period $period)
     {
-        $paginator = $this->get('knp_paginator');
-
         $hospital_id = $request->query->get('hospital_id', 0);
         $hospital_count = $request->query->get('hospital_count', 0);
         $next_hospital = $this->em->getRepository('App:Hospital')->getNext($hospital_id);
@@ -289,17 +285,18 @@ class PlacementController extends AbstractController
 
         $repartitions = $this->em->getRepository('App:Repartition')->getByPeriod($period, $next_hospital->getId());
 
-        $form = $this->createForm(RepartitionsType, $repartitions, ['period' => $period, 'repartitions' => $repartitions]);
-        $form_handler = new RepartitionsHandler($form, $request, $this->em, $repartitions);
+        $form = $this->createForm(RepartitionsType::class, $repartitions, ['type' => 'period', 'repartitions' => $repartitions]);
+        $form_handler = new RepartitionsHandler($form, $request, $this->em, $repartitions, $structure);
         if ($form_handler->process()) {
             $hospital_count;
             $this->session->getFlashBag()->add('notice', 'Répartition pour la période "' . $period . '" enregistrée (' . $hospital_count . '/' . $hospital_total . ').');
 
-            return $this->redirect($this->generateUrl('GCore_PARepartitionsPeriod', array(
+            return $this->redirect($this->generateUrl('GCore_PARepartitionsPeriod', [
                 'id'      => $period->getId(),
                 'hospital_id'    => $next_hospital->getId(),
                 'hospital_count' => $hospital_count,
-            )));
+                'slug'           => $structure->getSlug(),
+            ]));
         }
 
         return array(
@@ -310,9 +307,9 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/department/{department_id}/repartitions", name="GCore_PARepartitionsDepartment", requirements={"department_id" = "\d+"})
-     * @Template("App:PlacementAdmin:repartitionsEdit.html.twig")
+     * @Template("placement/repartitions.html.twig")
      */
-    public function repartitionsForDepartmentEditAction($slug, Request $request, $department_id)
+    public function repartitionsForDepartmentEditAction(Structure $structure, Request $request, $department_id)
     {
         $department = $this->em->getRepository('App:Department')->find($department_id);
 
@@ -327,12 +324,12 @@ class PlacementController extends AbstractController
             )));
         }
 
-        $form = $this->createForm(RepartitionsType, $repartitions, ['period' => $period, 'repartitions' => $repartitions]);
-        $form_handler = new RepartitionsHandler($form, $request, $this->em, $repartitions);
+        $form = $this->createForm(RepartitionsType::class, $repartitions, ['type' => 'department', 'repartitions' => $repartitions]);
+        $form_handler = new RepartitionsHandler($form, $request, $this->em, $repartitions, $structure);
         if ($form_handler->process()) {
             $this->session->getFlashBag()->add('notice', 'Répartition pour le terrain "' . $department . '" enregistrée.');
 
-            return $this->redirect($this->generateUrl('GCore_FSIndex'));
+            return $this->redirect($this->generateUrl('GCore_FSIndex', ['slug' => $structure->getSlug()]));
         }
 
         return array(
@@ -371,6 +368,7 @@ class PlacementController extends AbstractController
                 return new JsonResponse(array('message' => 'Error: Unknown entity.'), 404);
             else
                 throw $this->createNotFoundException('Unable to find department entity.');
+
         }
 
         $count = 0;

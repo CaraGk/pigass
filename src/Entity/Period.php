@@ -52,6 +52,20 @@ class Period
     private $end;
 
     /**
+     * @var date $simul_begin
+     *
+     * @ORM\Column(name="simul_begin", type="date", nullable=true)
+     */
+    private $simul_begin;
+
+    /**
+     * @var date $simul_end
+     *
+     * @ORM\Column(name="simul_end", type="date", nullable=true)
+     */
+    private $simul_end;
+
+    /**
      * @ORM\OneToMany(targetEntity="Repartition", mappedBy="period", cascade={"remove"})
      */
     private $repartitions;
@@ -145,6 +159,46 @@ class Period
     public function getEnd()
     {
         return $this->end;
+    }
+
+    /**
+     * Set simul_begin
+     *
+     * @param date $simul_begin
+     */
+    public function setSimulBegin($simul_begin)
+    {
+        $this->simul_begin = $simul_begin;
+    }
+
+    /**
+     * Get simul_begin
+     *
+     * @return date
+     */
+    public function getSimulBegin()
+    {
+        return $this->simul_begin;
+    }
+
+    /**
+     * Set simul_end
+     *
+     * @param date $simul_end
+     */
+    public function setSimulEnd($simul_end)
+    {
+        $this->simul_end = $simul_end;
+    }
+
+    /**
+     * Get simul_end
+     *
+     * @return date
+     */
+    public function getSimulEnd()
+    {
+        return $this->simul_end;
     }
 
     /**

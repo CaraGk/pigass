@@ -136,15 +136,12 @@ class HospitalController extends AbstractController
    * Displays a form to create a new Hospital entity.
    *
    * @Route("/{slug}/hospital/new", name="GCore_FSANewHospital")
-   * @Template("App:hospital:form.html.twig")
+   * @Template("hospital/form.html.twig")
    */
-  public function newHospitalAction($slug)
+  public function newHospitalAction(Structure $structure, Request $request)
   {
     $limit = $request->query->get('limit', null);
     $periods = $this->em->getRepository('App:Period')->findAll();
-    $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
-    if (!$structure)
-        throw $this->createNotFoundException('Structure inconnue');
 
     $hospital = new Hospital();
     $form   = $this->createForm(HospitalType::class, $hospital);
@@ -229,24 +226,27 @@ class HospitalController extends AbstractController
    * Edit the description of the Department entity.
    *
    * @Route("/{slug}/hospital/department/{id}", name="GCore_FSAEditDepartmentDescription", requirements={"id" = "\d+"})
-   * @Template("App:FieldSetAdmin:editDescription.html.twig")
+   * @Template("hospital/departmentForm.html.twig")
    */
   public function editDepartmentDescriptionAction($slug, Department $department, Request $request)
   {
-    $limit = $request->query->get('limit', null);
+      $limit = $request->query->get('limit', null);
+      $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
+      if (!$structure)
+        throw $this->createNotFoundException('Structure inconnue');
 
-    $editForm = $this->createForm(DepartmentDescriptionType::class, $department);
-    $formHandler = new DepartmentHandler($editForm, $request, $this->em);
+    $editForm = $this->createForm(DepartmentDescriptionType::class, $department, ['structure' => $structure]);
+    $formHandler = new DepartmentHandler($editForm, $request, $this->em, $structure);
 
     if ( $formHandler->process() ) {
       $this->session->getFlashBag()->add('notice', 'Description du service "' . $department->getName() . '" enregistrée.');
 
-      return $this->redirect($this->generateUrl('GCore_FSAEditDepartmentDescription', array('id' => $id, 'limit' => $limit)));
+      return $this->redirect($this->generateUrl('GCore_FSAEditDepartmentDescription', ['slug' => $structure->getSlug(), 'id' => $department->getId(), 'limit' => $limit]));
     }
 
     return array(
       'entity'    => $department,
-      'edit_form' => $editForm->createView(),
+      'form' => $editForm->createView(),
       'limit'     => $limit,
     );
   }

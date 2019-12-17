@@ -24,7 +24,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Symfony\Component\HttpFoundation\Response;
 use App\Entity\Accreditation,
     App\Form\AccreditationType,
-    App\Form\AccreditationHandler;
+    App\FormHandler\AccreditationHandler;
+use App\Entity\Department;
+use App\Entity\Structure;
 
 /**
  * Accreditation controller.
@@ -43,21 +45,22 @@ class AccreditationController extends AbstractController
   /**
    * Displays a form to add a new Accreditation entity.
    *
-   * @Route("/{slug}/accreditation/{id}/new", name="GCore_FSANewAccreditation", requirements={"id" = "\d+"})
-   * @Template("App:FieldSetAdmin:accreditationForm.html.twig")
+   * @Route("/{slug}/accreditation/{id}/new", name="GCore_FSANewAccreditation", requirements={"slug" = "\w+","id" = "\d+"})
+   * @Template("hospital/accreditationForm.html.twig")
    */
-  public function newAction($slug, $department)
+  public function newAction($slug, Department $department, Request $request)
   {
-    $limit = $this->get('request')->query->get('limit', null);
+    $limit = $request->query->get('limit', null);
 
     $accreditation = new Accreditation();
     $form = $this->createForm(AccreditationType::class, $accreditation);
-    $formHandler = new AccreditationHandler($form, $this->get('request'), $this->em, $this->um, $department);
+    $formHandler = new AccreditationHandler($form, $request, $this->em, $this->um, $department);
 
     if($formHandler->process()) {
       $this->session->getFlashBag()->add('notice', 'Agrément "' . $accreditation->getSector()->getName() . '" modifié.');
 
     return $this->redirect($this->generateUrl('GCore_FSShowDepartment', array(
+        'slug'  => $slug,
       'id'    => $department->getId(),
       'limit' => $limit,
     )));
@@ -75,19 +78,20 @@ class AccreditationController extends AbstractController
    * Displays a form to edit an existing Accreditation entity.
    *
    * @Route("/{slug}/accreditation/{id}/edit", name="GCore_FSAEditAccreditation", requirements={"id" = "\d+"})
-   * @Template("App:FieldSetAdmin:accreditationForm.html.twig")
+   * @Template("hospital/accreditationForm.html.twig")
    */
-  public function editAccreditationAction($slug, $accreditation)
+  public function editAccreditationAction($slug, Accreditation $accreditation, Request $request)
   {
-    $limit = $this->get('request')->query->get('limit', null);
+    $limit = $request->query->get('limit', null);
 
     $form = $this->createForm(AccreditationType::class, $accreditation);
-    $formHandler = new AccreditationHandler($form, $this->get('request'), $this->em, $this->um);
+    $formHandler = new AccreditationHandler($form, $request, $this->em, $this->um);
 
     if($formHandler->process()) {
       $this->session->getFlashBag()->add('notice', 'Agrément "' . $accreditation->getSector()->getName() . '" modifié.');
 
       return $this->redirect($this->generateUrl('GCore_FSShowDepartment', array(
+        'slug'  => $slug,
         'id'    => $accreditation->getDepartment()->getId(),
         'limit' => $limit,
       )));
@@ -106,9 +110,9 @@ class AccreditationController extends AbstractController
    *
    * @Route("/{slug}/accreditation/{id}/delete", name="GCore_FSADeleteAccreditation", requirements={"id" = "\d+"}))
    */
-  public function deleteAccreditationAction($id)
+  public function deleteAccreditationAction($slug, Accreditation $accreditation, Request $request)
   {
-    $limit = $this->get('request')->query->get('limit', null);
+    $limit = $request->query->get('limit', null);
     $department_id = $accreditation->getDepartment()->getId();
 
     $this->em->remove($accreditation);
@@ -117,6 +121,7 @@ class AccreditationController extends AbstractController
     $this->session->getFlashBag()->add('notice', 'Agrément "' . $accreditation->getSector()->getName() . '" supprimé.');
 
     return $this->redirect($this->generateUrl('GCore_FSShowDepartment', array(
+        'slug'  => $slug,
         'id'    => $department_id,
         'limit' => $limit,
     )));
@@ -128,10 +133,9 @@ class AccreditationController extends AbstractController
    * @Route("/{slug}/accreditation/{id}/promote", name="GCore_FSAPromote", requirements={"id" = "\d+"})
    * @Security("has_role('ROLE_ADMIN')")
    */
-  public function promoteAction($slug, $accreditation)
+  public function promoteAction($slug, Accreditation $accreditation, Request $request)
   {
-    if ($current_user->has_role('ROLE_ADMIN'))
-    $limit = $this->get('request')->query->get('limit', null);
+    $limit = $request->query->get('limit', null);
 
     $user = $accreditation->getUser();
     $user->addRole('ROLE_SUPERTEACHER');
@@ -139,10 +143,11 @@ class AccreditationController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Droits d\'administration donnés à l\'enseignant "' . $accreditation->getSupervisor() . '"');
 
-    return $this->redirect($this->generateUrl('GCore_FSShowDepartment', array(
+    return $this->redirect($this->generateUrl('GCore_FSShowDepartment', [
         'id'    => $accreditation->getDepartment()->getId(),
         'limit' => $limit,
-    )));
+        'slug'  => $slug,
+    ]));
   }
 
   /**
@@ -151,9 +156,9 @@ class AccreditationController extends AbstractController
    * @Route("/{slug}/accreditation/{id}/demote", name="GCore_FSADemote", requirements={"id" = "\d+"})
    * @Security("has_role('ROLE_ADMIN')")
    */
-  public function demoteAction($slug, $accreditation)
+  public function demoteAction($slug, Accreditation $accreditation, Request $request)
   {
-    $limit = $this->get('request')->query->get('limit', null);
+    $limit = $request->query->get('limit', null);
 
     $user = $accreditation->getUser();
     if( $user->hasRole('ROLE_SUPERTEACHER') )
@@ -162,9 +167,10 @@ class AccreditationController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Droits d\'administration retirés à l\'enseignant "' . $accreditation->getSupervisor() . '"');
 
-    return $this->redirect($this->generateUrl('GCore_FSShowDepartment', array(
+    return $this->redirect($this->generateUrl('GCore_FSShowDepartment', [
         'id'    => $accreditation->getDepartment()->getId(),
         'limit' => $limit,
-    )));
+        'slug'  => $slug,
+    ]));
   }
 }

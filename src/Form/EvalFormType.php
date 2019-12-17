@@ -13,29 +13,50 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType,
+    Symfony\Component\Form\Extension\Core\Type\TextType;
+use App\Form\EvalCriteriaType,
+    App\Form\EvalSectorType;
 
 /**
  * EvalFormType
  */
 class EvalFormType extends AbstractType
 {
-  public function buildForm(FormBuilderInterface $builder, array $options)
-  {
-    $builder
-      ->add('name')
-      ->add('criterias', 'collection', array(
-        'type' => EvalCriteriaType::class,
-        'allow_add' => true,
-        'allow_delete' => true,
-        'prototype' => true,
-        'by_reference' => false,
-      ));
-  }
+    private $exclude_sectors = null;
 
-  public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
-  {
-    $resolver->setDefaults(array(
-        'data_class' => 'App\Entity\EvalForm',
-    ));
-  }
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('name', TextType::class, [
+                'label' => 'Titre du formulaire (pour identification)',
+            ])
+            ->add('sectors', CollectionType::class, [
+                'label'        => 'Agréments',
+                'entry_type'   => EvalSectorType::class,
+                'entry_options' => ['exclude_sectors' => $this->exclude_sectors],
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'delete_empty' => true,
+                'prototype'    => true,
+                'by_reference' => false,
+            ])
+            ->add('criterias', CollectionType::class, [
+                'label'        => 'Questions du formulaire',
+                'entry_type'   => EvalCriteriaType::class,
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'delete_empty' => true,
+                'prototype'    => true,
+                'by_reference' => false,
+          ]);
+    }
+
+    public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => 'App\Entity\EvalForm',
+            'exclude_sectors' => null,
+        ));
+    }
 }

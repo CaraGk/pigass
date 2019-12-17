@@ -161,7 +161,10 @@ class DashboardController extends AbstractController
         $modules['stage']['departments'] = $this->em->getRepository('App:Department')->countAll($structure);
         $modules['stage']['periods'] = $this->em->getRepository('App:Period')->findBy(['structure' => $structure]);
 
-        $modules['evaluation']['total'] = null;
+        $modules['evaluation']['total'] = $this->em->getRepository('App:Evaluation')->countAll($structure);
+        $modules['evaluation']['forms'] = $this->em->getRepository('App:EvalForm')->findBy(['structure' => $structure]);
+
+        $modules['simulation']['rules'] = $this->em->getRepository('App:SectorRule')->findBy(['structure' => $structure]);
 
         return [
             'structure' => $structure,

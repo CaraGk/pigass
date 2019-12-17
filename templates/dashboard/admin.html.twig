@@ -66,7 +66,12 @@
                 {{ modules.stage.sectors|length }} catégories de stage : {% for sector in modules.stage.sectors %}{% if not loop.first %}, {% endif %}<span class="badge badge-info">{{ sector }}</span>{% endfor %}
             </p>
             <p class="card-text">
-                {{ modules.stage.periods|length }} périodes de stage : {% for period in modules.stage.periods %}{% if not loop.first %}, {% endif %}<span class="badge badge-info">{{ period }}</span>{% endfor %}
+                {{ modules.stage.periods|length }} périodes de stage :
+                {% for period in modules.stage.periods %}{% if not loop.first %}, {% endif %}
+                    <a class="btn btn-outline-info btn-sm" href="{{ path('GCore_PAPeriodEdit', {'slug': structure.slug, 'id': period.id}) }}" title="Modifier la période de stage « {{ period }} »">
+                        {{ period }}
+                    </a>
+                {% endfor %}
             </p>
             <p class="card-text">
             <a class="btn btn-primary" href={{ path('GCore_FSIndex', {'slug': structure.slug}) }} title="Afficher les terrains de stage">
@@ -79,6 +84,41 @@
             <a class="card-link btn btn-primary btn-sm" href="{{ path('app_placement_period', {'slug': structure.slug}) }}" title="Ajouter une période de stage">
                 <i class="fas fa-plus"></i> Nouvelle période
             </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if param('eval_' ~ structure.slug ~ '_active') %}
+    <div class="card mt-3">
+        <div class="card-header bg-primary text-white text-center">Évaluations</div>
+        <div class="card-body">
+            <p class="card-text">{{ modules.evaluation.total }} évaluations</p>
+            <p class="card-text">Formulaires :
+                {% for form in modules.evaluation.forms %}
+                <a class="btn btn-outline-info btn-sm" href="{{ path('GEval_AEdit', {'slug': structure.slug, 'id': form.id}) }}" title="Modifier le formulaire d'évaluation « {{ form }} »">
+                        {{ form }}
+                    </a>
+                {% else %}
+                    Aucun formulaire enregisitré.
+                {% endfor %}
+            </p>
+        </div>
+        <div class="card-footer text-center">
+        </div>
+    </div>
+    {% endif %}
+
+    {% if param('simul_' ~ structure.slug ~ '_active') %}
+    <div class="card mt-3">
+        <div class="card-header bg-primary text-white text-center">Simulations</div>
+        <div class="card-body">
+            {% for rule in modules.simulation.rules %}
+                <p class="card-text">{{ rule }}</p>
+            {% else %}
+                <p class="card-text">Aucune règle fixée</p>
+            {% endfor %}
+        </div>
+        <div class="card-footer text-center">
         </div>
     </div>
     {% endif %}

@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Annotation\Route,
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\Response;
 use App\Entity\Structure;
 use App\Entity\Period,
@@ -120,26 +121,30 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/period/{id}/edit", name="GCore_PAPeriodEdit", requirements={"id" = "\d+"})
-     * @Template("App:PlacementAdmin:period.html.twig")
+     * @Template("placement/period.html.twig")
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
-    public function editPeriodAction($slug, Request $request, Period $period)
+    public function editPeriodAction(Structure $structure, Request $request, Period $period)
     {
-      $periods = $this->em->getRepository('App:Period')->findAll();
+        $periods = $this->em->getRepository('App:Period')->findAll();
 
-      $form = $this->createForm(PeriodType::class, $period);
-      $formHandler = new PeriodHandler($form, $request, $this->em);
+        $form = $this->createForm(PeriodType::class, $period, [
+            'withSimul' => $this->em->getRepository('App:Parameter')->findByName('simul_' . $structure->getSlug() . '_active')->getValue(),
+        ]);
+        $formHandler = new PeriodHandler($form, $request, $this->em, $structure);
 
-      if ( $formHandler->process() ) {
-        $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" modifiée.');
+        if ( $formHandler->process() ) {
+            $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" modifiée.');
 
-        return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
-      }
+            return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+        }
 
-      return array(
-        'periods'        => $periods,
-        'period_id'      => $period->getId(),
-        'period_form'    => $form->createView(),
-      );
+        return array(
+            'periods'        => $periods,
+            'period_id'      => $period->getId(),
+            'form'    => $form->createView(),
+            'structure'      => $structure,
+        );
     }
 
     /**

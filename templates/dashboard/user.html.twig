@@ -235,47 +235,49 @@
     {% if param('placement_' ~ structure.slug ~ '_active') %}
     <div class="card mt-3">
         <div class="card-header bg-primary text-white text-center">Stages</div>
-        <ul class="card-body ">
+        <div class="card-body">
         {% for placement in modules.stages.placements %}
-            <li class="field entity placement card">
+        {% if loop.index is odd %}{% if not loop.first %}</div>{% endif %}<div class="card-deck">{% endif %}
+        <div class="card">
                 <div class="card-header text-center">
-                    {{ placement.repartition.department.name }} à {{ placement.repartition.department.hospital }}
+                    <a class="h6" href="{{ path('GCore_FSShowDepartment', {'slug': structure.slug, 'id': placement.repartition.department.id }) }}" title="Afficher le terrain de stage">
+                        {{ placement.repartition.department.name }} à {{ placement.repartition.department.hospital }}
+                    </a>
                 </div>
                 <div class="card-body">
-                    <div class="period">Période : {{ placement.repartition.period }}</div>
-                    <div class="department_sector">Agrément(s) :
-                        <ul class="">
-                            {% for accreditation in placement.repartition.department.accreditations %}
-                                <li class="label label-info">{{ accreditation.sector.name }}</li>
-                            {% endfor %}
-                        </ul>
+                    <div class="period"><i class="fas fa-calendar"></i> {{ placement.repartition.period }}</div>
+                    <div class="department_sector"><i class="fas fa-stamp"></i>
+                        {% for accreditation in placement.repartition.department.accreditations %}
+                            <span class="badge badge-info">{{ accreditation.sector.name }}</span>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="card-footer text-center">
                     <div class="btn-group">
-                        <a class="btn btn-primary" href="{{ path('app_placement_list', {'slug': structure.slug, 'id': placement.repartition.id })}}" title="Voir les autres étudiants">
+                        <a class="btn btn-primary btn-sm" href="{{ path('app_placement_list', {'slug': structure.slug, 'id': placement.repartition.id })}}" title="Voir les autres étudiants">
                             <span class="fas fa-user-friends"></span> Co-internes
                         </a>
                         {% if param('eval_' ~ structure.slug ~ '_active') == true %}
                             {% if placement.id not in modules.stages.evaluated %}
-                                <a class="nonevaluated btn btn-warning" href="{{ path('GEval_DEval', {'slug': structure.slug, 'id': placement.id }) }}" title="Évaluer le stage">
+                                <a class="nonevaluated btn btn-warning btn-sm" href="{{ path('GEval_DEval', {'slug': structure.slug, 'id': placement.id }) }}" title="Évaluer le stage">
                                     <span class="fas fa-clipboard-list"></span> Évaluer
                                 </a>
                             {% else %}
-                                <a class="evaluated btn btn-success" href="">
+                                <a class="evaluated btn btn-success btn-sm" href="">
                                     <span class="fas fa-clipboard-check"></span> Évalué
                                 </a>
                             {% endif %}
                         {% endif %}
                     </div>
                 </div>
-            </li>
+            </div>
+        {% if loop.last %}</div>{% endif %}
         {% else %}
-            <li class="field noentity error card">
+            <div class="field noentity error card">
                 <div class="card-body">Aucun stage effectué</div>
-            </li>
+            </div>
         {% endfor %}
-        </ul>
+        </div>
     </div>
     {% endif %}
 

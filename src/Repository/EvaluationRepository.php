@@ -12,6 +12,7 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * EvaluationRepository
@@ -264,6 +265,23 @@ class EvaluationRepository extends EntityRepository
 
         return $query->getQuery()
                      ->getResult()
+        ;
+    }
+
+    /**
+     * Compte l'ensemble des évaluations d'une structure
+     *
+     * @return integer
+     */
+    public function countAll(Structure $structure)
+    {
+        return $this->getBaseQuery()
+            ->join('d.hospital', 'h')
+            ->where('h.structure = :structure')
+            ->setParameter('structure', $structure)
+            ->select('COUNT(DISTINCT p)')
+            ->getQuery()
+            ->getSingleScalarResult()
         ;
     }
 }

@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Annotation\Route,
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\File\File,
     Symfony\Component\HttpFoundation\Response;
 use App\Entity\Department;
@@ -31,12 +32,13 @@ use App\Entity\Evaluation,
     App\FormHandler\ModerationHandler;
 use App\Entity\EvalForm,
     App\Form\EvalFormType,
-    App\FormHanler\EvalFormHandler;
+    App\FormHandler\EvalFormHandler;
 use App\Entity\EvalSector,
     App\Form\EvalSectorType,
     App\FormHandler\EvalSectorHandler;
 use App\Entity\Placement;
 use App\Entity\EvalCriteria;
+use App\Entity\Structure;
 
 /**
  * EvaluationController
@@ -59,8 +61,10 @@ class EvaluationController extends AbstractController
      *
      * @Route("/{slug}/eval/department/{id}", name="GEval_DShow", requirements={"id" = "\d+"})
      * @Template()
+     * @Entity("department", expr="repository.find(id)")
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function showAction($slug, Department $department)
+    public function showAction(Structure $structure, Department $department)
     {
         /* Vérification des droits ROLE_STUDENT sinon sélection uniquement des EvalCriteria où isPrivate == false */
         $user = $this->getUser();
@@ -71,15 +75,15 @@ class EvaluationController extends AbstractController
             $person = $this->em->getRepository('App:Person')->getByUser($user);
             $current_period = $this->em->getRepository('App:Period')->getCurrent();
             $count_placements = $this->em->getRepository('App:Placement')->getCountByPersonWithoutCurrentPeriod($person, $current_period);
-            if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_unevaluated')->getValue() and $this->em->getRepository('App:Evaluation')->personHasNonEvaluated($person, $current_period, $count_placements)) {
+            if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_unevaluated')->getValue() and $this->em->getRepository('App:Evaluation')->personHasNonEvaluated($person, $current_period, $count_placements)) {
                 $this->session->getFlashBag()->add('error', 'Il y a des évaluations non réalisées. Veuillez évaluer tous vos stages avant de pouvoir accéder aux autres évaluations.');
-                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
+                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug()]));
             }
 
             /* Vérification de l'adhésion de l'étudiant */
-            if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_nonmember')->getValue() and !$this->em->getRepository('App:Membership')->getCurrentForPerson($person, true)) {
+            if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_nonmember')->getValue() and !$this->em->getRepository('App:Membership')->getCurrentForPerson($person, true)) {
                 $this->session->getFlashBag()->add('error', 'Il faut être à jour de ses cotisations pour pouvoir accéder aux évaluations.');
-                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
+                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug()]));
             }
         } else {
             $limit['role'] = true;
@@ -91,7 +95,7 @@ class EvaluationController extends AbstractController
             }
         }
 
-        $limit['date'] = date('Y-m-d H:i:s', strtotime('-' . $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_limit')->getValue() . ' year'));
+        $limit['date'] = date('Y-m-d H:i:s', strtotime('-' . $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_limit')->getValue() . ' year'));
         $limit['date'] = date('Y-m-d H:i-s', strtotime('-10 year'));
 
         if (!$department)
@@ -99,7 +103,7 @@ class EvaluationController extends AbstractController
 
         $eval = $this->em->getRepository('App:Evaluation')->getByDepartment($department->getId(), $limit);
         $count_eval = $this->em->getRepository('App:Evaluation')->countByDepartment($department->getId(), $limit);
-        if (!($user->hasRole('ROLE_STUDENT') or $user->hasRole('ROLE_MEMBER')) and $count_eval < $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_min')->getValue()) {
+        if (!($user->hasRole('ROLE_STUDENT') or $user->hasRole('ROLE_MEMBER')) and $count_eval < $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_min')->getValue()) {
             $eval = null;
         }
 
@@ -213,20 +217,19 @@ class EvaluationController extends AbstractController
    * Displays a form to edit an existing eval_form entity.
    *
    * @Route("/{slug}/eval/form/{id}/edit", name="GEval_AEdit", requirements={"id" = "\d+"})
-   * @Template("App:Admin:form.html.twig")
+   * @Template("evaluation/form.html.twig")
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function editFormAction($slug, EvalForm $eval_form, Request $request)
+  public function editFormAction(Structure $structure, EvalForm $eval_form, Request $request)
   {
-    if (!$eval_form)
-      throw $this->createNotFoundException('Unable to find eval_form entity.');
-
-    $form = $this->createForm(EvalFormType::class, $eval_form);
-    $formHandler = new EvalFormHandler($form, $request, $this->em);
+    $exclude_sectors = $this->em->getRepository('App:EvalSector')->getAssignedSectors();
+    $form = $this->createForm(EvalFormType::class, $eval_form, ['exclude_sectors' => $exclude_sectors]);
+    $formHandler = new EvalFormHandler($form, $request, $this->em, $structure);
 
     if ( $formHandler->process() ) {
       $this->session->getFlashBag()->add('notice', 'Formulaire d\'évaluation "' . $eval_form->getName() . '" modifié.');
 
-      return $this->redirect($this->generateUrl('GEval_AIndex'));
+      return $this->redirect($this->generateUrl('GEval_AEdit', ['slug' => $structure->getSlug(), 'id' => $eval_form->getId()]));
     }
 
     return array(

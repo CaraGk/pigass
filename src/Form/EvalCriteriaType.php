@@ -13,30 +13,38 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType,
+    Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 /**
  * EvalCriteriaType
  */
 class EvalCriteriaType extends AbstractType
 {
-  public function buildForm(FormBuilderInterface $builder, array $options)
-  {
-    $builder->add('rank')
-            ->add('name')
-            ->add('type', 'choice', array(
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('rank', IntegerType::class, [
+                'label' => 'Rang',
+            ])
+            ->add('name', TextType::class, [
+                'label' => 'Intitulé de la question',
+            ])
+            ->add('type', ChoiceType::class, [
               'choices' => array(
-                '1' => 'Choix unique pondéré',
-                '5' => 'Choix unique non pondéré',
-                '7' => 'Échelle visuelle analogique',
-                '3' => 'Choix multiple',
-                '4' => 'Valeur numérique',
-                '6' => 'Horaire',
-                '2' => 'Texte long',
+                'Choix unique pondéré'        => '1',
+                'Choix unique non pondéré'    => '5',
+                'Échelle visuelle analogique' => '7',
+                'Choix multiple'              => '3',
+                'Valeur numérique'            => '4',
+                'Horaire'                     => '6',
+                'Texte long'                  => '2',
               ),
               'required' => true,
               'multiple' => false,
               'expanded' => false,
-            ))
+            ])
             ->add('more')
             ->add('required')
             ->add('moderate')

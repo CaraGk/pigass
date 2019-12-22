@@ -102,6 +102,10 @@
                     Aucun formulaire enregisitré.
                 {% endfor %}
             </p>
+            <p class="card-text">Évaluations à modérer :
+                <a class="btn btn-primary btn-sm" href="{{ path('GEval_ATextIndex', {'slug': structure.slug}) }}" title="Afficher les évaluations à modérer">
+                    {{ modules.evaluation.toModerate }}
+                </a>
         </div>
         <div class="card-footer text-center">
         </div>

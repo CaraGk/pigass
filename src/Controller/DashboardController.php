@@ -88,7 +88,7 @@ class DashboardController extends AbstractController
         $modules['stages']['placements'] = $this->em->getRepository('App:Placement')->getByPerson($person);
         $modules['stages']['evaluated'] = array();
         if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue())
-            $modules['stages']['evaluated'] = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array', $person);
+            $modules['stages']['evaluated'] = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array', $person);
 
         return [
             'structure'   => $structure,
@@ -163,6 +163,7 @@ class DashboardController extends AbstractController
 
         $modules['evaluation']['total'] = $this->em->getRepository('App:Evaluation')->countAll($structure);
         $modules['evaluation']['forms'] = $this->em->getRepository('App:EvalForm')->findBy(['structure' => $structure]);
+        $modules['evaluation']['toModerate'] = $this->em->getRepository('App:Evaluation')->countAll($structure, ['toModerate' => true]);
 
         $modules['simulation']['rules'] = $this->em->getRepository('App:SectorRule')->findBy(['structure' => $structure]);
 

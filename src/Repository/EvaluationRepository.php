@@ -24,13 +24,16 @@ class EvaluationRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getBaseQuery()
+    public function getBaseQuery(Structure $structure)
     {
         return $this->createQueryBuilder('e')
             ->join('e.placement', 'p')
             ->join('p.repartition', 'r')
             ->join('r.department', 'd')
+            ->join('d.hospital', 'h')
             ->join('e.evalCriteria', 'c')
+            ->where('h.structure = :structure')
+            ->setParameter('structure', $structure)
         ;
     }
 
@@ -39,9 +42,9 @@ class EvaluationRepository extends EntityRepository
      *
      * @return query
      */
-    public function getByDepartmentQuery($id, $limit = null)
+    public function getByDepartmentQuery(Structure $structure, $id, $limit = null)
     {
-        $query = $this->getBaseQuery();
+        $query = $this->getBaseQuery($structure);
         $query->join('r.period', 'q')
             ->where('d.id = :id')
             ->setParameter('id', $id)
@@ -69,9 +72,9 @@ class EvaluationRepository extends EntityRepository
      *
      * @return array
      */
-    public function getByDepartment($id, $limit = null)
+    public function getByDepartment(Structure $structure, $id, $limit = null)
     {
-        $query = $this->getByDepartmentQuery($id, $limit);
+        $query = $this->getByDepartmentQuery($structure, $id, $limit);
         $query->addSelect('q')
             ->addSelect('p')
             ->addSelect('r')
@@ -166,9 +169,9 @@ class EvaluationRepository extends EntityRepository
      *
      * return int
      */
-    public function countByDepartment($id, $limit = null)
+    public function countByDepartment(Structure $structure, $id, $limit = null)
     {
-        $query = $this->getByDepartmentQuery($id, $limit);
+        $query = $this->getByDepartmentQuery($structure, $id, $limit);
         $query->select('COUNT(DISTINCT p.id)');
 
         return $query->getQuery()
@@ -176,16 +179,20 @@ class EvaluationRepository extends EntityRepository
         ;
     }
 
-  public function getEvaluatedList($type = 'array', $person = null)
+  public function getEvaluatedList(Structure $structure, $type = 'array', $person = null)
   {
     $query = $this->createQueryBuilder('e')
-                  ->join('e.placement', 'p')
-                  ->addSelect('p');
+        ->join('e.placement', 'p')
+        ->join('p.person', 's')
+        ->addSelect('p')
+        ->where('s.structure = :structure')
+        ->setParameter('structure', $structure)
+    ;
 
     if ($person) {
-      $query->join('p.person', 's')
-            ->where('s.id = :person_id')
-              ->setParameter('person_id', $person->getId());
+        $query
+            ->andWhere('s.id = :person_id')
+            ->setParameter('person_id', $person->getId());
     }
 
     $results = $query->getQuery()->getResult();
@@ -203,9 +210,9 @@ class EvaluationRepository extends EntityRepository
       return null;
   }
 
-    public function getToModerate($eval_id = null)
+    public function getToModerate(Structure $structure, $eval_id = null)
     {
-        $query = $this->getBaseQuery();
+        $query = $this->getBaseQuery($structure);
         $query->where('e.validated = false')
               ->andWhere('e.moderated = false')
               ->addOrderBy('e.created_at', 'asc')
@@ -221,9 +228,9 @@ class EvaluationRepository extends EntityRepository
         }
     }
 
-    public function personHasNonEvaluated($person, $current_period, $count_placements)
+    public function personHasNonEvaluated(Structure $structure, Person $person, Period $current_period, $count_placements)
     {
-        $query = $this->getBaseQuery();
+        $query = $this->getBaseQuery($structure);
         $query->select('COUNT(DISTINCT p.id)')
               ->where('p.person = :person')
               ->setParameter('person', $person);
@@ -247,7 +254,7 @@ class EvaluationRepository extends EntityRepository
      *
      * @return ArrayCollection
      */
-    public function getByPlacement($id, $limit = null)
+    public function getByPlacement(Structure $structure, $id, $limit = null)
     {
         $query = $this->getBaseQuery();
         $query->join('r.period', 'q')
@@ -273,13 +280,19 @@ class EvaluationRepository extends EntityRepository
      *
      * @return integer
      */
-    public function countAll(Structure $structure)
+    public function countAll(Structure $structure, Array $options = ['toModerate' => false])
     {
-        return $this->getBaseQuery()
-            ->join('d.hospital', 'h')
-            ->where('h.structure = :structure')
-            ->setParameter('structure', $structure)
+        $query = $this->getBaseQuery($structure)
             ->select('COUNT(DISTINCT p)')
+        ;
+
+        if (isset($options['toModerate']) and $options['toModerate']) {
+            $query->andWhere('e.validated = false')
+                ->andWhere('e.moderated = false')
+            ;
+        }
+
+        return $query
             ->getQuery()
             ->getSingleScalarResult()
         ;

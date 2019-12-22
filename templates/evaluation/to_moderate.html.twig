@@ -1,0 +1,42 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ parent() }} - évaluations à modérer{% endblock %}
+{% block headline %}Évaluations à modérer{% endblock %}
+
+{% block action %}
+{% endblock %}
+
+{% block content %}
+    <div class="card list-group">
+        {% for evaluation in evaluations %}
+            <div class="list-group-item">
+                <span class="btn-group float-right">
+                    <button class="btn btn-primary dropdown-toogle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li class="action">
+                            <a href="{{ path('GEval_AModerationValid', {'id': evaluation.id})  }}" title="Valider l'évaluation">
+                                <i class="fas fa-ok-circle"></i> Valider
+                            </a>
+                        </li>
+                        <li class="action">
+                            <a href="{{ path('GEval_AModerationEdit', {'id': evaluation.id})  }}" title="Modérer l'évaluation de l'item" class="edit">
+                                <i class="fas fa-pencil-alt"></i> Modifier
+                            </a>
+                        </li>
+                        <li class="actions">
+                            <a href="{{ path('GEval_AModerationInvalid', {'id': evaluation.id})  }}" title="Invalider l'évaluation" class="delete">
+                                <i class="fas fa-remove-circle"></i> Supprimer
+                            </a>
+                        </li>
+                    </ul>
+                </span>
+
+                <div class=""><strong>{{ evaluation.placement.repartition.department.name  }} à {{ evaluation.placement.repartition.department.hospital.name  }}</strong></div>
+                <div class=""><em>{{ evaluation.evalCriteria.name  }}</em> du {{ evaluation.createdAt|date('d-m-Y')  }} : </div>
+                <div class="value">{{ evaluation.value  }}</div>
+            </div>
+            {% else %}
+                <div class="list-group-item">Aucun commentaire à afficher.</li>
+            {% endfor %}
+        </div>
+{% endblock %}

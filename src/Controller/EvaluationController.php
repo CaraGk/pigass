@@ -75,7 +75,7 @@ class EvaluationController extends AbstractController
             $person = $this->em->getRepository('App:Person')->getByUser($user);
             $current_period = $this->em->getRepository('App:Period')->getCurrent();
             $count_placements = $this->em->getRepository('App:Placement')->getCountByPersonWithoutCurrentPeriod($person, $current_period);
-            if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_unevaluated')->getValue() and $this->em->getRepository('App:Evaluation')->personHasNonEvaluated($person, $current_period, $count_placements)) {
+            if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_unevaluated')->getValue() and $this->em->getRepository('App:Evaluation')->personHasNonEvaluated($structure, $person, $current_period, $count_placements)) {
                 $this->session->getFlashBag()->add('error', 'Il y a des évaluations non réalisées. Veuillez évaluer tous vos stages avant de pouvoir accéder aux autres évaluations.');
                 return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug()]));
             }
@@ -91,7 +91,7 @@ class EvaluationController extends AbstractController
             if ($user->hasRole('ROLE_SUPERTEACHER') or $this->em->getRepository('App:Accreditation')->getByDepartmentAndUser($department->getId(), $user->getId())) {
             } else {
                 $this->session->getFlashBag()->add('error', 'Vous n\'avez pas les droits suffisants pour accéder aux évaluations d\'autres terrain de stage.');
-                return $this->redirect($this->generateUrl('GCore_FSIndex'));
+                return $this->redirect($this->generateUrl('GCore_FSIndex', ['slug' => $structure->getSlug()]));
             }
         }
 
@@ -101,8 +101,8 @@ class EvaluationController extends AbstractController
         if (!$department)
             throw $this->createNotFoundException('Unable to find department entity.');
 
-        $eval = $this->em->getRepository('App:Evaluation')->getByDepartment($department->getId(), $limit);
-        $count_eval = $this->em->getRepository('App:Evaluation')->countByDepartment($department->getId(), $limit);
+        $eval = $this->em->getRepository('App:Evaluation')->getByDepartment($structure, $department->getId(), $limit);
+        $count_eval = $this->em->getRepository('App:Evaluation')->countByDepartment($structure, $department->getId(), $limit);
         if (!($user->hasRole('ROLE_STUDENT') or $user->hasRole('ROLE_MEMBER')) and $count_eval < $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_min')->getValue()) {
             $eval = null;
         }
@@ -119,8 +119,9 @@ class EvaluationController extends AbstractController
      * @Route("/{slug}/eval/placement/{id}", name="GEval_DEval", requirements={"id" = "\d+"})
      * @Template()
      * @Security("has_role('ROLE_STUDENT')")
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function evaluateAction($slug, Placement $placement, Request $request)
+    public function evaluateAction(Structure $structure, Placement $placement, Request $request)
     {
         if (!$placement)
             throw $this->createNotFoundException('Unable to find placement entity.');
@@ -134,12 +135,12 @@ class EvaluationController extends AbstractController
 
         if (null != $eval_forms) {
             $form = $this->createForm(EvaluationType::class, null, ['eval_forms' => $eval_forms]);
-            $form_handler = new EvaluationHandler($form, $request, $this->em, $placement, $eval_forms, $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_moderate')->getValue());
+            $form_handler = new EvaluationHandler($form, $request, $this->em, $placement, $eval_forms, $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_moderate')->getValue());
 
             if ($form_handler->process()) {
                 $this->session->getFlashBag()->add('notice', 'Évaluation du stage "' . $placement->getRepartition()->getDepartment()->getName() . ' à ' . $placement->getRepartition()->getDepartment()->getHospital()->getName() . '" enregistrée.');
 
-                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $slug]));
+                return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug()]));
             }
 
             return array(
@@ -160,11 +161,12 @@ class EvaluationController extends AbstractController
      * @Route("/{slug}/eval/placement/{id}/show", name="GEval_DShowPerson", requirements={"id" = "\d+"})
      * @Template()
      * @Security("has_role('ROLE_SUPERTEACHER')")
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function showPersonAction($slug, Placement $placement)
+    public function showPersonAction(Structure $structure, Placement $placement)
     {
         $limit['role'] = true;
-        $evals = $this->em->getRepository('App:Evaluation')->getByPlacement($placement->getId(), $limit);
+        $evals = $this->em->getRepository('App:Evaluation')->getByPlacement($structure, $placement->getId(), $limit);
 
         return array(
             'evals' => $evals,
@@ -196,7 +198,7 @@ class EvaluationController extends AbstractController
    * @Route("/{slug}/eval/form/new", name="GEval_ANew")
    * @Template("App:Admin:form.html.twig")
    */
-  public function newFormAction($slug, Request $request)
+  public function newFormAction(Structure $structure, Request $request)
   {
     $eval_form = new EvalForm();
     $form = $this->createForm(EvalFormType::class, $eval_form);
@@ -205,7 +207,7 @@ class EvaluationController extends AbstractController
     if ( $formHandler->process() ) {
       $this->session->getFlashBag()->add('notice', 'Formulaire d\'évaluation "' . $eval_form->getName() . '" enregistré.');
 
-      return $this->redirect($this->generateUrl('GEval_AIndex'));
+      return $this->redirect($this->generateUrl('GEval_AIndex', ['slug' => $structure->getSlug()]));
     }
 
     return array(
@@ -241,14 +243,15 @@ class EvaluationController extends AbstractController
    * Deletes a eval_form entity.
    *
    * @Route("/{slug}/eval/form/{id}/delete", name="GEval_ADelete", requirements={"id" = "\d+"}))
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteFormAction($slug, EvalForm $eval_form)
+  public function deleteFormAction(Structure $structure, EvalForm $eval_form)
   {
     if (!$eval_form)
       throw $this->createNotFoundException('Unable to find eval_form entity.');
 
     foreach ($eval_form->getCriterias() as $criteria) {
-      if ($evaluations = $this->em->getRepository('App:Evaluation')->findByEvalCriteria($criteria->getId())) {
+      if ($evaluations = $this->em->getRepository('App:Evaluation')->findByEvalCriteria($structure, $criteria->getId())) {
         foreach ($evaluations as $evaluation) {
           $this->em->remove($evaluation);
         }
@@ -260,15 +263,16 @@ class EvaluationController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Formulaire d\'évaluation "' . $eval_form->getName() . '" supprimé.');
 
-    return $this->redirect($this->generateUrl('GEval_AIndex'));
+    return $this->redirect($this->generateUrl('GEval_AIndex', ['slug' => $structure->getSlug()]));
   }
 
   /**
    * Deletes a eval_criteria entity.
    *
    * @Route("/{slug}/eval/criteria/{id}/delete", name="GEval_ADeleteCriteria", requirements={"id" = "\d+"}))
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteCriteriaAction($slug, EvalCriteria $criteria)
+  public function deleteCriteriaAction(Structure $structure, EvalCriteria $criteria)
   {
     if (!$criteria)
       throw $this->createNotFoundException('Unable to find eval_criteria entity.');
@@ -278,7 +282,7 @@ class EvaluationController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Critère d\'évaluation "' . $criteria->getName() . '" supprimé.');
 
-    return $this->redirect($this->generateUrl('GEval_AIndex'));
+    return $this->redirect($this->generateUrl('GEval_AIndex', ['slug' => $structure->getSlug()]));
   }
 
   /**
@@ -286,8 +290,9 @@ class EvaluationController extends AbstractController
    *
    * @Route("/{slug}/eval/form/{id}/sector/add", name="GEval_ASectorAdd", requirements={"form_id" = "\d+"})
    * @Template("App:Admin:index.html.twig")
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function addSectorAction($slug, EvalForm $eval_form, Request $request)
+  public function addSectorAction(Structure $structure, EvalForm $eval_form, Request $request)
   {
     $eval_forms = $this->em->getRepository('App:EvalForm')->findAll();
     $sectors = $this->em->getRepository('App:EvalSector')->getAllByForm($eval_forms);
@@ -300,7 +305,7 @@ class EvaluationController extends AbstractController
     if ( $formHandler->process() ) {
       $this->session->getFlashBag()->add('notice', 'Relation "' . $eval_sector->getSector() . " : " . $eval_sector->getForm() . '" enregistrée.');
 
-      return $this->redirect($this->generateUrl('GEval_AIndex'));
+      return $this->redirect($this->generateUrl('GEval_AIndex', ['slug' => $structure->getSlug()]));
     }
 
     return array(
@@ -317,8 +322,9 @@ class EvaluationController extends AbstractController
    * Deletes a eval_sector entity.
    *
    * @Route("/{slug}/eval/sector/{id}/delete", name="GEval_ASectorDelete", requirements={"id" = "\d+"}))
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteSectorAction($slug, EvalSector $eval_sector)
+  public function deleteSectorAction(Structure $structure, EvalSector $eval_sector)
   {
     if (!$eval_sector)
       throw $this->createNotFoundException('Unable to find eval_sector entity.');
@@ -328,7 +334,7 @@ class EvaluationController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Relation "' . $eval_sector->getSector() . " : " . $eval_sector->getForm() . '" supprimée.');
 
-    return $this->redirect($this->generateUrl('GEval_AIndex'));
+    return $this->redirect($this->generateUrl('GEval_AIndex', ['slug' => $structure->getSlug()]));
   }
 
   /**
@@ -336,12 +342,11 @@ class EvaluationController extends AbstractController
    *
    * @Route("/{slug}/eval/moderation/", name="GEval_ATextIndex")
    * @Template()
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function textIndexAction($slug, Request $request)
+  public function toModerateAction(Structure $structure, Request $request)
   {
-    $paginator = $this->get('knp_paginator');
-    $evaluation_query = $this->em->getRepository('App:Evaluation')->getToModerate();
-    $evaluations = $paginator->paginate($evaluation_query, $Request->query->get('page', 1), 20);
+    $evaluations = $this->em->getRepository('App:Evaluation')->getToModerate($structure);
 
     return array(
       'evaluations' => $evaluations,
@@ -352,8 +357,9 @@ class EvaluationController extends AbstractController
      * Valide une évaluation textuelle
      *
      * @Route("/{slug}/eval/moderation/{id}/valid", name="GEval_AModerationValid", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function validModeration($slug, Evaluation $evaluation)
+    public function validModeration(Structure $structure, Evaluation $evaluation)
     {
 // Réécrire getToModerate() pour tester si l'évaluation est bien à modérer
 // Ajouter un test pour les droits admin
@@ -365,15 +371,16 @@ class EvaluationController extends AbstractController
 
         $this->session->getFlashBag()->add('notice', 'Évaluation validée.');
 
-        return $this->redirect($this->generateUrl('GEval_ATextIndex'));
+        return $this->redirect($this->generateUrl('GEval_ATextIndex', ['slug' => $structure->getSlug()]));
     }
 
     /**
      * Invalide une évaluation
      *
      * @Route("/{slug}/eval/moderation/{id}/delete", name="GEval_AModerationInvalid", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function textDeleteAction($slug, Evaluation $evaluation)
+    public function textDeleteAction(Structure $structure, Evaluation $evaluation)
     {
 // Réécrire getToModerate() pour tester si l'évaluation est bien à modérer
 // Ajouter un test pour les droits admin
@@ -386,7 +393,7 @@ class EvaluationController extends AbstractController
 
         $this->session->getFlashBag()->add('notice', 'Évaluation supprimée.');
 
-        return $this->redirect($this->generateUrl('GEval_ATextIndex'));
+        return $this->redirect($this->generateUrl('GEval_ATextIndex', ['slug' => $structure->getSlug()]));
     }
 
     /**
@@ -394,8 +401,9 @@ class EvaluationController extends AbstractController
      *
      * @Route("/{slug}/eval/moderation/{id}/edit", name="GEval_AModerationEdit", requirements={"id" = "\d+"})
      * @Template()
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function moderationEditAction($slug, Evaluation $evaluation, Request $request)
+    public function moderationEditAction(Structure $structure, Evaluation $evaluation, Request $request)
     {
 // Réécrire getToModerate() pour tester si l'évaluation est bien à modérer
 // Ajouter un test pour les droits admin
@@ -406,7 +414,7 @@ class EvaluationController extends AbstractController
         if ( $formHandler->process() ) {
             $this->session->getFlashBag()->add('notice', 'Évaluation modérée.');
 
-            return $this->redirect($this->generateUrl('GEval_ATextIndex'));
+            return $this->redirect($this->generateUrl('GEval_ATextIndex', ['slug' => $structure->getSlug()]));
         }
         return array(
             'evaluation' => $evaluation,
@@ -418,8 +426,9 @@ class EvaluationController extends AbstractController
      * Exporte les évaluations en PDF
      *
      * @Route("/{slug}/eval/export", name="GEval_APdfExport")
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function pdfExportAction($slug)
+    public function pdfExportAction(Structure $structure)
     {
         $hospitals = $this->em->getRepository('App:Hospital')->getAll();
         $limit['date'] = date('Y-m-d H:i:s', strtotime('-' . $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_limit')->getValue() . ' year'));
@@ -428,7 +437,7 @@ class EvaluationController extends AbstractController
 
         foreach ($hospitals as $hospital) {
             foreach ($hospital->getDepartments() as $department) {
-                $eval[$department->getId()] = $this->em->getRepository('App:Evaluation')->getByDepartment($department->getId(), $limit);
+                $eval[$department->getId()] = $this->em->getRepository('App:Evaluation')->getByDepartment($structure, $department->getId(), $limit);
             }
         }
 
@@ -457,10 +466,11 @@ class EvaluationController extends AbstractController
      * stages
      *
      * @Route("/{slug}/eval/mail", name="GEval_ASendMails")
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
-    public function sendMailsAction($slug)
+    public function sendMailsAction(Structure $structure)
     {
-        $evaluatedList = $this->em->getRepository('App:Evaluation')->getEvaluatedList();
+        $evaluatedList = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure);
         $persons = $this->em->getRepository('App:Person')->getWithPlacementNotIn($evaluatedList);
         $count = 0;
 
@@ -478,7 +488,7 @@ class EvaluationController extends AbstractController
         }
 
         $this->session->getFlashBag()->add('notice', $count . ' email(s) ont été envoyé(s).');
-        return $this->redirect($this->generateUrl('GEval_AIndex'));
+        return $this->redirect($this->generateUrl('GEval_AIndex', ['slug' => $structure->getSlug()]));
     }
 
     /**
@@ -486,10 +496,10 @@ class EvaluationController extends AbstractController
      *
      * @Route("/{slug}/eval/placement/{id}/delete", name="GEval_ADeleteEval", requirements={"id" = "\d+"})
      */
-    public function deleteEval($slug, Placement $placement, Request $request)
+    public function deleteEval(Structure $structure, Placement $placement, Request $request)
     {
         $this->em = $this->getDoctrine()->getManager();
-        $evaluations = $this->em->getRepository('App:Evaluation')->findByPlacement($placement->getId());
+        $evaluations = $this->em->getRepository('App:Evaluation')->findByPlacement($structure, $placement->getId());
 
         if (!$evaluations)
           throw $this->createNotFoundException('Unable to find evaluation entity.');
@@ -504,6 +514,7 @@ class EvaluationController extends AbstractController
         $queryArray = [];
         if($limit = $request()->query->get('limit')) {
             $queryArray['limit'] = array(
+                'slug'        => $structure->getSlug(),
                 'type'        => $limit['type'],
                 'value'       => $limit['value'],
                 'description' => $limit['description'],

@@ -281,7 +281,7 @@
     </div>
     {% endif %}
 
-    {% if is_granted('ROLE_ADMIN') %}
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STRUCTURE') %}
     <div class="card mt-3">
         <div class="card-header bg-primary text-white text-center">Droits d'accès</div>
         <div class="card-body">

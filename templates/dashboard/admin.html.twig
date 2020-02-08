@@ -66,12 +66,46 @@
                 {{ modules.stage.sectors|length }} catégories de stage : {% for sector in modules.stage.sectors %}{% if not loop.first %}, {% endif %}<span class="badge badge-info">{{ sector }}</span>{% endfor %}
             </p>
             <p class="card-text">
-                {{ modules.stage.periods|length }} périodes de stage :
-                {% for period in modules.stage.periods %}{% if not loop.first %}, {% endif %}
-                    <a class="btn btn-outline-info btn-sm" href="{{ path('GCore_PAPeriodEdit', {'slug': structure.slug, 'id': period.id}) }}" title="Modifier la période de stage « {{ period }} »">
-                        {{ period }}
-                    </a>
-                {% endfor %}
+                <table class="col">
+                    <thead>
+                        <tr>
+                            <th>
+                                {{ modules.stage.periods|length }} périodes de stage
+                            </th>
+                            <th class="text-center">
+                                Terrains ouverts
+                            </th>
+                            <th class="text-center">
+                                Postes
+                            </th>
+                            <th class="text-center">
+                                Non pourvus
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for period in modules.stage.periods %}
+                        <tr>
+                            <td>
+                                <a class="btn btn-light btn-sm" href="{{ path('GCore_PAPeriodEdit', {'slug': structure.slug, 'id': period.id}) }}" title="Modifier la période de stage « {{ period }} »">
+                                    {{ period }}
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-secondary">{{ modules.stage.opened[period.id] }}</span>
+                            </td>
+                            <td class="text-center">
+                                <a class="badge badge-secondary" href="{{ path('GCore_PARepartitionsPeriod', {'slug': structure.slug, 'id': period.id}) }}" title="Modifier les répartitions de la période « {{ period }} »">
+                                    {{ modules.stage.placements[period.id] }}
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-secondary">{{ modules.stage.none[period.id] }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </p>
             <p class="card-text">
             <a class="btn btn-primary" href={{ path('GCore_FSIndex', {'slug': structure.slug}) }} title="Afficher les terrains de stage">

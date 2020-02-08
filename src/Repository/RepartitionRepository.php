@@ -12,6 +12,8 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Period,
+    App\Entity\Structure;
 
 /**
  * RepartitionRepository
@@ -33,7 +35,7 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getByPeriodQuery($period)
+    public function getByPeriodQuery(Structure $structure, Period $period)
     {
         $query = $this->getBaseQuery();
         return $query->where('p.id = :period')

@@ -51,12 +51,13 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/placement/{id}", name="app_placement_list", requirements={"slug" = "\w+", "id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      * @Template
      */
-    public function listPlacements($slug, Repartition $repartition, Request $request)
+    public function listPlacements(Structure $structure, Repartition $repartition, Request $request)
     {
         $placements = $this->em->getRepository('App:Placement')->getByRepartition($repartition);
-        $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
+        $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $structure->getSlug()]);
 
         return [
             'structure'  => $structure,
@@ -68,12 +69,12 @@ class PlacementController extends AbstractController
      * @Route("/{slug}/period", name="GCore_PAPeriodIndex")
      * @Template()
      */
-    public function periodAction($slug)
+    public function periodAction(Structure $structure)
     {
-        $periods = $this->em->getRepository('App:Period')->findAll();
+        $periods = $this->em->getRepository('App:Period')->findBy(['structure' => $structure->getId()]);
 
         return array(
-            'slug'           => $slug,
+            'slug'           => $structure->getSlug(),
             'periods'        => $periods,
             'period_id'      => null,
             'period_form'    => null,
@@ -96,13 +97,14 @@ class PlacementController extends AbstractController
         $formHandler = new PeriodHandler($form, $request, $this->em, $structure);
 
         if ( $formHandler->process() ) {
-            $last_repartitions = $this->em->getRepository('App:Repartition')->getByPeriod($last_period);
+            $last_repartitions = $this->em->getRepository('App:Repartition')->getByPeriod($structure, $last_period);
             foreach($last_repartitions as $repartition) {
                 $new_repartition = new Repartition();
                 $new_repartition->setPeriod($period);
                 $new_repartition->setDepartment($repartition->getDepartment());
                 $new_repartition->setNumber($repartition->getNumber());
                 $new_repartition->setCluster($repartition->getCluster());
+                $new_repartition->setStructure($structure);
                 $this->em->persist($new_repartition);
           }
           $this->em->flush();
@@ -121,8 +123,8 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/period/{id}/edit", name="GCore_PAPeriodEdit", requirements={"id" = "\d+"})
-     * @Template("placement/period.html.twig")
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
+     * @Template("placement/period.html.twig")
      */
     public function editPeriodAction(Structure $structure, Request $request, Period $period)
     {
@@ -149,8 +151,9 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/period/{id}/delete", name="GCore_PAPeriodDelete", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
-    public function deletePeriodeAction($slug, Period $period)
+    public function deletePeriodeAction(Structure $structure, Period $period)
     {
       $this->em->remove($period);
       $this->em->flush();
@@ -187,9 +190,10 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/placement/{id}/edit", name="GCore_PAPlacementEdit", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      * @Template("App:PlacementAdmin:edit.html.twig")
      */
-    public function editPlacementAction($slug, Request $request, Placement $placement)
+    public function editPlacementAction(Structure $structure, Request $request, Placement $placement)
     {
       $limit = $request->query->get('limit', null);
       $paginator = $this->get('knp_paginator');
@@ -224,9 +228,10 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/placement/new", name="GCore_PAPlacementNew")
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      * @Template("App:PlacementAdmin:edit.html.twig")
      */
-    public function newPlacementAction($slug, Request $request)
+    public function newPlacementAction(Structure $structure, Request $request)
     {
       $limit = $request->query->get('limit', null);
       $paginator = $this->get('knp_paginator');
@@ -261,8 +266,9 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/placement/{id}/delete", name="GCore_PAPlacementDelete", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
-    public function deletePlacementAction($slug, Request $request, Placement $placement)
+    public function deletePlacementAction(Structure $structure, Request $request, Placement $placement)
     {
       $limit = $request->query->get('limit', null);
 
@@ -276,6 +282,7 @@ class PlacementController extends AbstractController
 
     /**
      * @Route("/{slug}/period/{id}/repartitions", name="GCore_PARepartitionsPeriod", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      * @Template("placement/repartitions.html.twig")
      */
     public function repartitionsForPeriodEditAction(Structure $structure, Request $request, Period $period)
@@ -283,7 +290,7 @@ class PlacementController extends AbstractController
         $hospital_id = $request->query->get('hospital_id', 0);
         $hospital_count = $request->query->get('hospital_count', 0);
         $next_hospital = $this->em->getRepository('App:Hospital')->getNext($hospital_id);
-        $hospital_total = $this->em->getRepository('App:Hospital')->countAll();
+        $hospital_total = $this->em->getRepository('App:Hospital')->countAll($structure);
 
         if (!$next_hospital)
             return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
@@ -297,16 +304,20 @@ class PlacementController extends AbstractController
             $this->session->getFlashBag()->add('notice', 'Répartition pour la période "' . $period . '" enregistrée (' . $hospital_count . '/' . $hospital_total . ').');
 
             return $this->redirect($this->generateUrl('GCore_PARepartitionsPeriod', [
-                'id'      => $period->getId(),
                 'hospital_id'    => $next_hospital->getId(),
                 'hospital_count' => $hospital_count,
                 'slug'           => $structure->getSlug(),
+                'id'         => $period->getId(),
             ]));
         }
 
         return array(
-            'origin' => $period->getName() . ' : ' . $next_hospital->getName(),
-            'form'   => $form->createView(),
+            'origin'    => $period->getName() . ' : ' . $next_hospital->getName(),
+            'form'      => $form->createView(),
+            'period'    => $period,
+            'structure' => $structure,
+            'hospital'  => $next_hospital,
+            'repartitions' => $repartitions,
         );
     }
 
@@ -347,9 +358,10 @@ class PlacementController extends AbstractController
      * Maintenance tasks
      *
      * @Route("/{slug}/maintenance/department", name="GCore_PAMaintenance")
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      * @Template()
      */
-    public function maintenanceAction($slug, Request $request)
+    public function maintenanceAction(Structure $structure, Request $request)
     {
         $departments = $this->em->getRepository('App:Department')->getAllInArray();
 
@@ -362,8 +374,9 @@ class PlacementController extends AbstractController
      * Maintenance for department's repartitions
      *
      * @Route("/{slug}/department/repartitions/", name="GCore_PARepartitionsDepartmentMaintenance")
+     * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
-    public function repartitionsForDepartmentMaintenanceAction($slug, Request $request)
+    public function repartitionsForDepartmentMaintenanceAction(Structure $structure, Request $request)
     {
         $periods = $this->em->getRepository('App:Period')->findAll();
         $department = $this->em->getRepository('App:Department')->find($request->get('department_id'));

@@ -1,13 +1,45 @@
 {% extends "layout.html.twig" %}
 
 {% block headline %}
-    Répartitions - {{ parent() }}
+    {{ structure }} - Répartitions - {{ period }} - {{ hospital }}
 {% endblock %}
 
 {% block content %}
     <div class="card">
+        <div class="card-header bg-primary text-white text-center">{{ period }} : {{ hospital }}</div>
         <div class="card-body">
-            {{ form(form) }}
+            {{ form_start(form) }}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Terrain</th>
+                        <th>Postes</th>
+                        <th>Stage couplé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repartition in repartitions %}
+                        <tr>
+                            <td class="">
+                                <a class="btn btn-light" href="{{ path('GCore_FSShowDepartment', {'slug': structure.slug, 'id': repartition.department.id}) }}" title="Afficher le terrain de stage">
+                                    {{ form_label(form['number_' ~ repartition.id]) }}
+                                </a>
+                            </td>
+                            <td class="">{{ form_widget(form['number_' ~ repartition.id]) }}</td>
+                            <td class="">{{ form_widget(form['cluster_' ~ repartition.id]) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td class="">Aucune répartition enregistrée</td></tr>
+                    {% endfor %}
+                </tbody>
+                <tfooter>
+                    <tr>
+                        <td>
+                            {{ form_end(form) }}
+                        </td>
+                    </tr>
+                </tfooter>
+            </table>
         </div>
     </div>
 {% endblock %}

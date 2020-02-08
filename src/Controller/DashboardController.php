@@ -161,6 +161,22 @@ class DashboardController extends AbstractController
         $modules['stage']['departments'] = $this->em->getRepository('App:Department')->countAll($structure);
         $modules['stage']['periods'] = $this->em->getRepository('App:Period')->findBy(['structure' => $structure]);
 
+        $clusters = [];
+        foreach ($modules['stage']['periods'] as $period) {
+            $modules['stage']['opened'][$period->getId()] = 0;
+            $modules['stage']['placements'][$period->getId()] = 0;
+            $modules['stage']['none'][$period->getId()] = 0;
+            foreach ($period->getRepartitions() as $repartition) {
+                if (!in_array($repartition->getCluster(), $clusters) and $number = $repartition->getNumber()) {
+                    $modules['stage']['opened'][$period->getId()]++;
+                    $modules['stage']['placements'][$period->getId()] += $number;
+                    if ($cluster = $repartition->getCluster()) {
+                        array_push($clusters, $cluster);
+                    }
+                }
+            }
+        }
+
         $modules['evaluation']['total'] = $this->em->getRepository('App:Evaluation')->countAll($structure);
         $modules['evaluation']['forms'] = $this->em->getRepository('App:EvalForm')->findBy(['structure' => $structure]);
         $modules['evaluation']['toModerate'] = $this->em->getRepository('App:Evaluation')->countAll($structure, ['toModerate' => true]);

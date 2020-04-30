@@ -21,7 +21,7 @@
         "build": "encore production"
     },
     "dependencies": {
-        "jquery": "^3.3.1",
+        "jquery": "^3.5.0",
         "jquery-mapael": "^2.2.0",
         "raphael": "^2.2.7"
     }

@@ -726,7 +726,7 @@ class RegisterController extends AbstractController
      * @Route("/{slug}/member/join", name="user_register_join", requirements={"slug" = "\w+"})
      * @Template()
      */
-    public function registerAction(Request $request, $slug, TokenGeneratorInterface $tokenGenerator, AuthorizationCheckerInterface $checker)
+    public function registerAction(Request $request, $slug, TokenGeneratorInterface $tokenGenerator, AuthorizationCheckerInterface $checker, \Swift_Mailer $mailer)
     {
         $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
         if (!$structure)
@@ -814,8 +814,26 @@ class RegisterController extends AbstractController
                 return $this->redirect($this->generateUrl('user_register_confirmation_send', ['email' => $membership->getPerson()->getUser()->getUsername(), 'slug' => $slug]));
             } elseif (isset($rejoin)) {
                 $this->session->getFlashBag()->add('success', 'Adhésion enregistrée pour ' . $membership->getPerson() . '.');
+                if ($this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_notification')->getValue()) {
+                    $mail = (new \Swift_Message('PIGASS - Nouvelle adhésion enregistrée'))
+                        ->setSubject('PIGASS - Nouvelle adhésion enregistrée')
+                        ->setFrom($this->getParameter('app.mailer_admin'))
+                        ->setTo($structure->getEmail())
+                        ->setBody($this->renderView('register/notification.txt.twig', ['person' => $membership->getPerson(), 'rejoin' => true], 'text/plain'))
+                    ;
+                    $mailer->send($mail);
+                }
             } else {
                 $this->session->getFlashBag()->add('success', 'Utilisateur ' . $membership->getPerson()->getUser()->getUsername() . ' créé et adhésion enregistrée pour ' . $membership->getPerson() . '. Envoi du mail d\'activation en cours.');
+                if ($this->em->getRepository('App:Parameter')->findByName('reg_' . $slug . '_notification')->getValue()) {
+                    $mail = (new \Swift_Message('PIGASS - Nouvelle adhésion enregistrée'))
+                        ->setSubject('PIGASS - Nouvelle adhésion enregistrée')
+                        ->setFrom($this->getParameter('app.mailer_admin'))
+                        ->setTo($structure->getEmail())
+                        ->setBody($this->renderView('register/notification.txt.twig', ['person' => $membership->getPerson(), 'rejoin' => false], 'text/plain'))
+                    ;
+                    $mailer->send($mail);
+                }
             }
 
             /* if user is admin and has taken over an account */

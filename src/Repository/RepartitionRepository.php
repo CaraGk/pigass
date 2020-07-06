@@ -39,7 +39,7 @@ class RepartitionRepository extends EntityRepository
     {
         $query = $this->getBaseQuery();
         return $query
-            ->where('s.id = :structure')
+            ->where('r.structure = :structure')
             ->setParameter('structure', $structure->getId())
             ->andWhere('p.id = :period')
             ->andWhere('a.begin <= :period_begin')

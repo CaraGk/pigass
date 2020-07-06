@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Annotation\Route,
     Doctrine\ORM\EntityManagerInterface,
     FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\Response;
 use App\Entity\Hospital,
     App\Form\HospitalType,
@@ -96,41 +97,42 @@ class HospitalController extends AbstractController
     );
   }
 
-  /**
-   * @Route("/{slug}/hospital/{id}/show", name="GCore_FSShowDepartment", requirements={"id" = "\d+"})
-   * @Template()
-   */
-  public function showAction($slug, Department $department, Request $request)
-  {
-      $user = $this->getUser();
-    $limit = $request->query->get('limit', null);
-    $clusters = null;
+    /**
+     * @Route("/{slug}/hospital/{id}/show", name="GCore_FSShowDepartment", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
+     * @Template()
+     */
+    public function showAction(Structure $structure, Department $department, Request $request)
+    {
+        $user = $this->getUser();
+        $limit = $request->query->get('limit', null);
+        $clusters = null;
 
-    foreach($department->getRepartitions() as $repartition) {
-        if ($cluster_name = $repartition->getCluster()) {
-            $period = $repartition->getPeriod();
-            $clusters[] = array(
-                'period'       => $period,
-                'repartitions' => $this->em->getRepository('App:Repartition')->getByPeriodAndCluster($period, $cluster_name),
-            );
+        foreach($department->getRepartitions() as $repartition) {
+            if ($cluster_name = $repartition->getCluster()) {
+                $period = $repartition->getPeriod();
+                $clusters[] = array(
+                    'period'       => $period,
+                    'repartitions' => $this->em->getRepository('App:Repartition')->getByPeriodAndCluster($structure, $period, $cluster_name),
+                );
+            }
         }
-    }
 
-    $evaluated = array();
-    $placements = $this->em->getRepository('App:Placement')->getByUsernameAndDepartment($user?$user->getUsername():null, $department->getId());
-    if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_active')->getValue() and null !== $placements) {
-        foreach ($placements as $placement) {
-            $evaluated[$placement->getId()] = $this->em->getRepository('App:Evaluation')->getByPlacement($placement->getId());
+        $evaluated = array();
+        $placements = $this->em->getRepository('App:Placement')->getByUsernameAndDepartment($user?$user->getUsername():null, $department->getId());
+        if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue() and null !== $placements) {
+            foreach ($placements as $placement) {
+                $evaluated[$placement->getId()] = $this->em->getRepository('App:Evaluation')->getByPlacement($placement->getId());
+            }
         }
-    }
 
-    return array(
-        'department' => $department,
-        'evaluated'  => $evaluated,
-        'limit'      => $limit,
-        'clusters'   => $clusters,
-    );
-  }
+        return array(
+            'department' => $department,
+            'evaluated'  => $evaluated,
+            'limit'      => $limit,
+            'clusters'   => $clusters,
+        );
+    }
 
   /**
    * Displays a form to create a new Hospital entity.

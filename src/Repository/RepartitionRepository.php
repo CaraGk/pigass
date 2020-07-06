@@ -38,7 +38,10 @@ class RepartitionRepository extends EntityRepository
     public function getByPeriodQuery(Structure $structure, Period $period)
     {
         $query = $this->getBaseQuery();
-        return $query->where('p.id = :period')
+        return $query
+            ->where('s.id = :structure')
+            ->setParameter('structure', $structure->getId())
+            ->andWhere('p.id = :period')
             ->andWhere('a.begin <= :period_begin')
             ->andWhere('a.end >= :period_end')
             ->setParameter('period', $period->getId())
@@ -49,14 +52,14 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getAvailableQuery($period)
+    public function getAvailableQuery(Period $period)
     {
         $query = $this->getByPeriodQuery($period);
         $query->andWhere('r.number > 0');
         return $query;
     }
 
-    public function getAvailable($period)
+    public function getAvailable(Period $period)
     {
         $query = $this->getAvailableQuery($period);
 
@@ -65,7 +68,7 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getAvailableForSector($period, $sector_id)
+    public function getAvailableForSector(Period $period, $sector_id)
     {
         $query = $this->getAvailableQuery($period);
         $query->andWhere('s.id = :sector_id')
@@ -76,9 +79,9 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getByPeriod($period, $hospital_id = null)
+    public function getByPeriod(Structure $structure, Period $period, $hospital_id = null)
     {
-        $query = $this->getByPeriodQuery($period);
+        $query = $this->getByPeriodQuery($structure, $period);
 
         if ($hospital_id != null) {
             $query->andWhere('h.id = :hospital_id')
@@ -102,9 +105,9 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getByPeriodAndDepartmentSector($period, $sector_id)
+    public function getByPeriodAndDepartmentSector(Structure $structure, Period $period, $sector_id)
     {
-        $query = $this->getByPeriodQuery($period);
+        $query = $this->getByPeriodQuery($structure, $period);
         $query->andWhere('a.end > :now')
               ->setParameter('now', new \DateTime('now'))
               ->andWhere('s.id = :sector_id')
@@ -116,9 +119,9 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getByPeriodAndCluster($period, $cluster)
+    public function getByPeriodAndCluster(Structure $structure, Period $period, $cluster)
     {
-        $query = $this->getByPeriodQuery($period);
+        $query = $this->getByPeriodQuery($structure, $period);
         $query->andWhere('r.cluster = :cluster')
               ->setParameter('cluster', $cluster)
         ;
@@ -128,9 +131,9 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getByPeriodAndDepartment($period, $department_id)
+    public function getByPeriodAndDepartment(Structure $structure, Period $period, $department_id)
     {
-        $query = $this->getByPeriodQuery($period);
+        $query = $this->getByPeriodQuery($structure, $period);
         $query->andWhere('d.id = :department_id')
             ->setParameter('department_id', $department_id)
             ->setMaxResults(1)

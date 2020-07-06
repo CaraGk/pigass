@@ -72,7 +72,7 @@ class HospitalController extends AbstractController
 
     /* Filtre sur le username pour l'entrée du menu Teacher */
     $arg['limit'] = $request->query->get('limit', $limit_default);
-    if ($arg['limit']['type'] == 'u.id' and $arg['limit']['value'] == '') {
+    if ($arg['limit'] and $arg['limit']['type'] == 'u.id' and $arg['limit']['value'] == '') {
         $arg['limit']['value'] = $user->getId();
         $arg['limit']['description'] = $user->getUsername();
     }

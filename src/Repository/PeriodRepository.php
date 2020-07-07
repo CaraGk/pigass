@@ -12,25 +12,30 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Structure;
 
 /**
  * PeriodRepository
  */
 class PeriodRepository extends EntityRepository
 {
-    public function getCurrent()
+    public function getCurrent(Structure $structure)
     {
         return $this->createQueryBuilder('p')
-                    ->where('p.begin > :now')
+                    ->where('p.structure = :structure')
+                    ->setParameter('structure', $structure->getId())
+                    ->andWhere('p.begin > :now')
                     ->andWhere('p.end < :now')
                     ->setParameter('now', date("Y-m-d"))
                     ->getQuery()
                     ->getOneOrNullResult();
     }
 
-    public function getLast()
+    public function getLast(Structure $structure)
     {
         return $this->createQueryBuilder('p')
+                    ->where('p.structure = :structure')
+                    ->setParameter('structure', $structure->getId())
                     ->orderBy('p.end', 'desc')
                     ->setMaxResults(1)
                     ->getQuery()

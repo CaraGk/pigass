@@ -173,7 +173,7 @@ class PlacementController extends AbstractController
       $placements = $this->em->getRepository('App:Placement')->getAll($structure, $limit);
 
       if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue()) { // Si les évaluations sont activées
-        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array');
+        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array');
       } else {
           $evaluated = null;
       }

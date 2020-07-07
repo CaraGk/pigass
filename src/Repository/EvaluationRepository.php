@@ -12,7 +12,9 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Structure;
+use App\Entity\Structure,
+    App\Entity\Person,
+    App\Entity\Period;
 
 /**
  * EvaluationRepository
@@ -46,7 +48,7 @@ class EvaluationRepository extends EntityRepository
     {
         $query = $this->getBaseQuery($structure);
         $query->join('r.period', 'q')
-            ->where('d.id = :id')
+            ->andWhere('d.id = :id')
             ->setParameter('id', $id)
             ->andWhere('not(c.moderate = true and e.validated = false)')
             ->addOrderBy('c.rank', 'asc')
@@ -213,7 +215,7 @@ class EvaluationRepository extends EntityRepository
     public function getToModerate(Structure $structure, $eval_id = null)
     {
         $query = $this->getBaseQuery($structure);
-        $query->where('e.validated = false')
+        $query->andWhere('e.validated = false')
               ->andWhere('e.moderated = false')
               ->addOrderBy('e.created_at', 'asc')
               ;
@@ -232,7 +234,7 @@ class EvaluationRepository extends EntityRepository
     {
         $query = $this->getBaseQuery($structure);
         $query->select('COUNT(DISTINCT p.id)')
-              ->where('p.person = :person')
+              ->andWhere('p.person = :person')
               ->setParameter('person', $person);
 
         if ($current_period != null) {
@@ -258,7 +260,7 @@ class EvaluationRepository extends EntityRepository
     {
         $query = $this->getBaseQuery();
         $query->join('r.period', 'q')
-            ->where('p.id = :id')
+            ->andWhere('p.id = :id')
             ->setParameter('id', $id)
             ->addOrderBy('c.rank', 'asc')
             ->addOrderBy('q.begin', 'asc')

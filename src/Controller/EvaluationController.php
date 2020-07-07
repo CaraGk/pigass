@@ -73,7 +73,9 @@ class EvaluationController extends AbstractController
 
             /* Vérification de l'évaluation de tous ses stages (sauf le courant) par l'étudiant */
             $person = $this->em->getRepository('App:Person')->getByUser($user);
-            $current_period = $this->em->getRepository('App:Period')->getCurrent();
+            $current_period = $this->em->getRepository('App:Period')->getCurrent($structure);
+            if (!$current_period)
+                $current_period = $this->em->getRepository('App:Period')->getLast($structure);
             $count_placements = $this->em->getRepository('App:Placement')->getCountByPersonWithoutCurrentPeriod($person, $current_period);
             if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_unevaluated')->getValue() and $this->em->getRepository('App:Evaluation')->personHasNonEvaluated($structure, $person, $current_period, $count_placements)) {
                 $this->session->getFlashBag()->add('error', 'Il y a des évaluations non réalisées. Veuillez évaluer tous vos stages avant de pouvoir accéder aux autres évaluations.');

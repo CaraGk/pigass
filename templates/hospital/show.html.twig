@@ -5,6 +5,9 @@
 {% block headline %}{{ department.name }} à {{ department.hospital.name }}{% endblock %}
 
 {% block action %}
+            <a class="btn btn-primary" href="{{ path('GCore_FSIndex', {'slug': department.hospital.structure.slug}) }}">
+                <i class='fas fa-arrow-alt-circle-left'></i> Retour aux terrains
+            </a>
             <a class="btn btn-primary" href="{{ path('GCore_FSShowDepartment', {'slug': department.hospital.structure.slug, 'id': department.id}) }}">
                 <i class='fas fa-hospital'></i> Terrain de stage
             </a>

@@ -78,7 +78,7 @@ class HospitalController extends AbstractController
         $arg['limit']['description'] = $user->getUsername();
     }
 
-    $period = $this->em->getRepository('App:Period')->getLast();
+    $period = $this->em->getRepository('App:Period')->getLast($structure);
     if($period) {
         $arg['period'] = $period->getId();
     } else {

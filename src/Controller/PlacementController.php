@@ -74,7 +74,7 @@ class PlacementController extends AbstractController
         $periods = $this->em->getRepository('App:Period')->findBy(['structure' => $structure->getId()]);
 
         return array(
-            'slug'           => $structure->getSlug(),
+            'structure'  => $structure,
             'periods'        => $periods,
             'period_id'      => null,
             'period_form'    => null,
@@ -111,13 +111,15 @@ class PlacementController extends AbstractController
 
           $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" enregistrée.');
 
-          return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
+          return $this->redirect($this->generateUrl('app_dashboard_admin', [
+              'slug' => $structure->getSlug()
+          ]));
       }
 
       return array(
-        'periods'        => $periods,
-        'form'    => $form->createView(),
-        'structure'      => $structure,
+        'periods'     => $periods,
+        'period_form' => $form->createView(),
+        'structure'   => $structure,
       );
     }
 
@@ -138,14 +140,16 @@ class PlacementController extends AbstractController
         if ( $formHandler->process() ) {
             $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" modifiée.');
 
-            return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+            return $this->redirect($this->generateUrl('app_dashboard_admin', [
+                'slug' => $structure->getSlug(),
+            ]));
         }
 
         return array(
-            'periods'        => $periods,
-            'period_id'      => $period->getId(),
-            'form'    => $form->createView(),
-            'structure'      => $structure,
+            'periods'     => $periods,
+            'period_id'   => $period->getId(),
+            'period_form' => $form->createView(),
+            'structure'   => $structure,
         );
     }
 
@@ -160,7 +164,7 @@ class PlacementController extends AbstractController
 
       $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" supprimée.');
 
-      return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+      return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
     }
 
     /**
@@ -206,7 +210,7 @@ class PlacementController extends AbstractController
       if ( $formHandler->process() ) {
         $this->session->getFlashBag()->add('notice', 'Stage "' . $placement->getPerson() . ' : ' . $placement->getRepartition()->getDepartment() . $placement->getRepartition()->getPeriod() . '" modifié.');
 
-        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex'));
+        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex', ['slug' => $structure->getSlug()]));
       }
 
       $manager = $this->container->get('kdb_parameters.manager');
@@ -223,6 +227,7 @@ class PlacementController extends AbstractController
         'placement_form' => $form->createView(),
         'evaluated'      => $evaluated,
         'limit'          => $limit,
+        'structure'  => $structure,
       );
     }
 
@@ -244,7 +249,7 @@ class PlacementController extends AbstractController
       if ( $placement = $formHandler->process() ) {
         $this->session->getFlashBag()->add('notice', 'Stage de '. $placement->getPerson() . ' à ' . $placement->getRepartition()->getDepartment() . ' en ' . $placement->getRepartition()->getPeriod() . '" enregistré.');
 
-        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex'));
+        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex', ['slug' => $structure->getSlug()]));
       }
 
       $manager = $this->container->get('kdb_parameters.manager');
@@ -261,6 +266,7 @@ class PlacementController extends AbstractController
         'placement_form' => $form->createView(),
         'evaluated'      => $evaluated,
         'limit'          => $limit,
+        'structure'  => $structure,
       );
     }
 
@@ -277,7 +283,7 @@ class PlacementController extends AbstractController
 
       $this->session->getFlashBag()->add('notice', 'Stage "' . $placement->getPerson() . ' : ' . $placement->getRepartition()->getDepartment() . $placement->getRepartition()->getPeriod() . '" supprimé.');
 
-      return $this->redirect($this->generateUrl('GCore_PAPlacementIndex'));
+      return $this->redirect($this->generateUrl('GCore_PAPlacementIndex', ['slug' => $structure->getSlug()]));
     }
 
     /**
@@ -293,7 +299,7 @@ class PlacementController extends AbstractController
         $hospital_total = $this->em->getRepository('App:Hospital')->countAll($structure);
 
         if (!$next_hospital)
-            return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+            return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
 
         $repartitions = $this->em->getRepository('App:Repartition')->getByPeriod($period, $next_hospital->getId());
 
@@ -335,9 +341,10 @@ class PlacementController extends AbstractController
         $repartitions = $this->em->getRepository('App:Repartition')->getByDepartment($department_id);
         $periods = $this->em->getRepository('App:Period')->findAll();
         if (count($repartitions) < count($periods)) {
-            return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartmentMaintenance', array(
+            return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartmentMaintenance', [
                 'department_id' => $department->getId(),
-            )));
+                'slug'          => $structure->getSlug(),
+            ]));
         }
 
         $form = $this->createForm(RepartitionsType::class, $repartitions, ['type' => 'department', 'repartitions' => $repartitions]);
@@ -349,8 +356,10 @@ class PlacementController extends AbstractController
         }
 
         return array(
-            'origin'     => $department,
-            'form' => $form->createView(),
+            'origin'       => $department,
+            'form'         => $form->createView(),
+            'structure'    => $structure,
+            'repartitions' => $repartitions,
         );
     }
 
@@ -367,6 +376,7 @@ class PlacementController extends AbstractController
 
         return array(
             'departments' => $departments,
+            'structure'  => $structure,
         );
     }
 
@@ -411,6 +421,7 @@ class PlacementController extends AbstractController
 
             return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartment', array(
                 'department_id' => $department->getId(),
+                'slug'          => $structure->getSlug(),
             )));
         }
     }

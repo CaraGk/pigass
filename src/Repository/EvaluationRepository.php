@@ -258,7 +258,7 @@ class EvaluationRepository extends EntityRepository
      */
     public function getByPlacement(Structure $structure, $id, $limit = null)
     {
-        $query = $this->getBaseQuery();
+        $query = $this->getBaseQuery($structure);
         $query->join('r.period', 'q')
             ->andWhere('p.id = :id')
             ->setParameter('id', $id)

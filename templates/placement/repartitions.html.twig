@@ -1,12 +1,12 @@
 {% extends "layout.html.twig" %}
 
 {% block headline %}
-    {{ structure }} - Répartitions - {{ period }} - {{ hospital }}
+{{ structure }} - Répartitions - {% if period is defined %}{{ period }} - {{ hospital }}{% else %}{{ origin }}{% endif %}
 {% endblock %}
 
 {% block content %}
     <div class="card">
-        <div class="card-header bg-primary text-white text-center">{{ period }} : {{ hospital }}</div>
+        <div class="card-header bg-primary text-white text-center">{% if period is defined %}{{ period }} : {{ hospital }}{% else %}{{ origin }}{% endif %}</div>
         <div class="card-body">
             {{ form_start(form) }}
             <table>

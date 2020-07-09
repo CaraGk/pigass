@@ -122,7 +122,7 @@ class HospitalController extends AbstractController
         $placements = $this->em->getRepository('App:Placement')->getByUsernameAndDepartment($user?$user->getUsername():null, $department->getId());
         if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue() and null !== $placements) {
             foreach ($placements as $placement) {
-                $evaluated[$placement->getId()] = $this->em->getRepository('App:Evaluation')->getByPlacement($placement->getId());
+                $evaluated[$placement->getId()] = $this->em->getRepository('App:Evaluation')->getByPlacement($structure, $placement->getId());
             }
         }
 
@@ -165,13 +165,13 @@ class HospitalController extends AbstractController
    * Displays a form to edit an existing Hospital entity.
    *
    * @Route("/{slug}/hospital/{id}/edit", name="GCore_FSAEditHospital", requirements={"id" = "\d+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template("hospital/form.html.twig")
    */
-  public function editHospitalAction($slug, Hospital $hospital, Request $request)
+  public function editHospitalAction(Structure $structure, Hospital $hospital, Request $request)
   {
     $limit = $request->query->get('limit', null);
     $periods = $this->em->getRepository('App:Period')->findAll();
-    $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
     if (!$structure)
         throw $this->createNotFoundException('Structure inconnue');
 
@@ -194,8 +194,9 @@ class HospitalController extends AbstractController
    * Deletes a Hospital entity.
    *
    * @Route("/{slug}/hospital/{id}/delete", name="GCore_FSADeleteHospital", requirements={"id" = "\d+"}))
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteHospitalAction($slug, Hospital $hospital, Request $request)
+  public function deleteHospitalAction(Structure $structure, Hospital $hospital, Request $request)
   {
     $limit = $request->query->get('limit', null);
 
@@ -211,8 +212,9 @@ class HospitalController extends AbstractController
    * Deletes a Department entity.
    *
    * @Route("/{slug}/department/{id}/delete", name="GCore_FSADeleteDepartment", requirements={"id" = "\d+"}))
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteDepartmentAction($slug, Department $department, Request $request)
+  public function deleteDepartmentAction(Structure $structure, Department $department, Request $request)
   {
     $limit = $request->query->get('limit', null);
 
@@ -228,12 +230,12 @@ class HospitalController extends AbstractController
    * Edit the description of the Department entity.
    *
    * @Route("/{slug}/hospital/department/{id}", name="GCore_FSAEditDepartmentDescription", requirements={"id" = "\d+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template("hospital/departmentForm.html.twig")
    */
-  public function editDepartmentDescriptionAction($slug, Department $department, Request $request)
+  public function editDepartmentDescriptionAction(Structure $structure, Department $department, Request $request)
   {
       $limit = $request->query->get('limit', null);
-      $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
       if (!$structure)
         throw $this->createNotFoundException('Structure inconnue');
 
@@ -257,15 +259,13 @@ class HospitalController extends AbstractController
    * Edit the description of the Hospital entity.
    *
    * @Route("/{slug}/hospital/{id}", name="GCore_FSAEditHospitalDescription", requirements={"id" = "\d+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template("App:FieldSetAdmin:editDescription.html.twig")
    */
-  public function editHospitalDescriptionAction($slug, Hospital $hospital, Request $request)
+  public function editHospitalDescriptionAction(Structure $structure, Hospital $hospital, Request $request)
   {
     $limit = $request->query->get('limit', null);
     $periods = $this->em->getRepository('App:Period')->findAll();
-    $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
-    if (!$structure)
-        throw $this->createNotFoundException('Structure inconnue');
 
     $editForm = $this->createForm(HospitalDescriptionType::class, $hospital);
     $formHandler = new HospitalHandler($editForm, $request, $this->em, $periods, $structure);

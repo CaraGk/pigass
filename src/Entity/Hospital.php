@@ -221,6 +221,7 @@ class Hospital
      */
     public function removeDepartment(\App\Entity\Department $department)
     {
+        $this->departments->removeElement($department);
     }
 
     /**

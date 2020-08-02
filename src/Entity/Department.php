@@ -54,12 +54,12 @@ class Department
     private $hospital;
 
     /**
-     * @ORM\OneToMany(targetEntity="Accreditation", mappedBy="department", cascade={"remove", "persist"})
+     * @ORM\OneToMany(targetEntity="Accreditation", mappedBy="department", cascade={"remove", "persist"}, orphanRemoval=true)
      */
     private $accreditations;
 
     /**
-     * @ORM\OneToMany(targetEntity="Repartition", mappedBy="department", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="Repartition", mappedBy="department", cascade={"remove"}, orphanRemoval=true)
      */
     private $repartitions;
 

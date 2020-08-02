@@ -11,6 +11,8 @@
 /public/uploads/*.*
 /public/uploads/signs/*
 /public/uploads/logos/*
+/public/js/
+/templates/jquery.collection.html.twig
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/

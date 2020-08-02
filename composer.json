@@ -35,7 +35,8 @@
         "symfony/yaml": "*",
         "twbs/bootstrap": "^4.1",
         "twig/extensions": "^1.5",
-        "vich/uploader-bundle": "^1.8"
+        "vich/uploader-bundle": "^1.8",
+        "ninsuo/symfony-collection": "^2.1"
     },
     "require-dev": {
         "sensiolabs/security-checker": "^5.0",
@@ -73,10 +74,12 @@
             "requirements-checker": "script"
         },
         "post-install-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "Fuz\\Symfony\\Collection\\ScriptHandler::postInstall"
         ],
         "post-update-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "Fuz\\Symfony\\Collection\\ScriptHandler::postUpdate"
         ]
     },
     "conflict": {

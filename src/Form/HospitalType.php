@@ -40,13 +40,14 @@ class HospitalType extends AbstractType
                 'label' => 'N° de téléphone',
             ])
             ->add('departments', CollectionType::class, [
-                'label'      => 'Terrains de stage',
-                'entry_type' => DepartmentType::class,
-                'allow_add' => true,
+                'label'        => 'Terrains de stage',
+                'entry_type'   => DepartmentType::class,
+                'allow_add'    => true,
                 'allow_delete' => true,
                 'delete_empty' => true,
-                'prototype' => true,
+                'prototype'    => true,
                 'by_reference' => false,
+                'attr'         => ['class' => 'departments_collection'],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description (texte libre)'

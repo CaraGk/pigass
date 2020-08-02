@@ -55,7 +55,7 @@ class Repartition
     private $number;
 
     /**
-     * @ORM\OneToMany(targetEntity="Placement", mappedBy="repartition", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="Placement", mappedBy="repartition", cascade={"remove"}, orphanRemoval=true)
      */
     private $placements;
 

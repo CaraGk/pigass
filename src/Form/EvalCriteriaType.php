@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\HiddenType,
     Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 /**
@@ -25,8 +26,9 @@ class EvalCriteriaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('rank', IntegerType::class, [
+            ->add('rank', HiddenType::class, [
                 'label' => 'Rang',
+                'attr'  => [ 'class' => 'criteria_position' ]
             ])
             ->add('name', TextType::class, [
                 'label' => 'Intitulé de la question',

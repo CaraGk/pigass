@@ -157,6 +157,30 @@
             {% endfor %}
         </div>
         <div class="card-footer text-center">
+            {% if modules.simulation.count > 0 %}
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SSim', {'slug': structure.slug}) }}" title="Lancer l'algorithme de simulation">
+                    <i class="fas fa-refresh"></i> Actualiser
+                </a>
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SAList', {'slug': structure.slug}) }}" title="Afficher la table de simulation">
+                    Simulations
+                </a>
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SASave', {'slug': structure.slug}) }}" title="Valider les simulation et les enregistrer dans les stages." class="confirm" confirm="Attention ! Valider les données va enregistrer les stages correspondants et supprimer la simulation actuelle. Souhaitez-vous continuer ?">
+                    <i class="fas fa-ok-circle"></i> Valider
+                </a>
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SAPurge', {'slug': structure.slug}) }}" title="Supprimer la table de simulation" class="confirm" confirm="Attention ! Cette opération va supprimer toutes les données concernant la simulation en cours. Souhaitez-vous continuer ?">
+                    <i class="fas fa-trash"></i> Supprimer
+                </a>
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SALiveRepart', {'slug': structure.slug}) }}" title="Passer en mode de répartition en présentiel">
+                    <i class="fas fa-time"></i> Répartir
+                </a>
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SALiveLeft', {'slug': structure.slug}) }}" title="Afficher les postes restants en présentiel">
+                    <i class="fas fa-eye-open"></i> Postes restants
+                </a>
+            {% else %}
+                <a class="btn btn-primary btn-sm" href="{{ path('GSimul_SADefine', {'slug': structure.slug}) }}" title="Générer la table de simulation">
+                    <i class="fas fa-off"></i> Générer la table
+                </a>
+            {% endif %}
         </div>
     </div>
     {% endif %}

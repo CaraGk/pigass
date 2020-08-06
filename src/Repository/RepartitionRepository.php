@@ -13,6 +13,7 @@ namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use App\Entity\Period,
+    App\Entity\Sector,
     App\Entity\Structure;
 
 /**
@@ -52,27 +53,27 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getAvailableQuery(Period $period)
+    public function getAvailableQuery(Structure $structure, Period $period)
     {
-        $query = $this->getByPeriodQuery($period);
+        $query = $this->getByPeriodQuery($structure, $period);
         $query->andWhere('r.number > 0');
         return $query;
     }
 
-    public function getAvailable(Period $period)
+    public function getAvailable(Structure $structure, Period $period)
     {
-        $query = $this->getAvailableQuery($period);
+        $query = $this->getAvailableQuery($structure, $period);
 
         return $query->getQuery()
                      ->getResult()
         ;
     }
 
-    public function getAvailableForSector(Period $period, $sector_id)
+    public function getAvailableForSector(Structure $structure, Period $period, Sector $sector)
     {
-        $query = $this->getAvailableQuery($period);
+        $query = $this->getAvailableQuery($structure, $period);
         $query->andWhere('s.id = :sector_id')
-              ->setParameter('sector_id', $sector_id)
+              ->setParameter('sector_id', $sector->getId())
         ;
         return $query->getQuery()
                      ->getResult()

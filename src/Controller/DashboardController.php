@@ -21,7 +21,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
     Symfony\Component\HttpFoundation\Response;
-use App\Entity\Structure;
+use App\Entity\Structure,
+    App\Entity\Wish,
+    App\Form\WishType,
+    App\FormHandler\WishHandler;
 
 /**
  * Dashboard controller.
@@ -89,6 +92,26 @@ class DashboardController extends AbstractController
         $modules['stages']['evaluated'] = array();
         if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue())
             $modules['stages']['evaluated'] = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array', $person);
+
+        /* Load simulations */
+        $period = $this->em->getRepository('App:Period')->getLast($structure);
+        $modules['simulation']['period'] = $this->em->getRepository('App:Period')->getSimulationActive($structure);
+        if($simulation = $this->em->getRepository('App:Simulation')->getSimulation($person)) {
+            $modules['simulation']['simulation'] = $simulation;
+            $modules['simulation']['wishes'] = $this->em->getRepository('App:Wish')->getByPerson($person, $period->getId());
+            $modules['simulation']['rules'] = $this->em->getRepository('App:SectorRule')->getForPerson($simulation, $period, $this->em);
+            $modules['simulation']['missing'] = $this->em->getRepository('App:Simulation')->countMissing($simulation);
+            $new_wish = new Wish();
+            $form = $this->createForm(WishType::class, $new_wish, ['rules' => $modules['simulation']['rules']]);
+            $formHandler = new WishHandler($form, $request, $this->em, $simulation);
+            if ($formHandler->process()) {
+                $this->session->getFlashBag()->add('notice', 'Nouveau vœu : "' . $new_wish->getDepartment() . '" enregistré.');
+                return $this->redirect($this->generateUrl('app_dashboard_user', ['person_id' => $simulation->getPerson()->getId(), 'slug' => $structure->getSlug()]));
+            }
+            $modules['simulation']['wish_form'] = $form->createView();
+        } else {
+            $modules['simulation']['simulation'] = null;
+        }
 
         return [
             'structure'   => $structure,
@@ -182,6 +205,7 @@ class DashboardController extends AbstractController
         $modules['evaluation']['toModerate'] = $this->em->getRepository('App:Evaluation')->countAll($structure, ['toModerate' => true]);
 
         $modules['simulation']['rules'] = $this->em->getRepository('App:SectorRule')->findBy(['structure' => $structure]);
+        $modules['simulation']['count'] = $this->em->getRepository('App:Simulation')->countTotal();
 
         return [
             'structure' => $structure,

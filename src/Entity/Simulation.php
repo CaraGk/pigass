@@ -81,7 +81,7 @@ class Simulation
     private $is_validated;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Wish", mappedBy="simperson", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Wish", mappedBy="simulation", cascade={"remove"})
      * @ORM\OrderBy({"rank" = "asc"})
      */
     private $wishes;

@@ -99,7 +99,7 @@ class Person
   private $anonymous;
 
   /**
-   * @ORM\ManyToOne(targetEntity="Grade", inversedBy="students")
+   * @ORM\ManyToOne(targetEntity="Grade", inversedBy="persons")
    * @ORM\JoinColumn(name="grade_id", referencedColumnName="id")
    */
   private $grade;

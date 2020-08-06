@@ -57,7 +57,7 @@ class GradeController extends AbstractController
 
   /**
    * @Route("/{slug}/grade/new", name="GUser_GANew")
-   * @Template("App:GradeAdmin:index.html.twig")
+   * @Template("grade/index.html.twig")
    */
   public function newAction()
   {
@@ -83,7 +83,7 @@ class GradeController extends AbstractController
 
   /**
    * @Route("/{slug}/grade/{id}/edit", name="GUser_GAEdit", requirements={"id" = "\d+"})
-   * @Template("App:GradeAdmin:index.html.twig")
+   * @Template("grade/index.html.twig")
    */
   public function editAction($slug, $grade)
   {

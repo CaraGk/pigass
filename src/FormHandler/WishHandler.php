@@ -50,10 +50,10 @@ class WishHandler
   {
     $rank = $this->em->getRepository('App:Wish')->getMaxRank($this->simulation->getPerson());
 
-    $wish->setSimperson($this->simulation);
+    $wish->setSimulation($this->simulation);
     $wish->setRank($rank+1);
     if (!$wish->getStructure())
-        $wish->setStructure($simulation->getStructure());
+        $wish->setStructure($this->simulation->getStructure());
 
     $this->em->persist($wish);
     $this->em->flush();

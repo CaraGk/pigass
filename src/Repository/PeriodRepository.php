@@ -41,4 +41,14 @@ class PeriodRepository extends EntityRepository
                     ->getQuery()
                     ->getOneOrNullResult();
     }
+
+    public function getSimulationActive(Structure $structure)
+    {
+        return $this->createQueryBuilder('s')
+            ->where('p.structure = :structure')
+            ->setParameter('structure', $structure->getId())
+            ->andWhere('s.begin <= :now')
+            ->andWhere('s.end >= :now')
+            ->setParameter('now', new \DateTime('now'));
+    }
 }

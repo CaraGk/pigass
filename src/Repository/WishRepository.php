@@ -21,7 +21,7 @@ class WishRepository extends EntityRepository
   public function getWishPersonQuery($person_id)
   {
     return $this->createQueryBuilder('w')
-                ->join('w.simperson', 't')
+                ->join('w.simulation', 't')
                 ->where('t.person = :person')
                   ->setParameter('person', $person_id);
   }
@@ -29,7 +29,7 @@ class WishRepository extends EntityRepository
   public function getWishQuery()
   {
     return $this->createQueryBuilder('w')
-                ->join('w.simperson', 't')
+                ->join('w.simulation', 't')
                 ->join('w.department', 'd')
                 ->join('d.hospital', 'h')
                 ->join('d.accreditations', 'a')
@@ -70,14 +70,14 @@ class WishRepository extends EntityRepository
     return $query->getQuery()->getResult();
   }
 
-  public function getPersonWishList($simperson_id)
+  public function getPersonWishList($simulation_id)
   {
     $query = $this->createQueryBuilder('w')
                   ->join('w.department', 'd')
                   ->join('d.accreditations', 'a')
                   ->join('a.sector', 's')
-                  ->where('w.simperson = :simperson_id')
-                  ->setParameter('simperson_id', $simperson_id)
+                  ->where('w.simulation = :simulation_id')
+                  ->setParameter('simulation_id', $simulation_id)
                   ->andWhere('a.end > :now')
                   ->setParameter('now', new \DateTime('now'))
                   ->addSelect('d')

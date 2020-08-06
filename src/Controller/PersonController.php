@@ -478,7 +478,7 @@ class PersonController extends AbstractController
                 $this->em->persist($membership);
             }
 
-            /* Simperson */
+            /* Simulation */
             $simulation = $this->em->getRepository('App:Simulation')->findOneBy(array('person' => $mergeArray['orig']));
             if (isset($simulation)) {
                 $simulation->setPerson($person_dest);

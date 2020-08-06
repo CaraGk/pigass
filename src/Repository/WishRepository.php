@@ -28,20 +28,20 @@ class WishRepository extends EntityRepository
 
   public function getWishQuery()
   {
-    return $this->createQueryBuilder('w')
-                ->join('w.simulation', 't')
-                ->join('w.department', 'd')
-                ->join('d.hospital', 'h')
-                ->join('d.accreditations', 'a')
-                ->join('a.sector', 'u')
-                ->where('a.end > :now')
-                ->setParameter('now', new \DateTime('now'))
-                ->addSelect('d')
-                ->addSelect('h')
-                ->addSelect('t')
-                ->addSelect('a')
-                ->addSelect('u')
-    ;
+      return $this
+          ->createQueryBuilder('w')
+          ->join('w.simulation', 't')
+          ->join('w.department', 'd')
+          ->join('d.hospital', 'h')
+          ->join('d.accreditations', 'a')
+          ->join('a.sector', 'u')
+          ->where('a.revoked = false')
+          ->addSelect('d')
+          ->addSelect('h')
+          ->addSelect('t')
+          ->addSelect('a')
+          ->addSelect('u')
+      ;
   }
 
   public function getByPerson($person_id, $period_id)
@@ -72,17 +72,18 @@ class WishRepository extends EntityRepository
 
   public function getPersonWishList($simulation_id)
   {
-    $query = $this->createQueryBuilder('w')
-                  ->join('w.department', 'd')
-                  ->join('d.accreditations', 'a')
-                  ->join('a.sector', 's')
-                  ->where('w.simulation = :simulation_id')
-                  ->setParameter('simulation_id', $simulation_id)
-                  ->andWhere('a.end > :now')
-                  ->setParameter('now', new \DateTime('now'))
-                  ->addSelect('d')
-                  ->addSelect('a')
-                  ->addSelect('s');
+      $query = $this
+          ->createQueryBuilder('w')
+          ->join('w.department', 'd')
+          ->join('d.accreditations', 'a')
+          ->join('a.sector', 's')
+          ->where('w.simulation = :simulation_id')
+          ->setParameter('simulation_id', $simulation_id)
+          ->andWhere('a.revoked = false')
+          ->addSelect('d')
+          ->addSelect('a')
+          ->addSelect('s')
+      ;
 
     return $query->getQuery()->getResult();
   }

@@ -41,9 +41,7 @@ class HospitalRepository extends EntityRepository
         foreach ($orderBy as $col => $order) {
             $query->addOrderBy($col . '.name', $order);
         }
-        $query->andWhere('a.end > :now')
-              ->setParameter('now', new \DateTime('now'))
-        ;
+        $query->andWhere('a.revoked = false');
 
         return $query->getQuery()
                      ->getResult()
@@ -76,9 +74,7 @@ class HospitalRepository extends EntityRepository
         }
 
         if (!isset($arg['admin'])) {
-            $query->andWhere('a.end > :now')
-                  ->setParameter('now', new \DateTime('now'))
-            ;
+            $query->andWhere('a.revoked = false');
         }
 
         return $query->getQuery()

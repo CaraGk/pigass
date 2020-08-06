@@ -31,7 +31,7 @@ class EvalFormRepository extends EntityRepository
             ->where('p.id = :placement_id')
             ->setParameter('placement_id', $placement_id)
             ->andWhere('a.begin <= q.begin')
-            ->andWhere('a.end >= q.end')
+            ->andWhere('a.revoked = false')
         ;
 
         return $query->getQuery()

@@ -55,7 +55,7 @@ class AccreditationHandler
             $accreditation->setDepartment($this->department);
             if ($user = $this->um->findUserByEmail($accreditation->getUser()->getEmail())) {
                 $user->addRole('ROLE_TEACHER');
-                if ($user->isEnabled() == false) {
+                if ($user->isEnabled() == false and !$accreditation->isRevoked()) {
                     $user->setEnabled(true);
                     $user->setPlainPassword($this->generatePwd(8));
                 }
@@ -64,7 +64,8 @@ class AccreditationHandler
             } else {
                 $user = $accreditation->getUser();
                 $user->addRole('ROLE_TEACHER');
-                $user->setEnabled(true);
+                if (!$accreditation->isRevoked())
+                    $user->setEnabled(true);
                 $user->setConfirmationToken(null);
                 $user->setUsername($user->getEmail());
                 $user->setPlainPassword($this->generatePwd(8));
@@ -73,13 +74,16 @@ class AccreditationHandler
             }
         } else {
             $user = $accreditation->getUser();
-            if ($user->isEnabled() == false) {
+            if ($user->isEnabled() == false and !$accreditation->isRevoked()) {
                 $user->setEnabled(true);
                 $user->setPlainPassword($this->generatePwd(8));
             }
             $user->setUsername($user->getEmail());
             $this->um->updateUser($user);
         }
+
+        if ($accreditation->isRevoked() and ($accreditation->getEnd() == null or $accreditation->getEnd() > new \DateTime('now')))
+            $accreditation->setEnd(new \DateTime('now'));
 
         $accreditation->setStructure($accreditation->getDepartment()->getHospital()->getStructure());
 

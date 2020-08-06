@@ -50,9 +50,16 @@ class Accreditation
     /**
      * @var date $end
      *
-     * @ORM\Column(name="end", type="date")
+     * @ORM\Column(name="end", type="date", nullable=true)
      */
     private $end;
+
+    /**
+     * @var date $revoked
+     *
+     * @ORM\Column(name="revoked", type="boolean")
+     */
+    private $revoked;
 
     /**
      * @ORM\ManyToOne(targetEntity="Department", inversedBy="accreditations", cascade={"persist"})
@@ -262,7 +269,7 @@ class Accreditation
      *
      * @param \App\Entity\Structure $structure
      *
-     * @return Fee
+     * @return Accreditation
      */
     public function setStructure(\App\Entity\Structure $structure = null)
     {
@@ -279,6 +286,29 @@ class Accreditation
     public function getStructure()
     {
         return $this->structure;
+    }
+
+    /**
+     * Is revoked
+     *
+     * @return boolean
+     */
+    public function isRevoked()
+    {
+        return $this->revoked;
+    }
+
+    /**
+     * Set revoked
+     *
+     * @param boolean $revoked
+     * @return Accreditation
+     */
+    public function setRevoked($revoked)
+    {
+        $this->revoked = $revoked;
+
+        return $this;
     }
 
 }

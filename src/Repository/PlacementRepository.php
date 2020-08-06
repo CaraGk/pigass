@@ -43,13 +43,15 @@ class PlacementRepository extends EntityRepository
   public function getByUsername($user, $id = null)
   {
     $query = $this->getBaseQuery();
-    $query->where('u.username = :user')
-          ->setParameter('user', $user)
-          ->andWhere('a.begin <= q.begin')
-          ->andWhere('a.end >= q.end')
-          ->addOrderBy('q.begin', 'desc')
-          ->addOrderBy('h.name', 'asc')
-          ->addOrderBy('d.name', 'asc');
+    $query
+        ->where('u.username = :user')
+        ->setParameter('user', $user)
+        ->andWhere('a.begin <= q.begin')
+        ->andWhere('a.revoked = false')
+        ->addOrderBy('q.begin', 'desc')
+        ->addOrderBy('h.name', 'asc')
+        ->addOrderBy('d.name', 'asc')
+    ;
 
     if ($id) {
         $query->andWhere('p.id = :id')

@@ -44,7 +44,7 @@ class RepartitionRepository extends EntityRepository
             ->setParameter('structure', $structure->getId())
             ->andWhere('p.id = :period')
             ->andWhere('a.begin <= :period_begin')
-            ->andWhere('a.end >= :period_end')
+            ->andWhere('(a.end IS NULL OR a.end <= :period_end)')
             ->setParameter('period', $period->getId())
             ->setParameter('period_begin', $period->getBegin())
             ->setParameter('period_end', $period->getEnd())
@@ -109,10 +109,9 @@ class RepartitionRepository extends EntityRepository
     public function getByPeriodAndDepartmentSector(Structure $structure, Period $period, $sector_id)
     {
         $query = $this->getByPeriodQuery($structure, $period);
-        $query->andWhere('a.end > :now')
-              ->setParameter('now', new \DateTime('now'))
-              ->andWhere('s.id = :sector_id')
-              ->setParameter('sector_id', $sector_id)
+        $query
+            ->andWhere('s.id = :sector_id')
+            ->setParameter('sector_id', $sector_id)
         ;
 
         return $query->getQuery()

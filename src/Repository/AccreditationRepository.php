@@ -39,9 +39,10 @@ class AccreditationRepository extends EntityRepository
     public function getActiveByDepartmentQuery($department_id)
     {
         $query = $this->getByDepartmentQuery($department_id);
-        return $query->andWhere('a.begin < :now')
-                     ->andWhere('a.end > :now')
-                     ->setParameter('now', new \DateTime('now'))
+        return $query
+            ->andWhere('a.begin < :now')
+            ->andWhere('a.revoked = false')
+            ->setParameter('now', new \DateTime('now'))
         ;
     }
 

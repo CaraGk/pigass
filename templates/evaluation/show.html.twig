@@ -25,22 +25,25 @@
 
 {% block content %}
     <div class="tab-content">
-        <ul class="evaluation tab-pane active list-group container-fluid" id="evaluation">
+        <div class="evaluation tab-pane active container-fluid" id="evaluation">
             {% set rank = 0 %}
             {% for item in eval %}
                 {% set rank = rank + 1 %}
 
-                <li class="list-group-item criteria {{ cycle(['odd', 'even'], loop.index0) }} d-flex justify-content-between align-items-center">
-                    <span>{{ rank }}. {{ item['name'] }}</span>
+                <div class="card mt-3 criteria {{ cycle(['odd', 'even'], loop.index0) }}">
+                    <div class="card-header bg-primary text-white text-center">{{ item['name'] }}</div>
+                    <div class="card-body">
                     {% if item['type'] == 2 %}
-                        <ul class="comments col-sm-12">
+                        <ul class="comments list-group">
                             {% for comment in item['text'] %}
-                                <li class="comment {{ cycle(['subodd', 'subeven'], loop.index0) }}">{{ comment }}</li>
+                                <li class="list-group-item comment {{ cycle(['subodd', 'subeven'], loop.index0) }}">{{ comment }}</li>
                             {% endfor %}
                         </ul>
                     {% elseif item['type'] == 1 or item['type'] == 7 %}
                         <span>
-                        <span class="mean" title="Évaluations antérieures : {% for period,mean in item['mean'] %}{% if period > 0 %}{{ mean }} ({{ item['total'][period] }}) ; {% endif %}{% endfor %}"><progress class="bar" value="{{ item['mean'][0] }}" max="100">{{ item['mean'][0] }}</progress></span>
+                        <span class="mean progress bg-secondary" title="Évaluations antérieures : {% for period,mean in item['mean'] %}{% if period > 0 %}{{ mean }} ({{ item['total'][period] }}) ; {% endif %}{% endfor %}">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ item['mean'][0]|round(0,'floor') }}%;" aria-valuenow="{{ item['mean'][0]|round(0,'floor') }}" aria-valuemin="0" aria-valuemax="100">{{ item['mean'][0] }}</div>
+                        </span>
                         <span class="total badge" title="{{ item['total'][0] }} {% if item['total'][0] > 1 %}évaluations{% else %} évaluation{% endif %}">({{ item['total'][0] }} éval.)</span>
                         </span>
                     {% elseif item['type'] == 3 %}
@@ -68,7 +71,8 @@
                     {% else %}
                         <span class="">{{ item['type'] }}</span>
                     {% endif %}
-                </li>
+                    </div>
+                </div>
             {% else %}
                 <div class="list-group-item criteria">Aucune évaluation pour le terrain de stage.</div>
             {% endfor %}

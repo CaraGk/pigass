@@ -1,0 +1,48 @@
+{% extends 'layout.html.twig' %}
+
+{% block headline %}
+    Promotions
+{% endblock %}
+
+{% block action %}
+    <a class="btn btn-primary" href="{{ path('GUser_GANew', {slug: structure.slug}) }}" title="Ajouter un nouveau niveau">
+        <i class="fas fa-plus"></i> Ajouter
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="list-group">
+        {% for grade in grades %}
+            <div class="list-group-item {% if not grade.isActive %}text-muted{% endif %}">
+                {% if grade_id == grade.id and grade_form is not empty %}
+                    <div class="field grade">{{ form(grade_form) }}</div>
+                    <div class="field"><a href="{{ path('GUser_GAIndex', {slug: structure.slug}) }}" title="Annuler l'ajout de catégorie" class="back"><img src="{{ asset('bundles/gessehcore/images/Error_Symbol.png') }}" alt="Annuler"></a></div>
+                {% else %}
+                    <div class="field rank">{{ grade.rank }}.</div>
+                    <div class="field title">{{ grade.name }}</div>
+                    <div class="btn-group float-right">
+                        <div class="btn btn-primary">
+                            <a href="{{ path('GUser_GAEdit', {'id': grade.id, 'slug': structure.slug}) }}" title="Modifier la promotion '{{ grade }}'">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                        </div>
+                        <div class="btn btn-primary">
+                            <a href="{{ path('GUser_GADelete', {'id': grade.id, 'slug': structure.slug}) }}" title="Supprimer la promotion '{{ grade }}'" class="confirm delete" confirm="Attention ! Cette opération va supprimer tous les étudiants de cette promotion et toutes les informations liées. Cette action est irrévocable. Êtes-vous sûrs de vouloir continuer ?">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        {% if grade_form is not empty and grade_id is empty %}
+            <div class="list-group-item">{{ form(grade_form) }}</div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/gessehcore/js/confirm.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/gessehcore/js/actions.js') }}" type="text/javascript"></script>
+{% endblock %}

@@ -183,6 +183,7 @@ class DashboardController extends AbstractController
         $modules['stage']['hospitals'] = $this->em->getRepository('App:Hospital')->countAll($structure);
         $modules['stage']['departments'] = $this->em->getRepository('App:Department')->countAll($structure);
         $modules['stage']['periods'] = $this->em->getRepository('App:Period')->findBy(['structure' => $structure]);
+        $modules['stage']['grades'] = $this->em->getRepository('App:Grade')->findBy(['structure' => $structure]);
 
         $clusters = [];
         foreach ($modules['stage']['periods'] as $period) {

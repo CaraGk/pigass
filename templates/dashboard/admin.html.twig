@@ -58,8 +58,12 @@
         <div class="card-header bg-primary text-white text-center">Stages</div>
         <div class="card-body">
             <p class="card-text">
-            <a class="btn btn-primary" href="{{ path('user_person_index', {'slug': structure.slug}) }}" title="Afficher les étudiants">
+                <a class="btn btn-primary" href="{{ path('user_person_index', {'slug': structure.slug}) }}" title="Afficher les étudiants">
                     {{ modules.stage.count }} étudiants
+                </a>
+                répartis dans
+                <a class="btn btn-primary" href="{{ path('GUser_GAIndex', {slug: structure.slug}) }}" title="Afficher les promotions">
+                    {{ modules.stage.grades|length }} promotions
                 </a>
             </p>
             <p class="card-text">

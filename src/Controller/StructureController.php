@@ -60,6 +60,8 @@ class StructureController extends AbstractController
                 $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
                 $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
                 if (!$last_membership) {
+                    $slug = $person->getStructure()->getSlug();
+                    $this->session->set('slug', $slug);
                     return $this->redirect($this->generateUrl('app_structure_map'));
                 } else {
                     $slug = $last_membership->getStructure()->getSlug();

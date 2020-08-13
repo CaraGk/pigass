@@ -14,7 +14,8 @@ namespace App\FormHandler;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
-use App\Entity\Placement;
+use App\Entity\Placement,
+    App\Entity\Person;
 
 /**
  * PlacementType Handler
@@ -54,7 +55,6 @@ class PlacementHandler
       $placement = new Placement();
       $placement->setRepartition($repartition);
       $placement->setPerson($person);
-      $placement->setStructure($department->getStructure());
     if($cluster_name = $placement->getRepartition()->getCluster()) {
         $other_repartitions = $this->em->getRepository('App:Repartition')->getByPeriodAndCluster($period, $cluster_name);
         foreach ($other_repartitions as $repartition) {

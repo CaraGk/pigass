@@ -268,15 +268,23 @@
                                 </a>
                             {% endif %}
                         {% endif %}
+                        {% if is_granted('ROLE_STRUCTURE') %}
+                            <a class="btn btn-danger btn-sm" href="{{ path('GCore_PAPlacementDelete', {'slug': structure.slug, 'id': placement.id}) }}?{{ app.request.queryString }}" title="Supprimer le stage">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         {% if loop.last %}</div>{% endif %}
         {% else %}
-            <div class="field noentity error card">
-                <div class="card-body">Aucun stage effectué</div>
-            </div>
+                <p class="card-text">Aucun stage effectué</p>
         {% endfor %}
+        </div>
+        <div class="card-footer text-center">
+            <a class="btn btn-primary btn-sm" href="{{ path('GCore_PAPlacementNew', {'slug': structure.slug}) }}?{{ app.request.queryString }}" title="Ajouter un stage">
+                <i class="fas fa-plus"></i> Ajouter
+            </a>
         </div>
     </div>
     {% endif %}

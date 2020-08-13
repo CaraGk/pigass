@@ -234,28 +234,29 @@ class PlacementController extends AbstractController
     /**
      * @Route("/{slug}/placement/new", name="GCore_PAPlacementNew")
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
-     * @Template("App:PlacementAdmin:edit.html.twig")
+     * @Template("placement/edit.html.twig")
      */
     public function newPlacementAction(Structure $structure, Request $request)
     {
-      $limit = $request->query->get('limit', null);
-      $paginator = $this->get('knp_paginator');
-      $placements_query = $this->em->getRepository('App:Placement')->getAll($limit);
-      $placements = $paginator->paginate( $placements_query, $request->query->get('page', 1), 20);
+        $user = $this->getUser();
+        $userid = $request->query->get('userid', null);
+        $person = $this->testAdminTakeOver($user, $userid);
 
-      $form = $this->createForm(PlacementType::class);
+      $limit = $request->query->get('limit', null);
+      $placements = $this->em->getRepository('App:Placement')->getAll($structure, $limit);
+
+      $form = $this->createForm(PlacementType::class, null, ['person' => $person->getId()]);
       $formHandler = new PlacementHandler($form, $request, $this->em);
 
       if ( $placement = $formHandler->process() ) {
         $this->session->getFlashBag()->add('notice', 'Stage de '. $placement->getPerson() . ' à ' . $placement->getRepartition()->getDepartment() . ' en ' . $placement->getRepartition()->getPeriod() . '" enregistré.');
 
-        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex', ['slug' => $structure->getSlug()]));
+        return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug(), 'userid' => $placement->getPerson()->getUser()->getId()]));
       }
 
-      $manager = $this->container->get('kdb_parameters.manager');
-      $mod_eval = $this->em->getRepository('App:Parameter')->findByName('eval_active');
+      $mod_eval = $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active');
       if (true == $mod_eval->getValue()) { // Si les évaluations sont activées
-        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array');
+        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array');
       } else {
           $evaluated = null;
       }
@@ -283,7 +284,7 @@ class PlacementController extends AbstractController
 
       $this->session->getFlashBag()->add('notice', 'Stage "' . $placement->getPerson() . ' : ' . $placement->getRepartition()->getDepartment() . $placement->getRepartition()->getPeriod() . '" supprimé.');
 
-      return $this->redirect($this->generateUrl('GCore_PAPlacementIndex', ['slug' => $structure->getSlug()]));
+      return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug(), 'userid' => $placement->getPerson()->getUser()->getId()]));
     }
 
     /**
@@ -423,6 +424,29 @@ class PlacementController extends AbstractController
                 'department_id' => $department->getId(),
                 'slug'          => $structure->getSlug(),
             )));
+        }
+    }
+
+    /**
+     * Test for admin take over function
+     *
+     * @return Person
+     */
+    private function testAdminTakeOver($user, $userid = null)
+    {
+        if ($user->hasRole('ROLE_ADMIN') and $userid != null) {
+            $user = $this->um->findUserBy(array(
+                'id' => $userid,
+            ));
+        }
+
+        $person = $this->em->getRepository('App:Person')->getByUsername($user->getUsername());
+
+        if (!$person) {
+            $this->session->getFlashBag()->add('error', 'Adhérent inconnu.');
+            return $this->redirect($this->generateUrl('user_register_index'));
+        } else {
+            return $person;
         }
     }
 }

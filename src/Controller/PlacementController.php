@@ -87,8 +87,8 @@ class PlacementController extends AbstractController
      */
     public function newPeriodAction(Structure $structure, Request $request)
     {
-        $periods = $this->em->getRepository('App:Period')->findAll();
-        $last_period = $this->em->getRepository('App:Period')->getLast();
+        $periods = $this->em->getRepository('App:Period')->findAll(['structure' => $structure]);
+        $last_period = $this->em->getRepository('App:Period')->getLast($structure);
 
         $period = new Period();
         $form = $this->createForm(PeriodType::class, $period, [
@@ -120,6 +120,7 @@ class PlacementController extends AbstractController
         'periods'     => $periods,
         'period_form' => $form->createView(),
         'structure'   => $structure,
+        'period_id'   => null,
       );
     }
 

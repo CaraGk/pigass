@@ -1,54 +1,76 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}
-    {{ parent() }} - Stages
-    {% if limit is not null %}
-        ({{ limit.description }})
-    {% endif %}
-{% endblock %}
+{% block title %}{{ parent() }} - {{ structure.name }} - Stages - {{ limit.description }}{% endblock %}
 
-{% block title %}
-    Stages
-    {% if limit is not null %}
-        ({{ limit.description }})
-    {% endif %}
-    <span class=""><a href="{{ path('GCore_PAPlacementNew') }}?{{ app.request.queryString }}" title="Ajouter un nouveau stage" class="add"><img src="{{ asset('bundles/gessehcore/images/Add.png') }}" alt="Ajouter" /></a></span>
+{% block headline %}Stages : {{ limit.description }}{% endblock %}
+
+{% block action %}
 {% endblock %}
 
 {% block content %}
-    {% if placement_form is not empty %}
-        {% form_theme placement_form 'GessehCoreBundle:Form:fields.html.twig' %}
-        <div>{{ form_errors(placement_form) }}</div>
-        {{ form_start(placement_form) }}
-    {% endif %}
-    {% if placement_form is not empty and placement_id is empty %}
-        <ul class="entities placements list-group">{% include 'GessehCoreBundle:PlacementAdmin:placementEdit.html.twig' %}</ul>
-    {% endif %}
-    <ul class="entities placements list-group">
-        {% for placement in placements %}
-            {% include placement_id == placement.id ? 'GessehCoreBundle:PlacementAdmin:placementEdit.html.twig' : 'GessehCoreBundle:PlacementAdmin:placementIndex.html.twig' %}
-        {% else %}
-            <li class="noentity placement list-group-item">Aucun stage à afficher</li>
-        {% endfor %}
-    </ul>
-    <div class="pagination">{{ knp_pagination_render(placements) }}</div>
-    {% if placement_form is not empty %}{{ form_end(placement_form) }}{% endif %}
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent()  }}
-    <link href="https://code.jquery.com/ui/1.11.4/themes/start/jquery-ui.css" type="text/css" rel="stylesheet" />
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script src="{{ asset('bundles/gessehsimulation/js/combobox.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('bundles/gessehcore/js/confirm.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('bundles/gessehcore/js/actions.js') }}" type="text/javascript"></script>
-    <script>
-        $(document).ready(function() {
-            $('select.combobox').combobox()
-        });
-    </script>
+    {% for placement in placements %}
+        <div class="card">
+            <h2 class="card-header text-center bg-primary text-white">
+                {% if limit.type == 's.id' %}
+                    <a class="card-link text-white" href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': {'type': 'd.id', 'value': placement.repartition.department.id, 'description': placement.repartition.department.name ~ ' à ' ~ placement.repartition.department.hospital.name}})  }}" title="Afficher les étudiants par stage dans le service {{ placement.repartition.department  }}">
+                        {{ placement.repartition.department  }}
+                    </a>
+                {% else %}
+                    <a class="card-link text-white" href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': {'type': 's.id', 'value': placement.person.id, 'description': placement.person.surname ~ ' ' ~ placement.person.name}})  }}" title="Afficher les stages de l'étudiant {{ placement.person  }}">
+                        {{ placement.person  }}
+                    </a>
+                {% endif %}
+            </h2>
+            <div class="card-body">
+                <div class="">
+                    <i class="fas fa-calendar"></i> {{ placement.repartition.period  }}
+                </div>
+                <div class="">
+                    <a class="card-link" href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': {'type': 'd.id', 'value': placement.repartition.department.id, 'description': placement.repartition.department.name ~ ' à ' ~ placement.repartition.department.hospital.name}})  }}" title="Afficher les étudiants par stage dans le service {{ placement.repartition.department  }}">
+                        <i class="fas fa-hospital"></i> {{ placement.repartition.department  }}
+                    </a>
+                </div>
+                <div class="">
+                    <a class="card-link w-100" href="{{ path('GCore_PAPlacementIndex', {'slug': structure.slug, 'limit': {'type': 's.id', 'value': placement.person.id, 'description': placement.person.surname ~ ' ' ~ placement.person.name}})  }}" title="Afficher les stages de l'étudiant {{ placement.person  }}">
+                        <i class="fas fa-user"></i> {{ placement.person  }}
+                    </a>
+                </div>
+                {% if param('eval_' ~ structure.slug ~ '_active') == true %}
+                    <div class="">
+                        {% if placement.id in evaluated %}
+                            <a class="card-link text-success" href="{{ path('GEval_DShowPerson', {'slug': structure.slug, 'id': placement.id})  }}?{{ app.request.queryString  }}" title="Afficher l'évaluation du stage">
+                                <i class="fas fa-clipboard-check"></i> Évalué
+                            </a>
+                            <a class="card-link text-danger" href="{{ path('GEval_ADeleteEval', {'slug': structure.slug, 'id': placement.id})  }}?{{ app.request.queryString  }}" title="Supprimer l'évaluation du stage" class="confirm delete" confirm="Attention ! Vous vous apprêtez à supprimer complètement cette évaluation. L'étudiant devra réévaluer son stage. Confirmez-vous ?">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        {% else %}
+                            <a class="card-link text-danger" href="#">
+                                <i class="fas fa-clipboard"></i> Non évalué
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer btn-group">
+                <a class="btn btn-primary btn-sm" href="{{ path('GCore_PAPlacementEdit', {'slug': structure.slug, 'id': placement.id})  }}?{{ app.request.queryString  }}#placement_{{ placement.id  }}" title="Modifier le stage" class="edit">
+                    <i class="fas fa-pencil"></i> Modifier
+                </a>
+                <a class="btn btn-danger btn-sm" href="{{ path('GCore_PAPlacementDelete', {'slug': structure.slug, 'id': placement.id})  }}?{{ app.request.queryString  }}" title="Supprimer le stage" class="confirm delete" confirm="Attention ! Cette opération va supprimer le stage et tous les éléments qui s'y rapportent. Voulez-vous continuer ?">
+                    <i class="fas fa-trash"></i> Supprimer
+                </a>
+                {% if false %}{% if param('eval_' ~ structure.slug ~ '_active') == true and placement.id not in evaluated %}
+                    <a class="btn btn-primary btn-sm" href="" title="Envoyer un message de rappel">
+                        <i class="fas fa-envelope"></i> Rappel
+                    </a>
+                {% endif %}{% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                Aucun stage enregistré
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

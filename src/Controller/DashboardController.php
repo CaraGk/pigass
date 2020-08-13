@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Annotation\Route,
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\Response;
 use App\Entity\Structure,
     App\Entity\Wish,
@@ -46,6 +47,7 @@ class DashboardController extends AbstractController
      * Person dashboard
      *
      * @Route("/{slug}/user", name="app_dashboard_user", requirements={"slug" = "\w+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      * @Template
      * @security("is_granted('ROLE_MEMBER') or is_granted('ROLE_STUDENT') or is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')")
      */
@@ -126,6 +128,7 @@ class DashboardController extends AbstractController
      * Admin dashboard
      *
      * @Route("/{slug}/admin", name="app_dashboard_admin", requirements={"slug" = "\w+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      * @Template
      * @Security("is_granted('ROLE_ADMIN') or (is_granted('ROLE_STRUCTURE') and  is_granted(structure.getRole()))")
      */

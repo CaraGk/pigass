@@ -4,7 +4,7 @@
  * This file is part of PIGASS project
  *
  * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
- * @copyright: Copyright 2013-2018 Pierre-François Angrand
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */

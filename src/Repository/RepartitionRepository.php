@@ -44,10 +44,10 @@ class RepartitionRepository extends EntityRepository
             ->setParameter('structure', $structure->getId())
             ->andWhere('p.id = :period')
             ->andWhere('a.begin <= :period_begin')
-            ->andWhere('(a.end IS NULL OR a.end <= :period_end)')
+//            ->andWhere('(a.end IS NULL OR a.end <= :period_end)')
             ->setParameter('period', $period->getId())
             ->setParameter('period_begin', $period->getBegin())
-            ->setParameter('period_end', $period->getEnd())
+//            ->setParameter('period_end', $period->getEnd())
             ->addOrderBy('h.name', 'asc')
             ->addOrderBy('d.name', 'asc')
         ;

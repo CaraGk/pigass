@@ -30,16 +30,16 @@
                         $('#repartitions .info').text(d.id + '. ' + d.name);
                         repartitions = repartitions + parseInt(response.message);
                         if (repartitions > 0)
-                            $('#repartitions panel.heading').text('Maintenance des répartitions : ' + repartitions + ' répartitions ajoutées');
+                            $('#repartitions card.header').text('Maintenance des répartitions : ' + repartitions + ' répartitions ajoutées');
                         count++;
                         ongoing = Math.round(count*100/departments.length);
                         $('#repartitions .progress-bar').attr('aria-valuenow', ongoing).css('width', ongoing + '%').text(ongoing + '%');
                     },
                     error: function(response) {
-                        if ($('#repartitions .panel-footer').text() != 'Aucune erreur')
-                            $('#repartitions .panel-footer').append(d.id + ': ' + d.name + ' (' + response.message +')<br />');
+                        if ($('#repartitions .card-footer').text() != 'Aucune erreur')
+                            $('#repartitions .card-footer').append(d.id + ': ' + d.name + ' (' + response.message +')<br />');
                         else
-                            $('#repartitions .panel-footer').text(d.id + ': ' + d.name + ' (' + response.message +')<br />');
+                            $('#repartitions .card-footer').text(d.id + ': ' + d.name + ' (' + response.message +')<br />');
                         count++;
                         ongoing = Math.round(count*100/departments.length);
                         $('#repartitions .progress-bar').attr('aria-valuenow', ongoing).css('width', ongoing + '%').text(ongoing + '%');

@@ -22,7 +22,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
-    Symfony\Component\HttpFoundation\Response;
+    Symfony\Component\HttpFoundation\Response,
+    Symfony\Component\HttpFoundation\JsonResponse;
+;
 use App\Entity\Structure;
 use App\Entity\Period,
     App\Form\PeriodType,
@@ -33,6 +35,7 @@ use App\Entity\Placement,
 use App\Entity\Repartition,
     App\Form\RepartitionsType,
     App\FormHandler\RepartitionsHandler;
+use App\Entity\Department;
 
 
 /**
@@ -385,12 +388,12 @@ class PlacementController extends AbstractController
     /**
      * Maintenance for department's repartitions
      *
-     * @Route("/{slug}/department/repartitions/", name="GCore_PARepartitionsDepartmentMaintenance")
+     * @Route("/{slug}/maintenance/departement/repartitions", name="GCore_PARepartitionsDepartmentMaintenance")
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
     public function repartitionsForDepartmentMaintenanceAction(Structure $structure, Request $request)
     {
-        $periods = $this->em->getRepository('App:Period')->findAll();
+        $periods = $this->em->getRepository('App:Period')->findBy(['structure' => $structure->getId()]);
         $department = $this->em->getRepository('App:Department')->find($request->get('department_id'));
 
         if(!$department) {
@@ -398,12 +401,11 @@ class PlacementController extends AbstractController
                 return new JsonResponse(array('message' => 'Error: Unknown entity.'), 404);
             else
                 throw $this->createNotFoundException('Unable to find department entity.');
-
         }
 
         $count = 0;
         foreach ($periods as $period) {
-            if (!$this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($period, $department->getId())) {
+            if (!$this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($structure, $period, $department->getId())) {
                 $repartition = new Repartition();
                 $repartition->setDepartment($department);
                 $repartition->setPeriod($period);

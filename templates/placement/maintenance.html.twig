@@ -20,26 +20,28 @@
     <script type="text/javascript">
         $(document).ready(function() {
             var departments = $('#repartitions').data('departments');
-            var count = 0, ongoing = 0, repartitions = 0;
+            var count = 0, ongoing = 0, repartitions_added = 0, repartitions_removed = 0;
             for (let d of departments) {
                 $.ajax({
                     url: "{{ path('GCore_PARepartitionsDepartmentMaintenance', {'slug': structure.slug}) }}",
                     method: "GET",
                     data: {department_id: d.id},
                     success: function(response) {
+                        console.debug(response.message.add);
                         $('#repartitions .info').text(d.id + '. ' + d.name);
-                        repartitions = repartitions + parseInt(response.message);
-                        if (repartitions > 0)
-                            $('#repartitions card.header').text('Maintenance des répartitions : ' + repartitions + ' répartitions ajoutées');
+                        repartitions_added = repartitions_added + parseInt(response.message.add);
+                        repartitions_removed = repartitions_removed + parseInt(response.message.remove);
+                        if (repartitions_added > 0 || repartitions_removed > 0)
+                            $('#repartitions card.header').text('Maintenance des répartitions : ' + repartitions_added + ' ajoutées, ' + repartitions_removed + 'supprimées');
                         count++;
                         ongoing = Math.round(count*100/departments.length);
                         $('#repartitions .progress-bar').attr('aria-valuenow', ongoing).css('width', ongoing + '%').text(ongoing + '%');
                     },
                     error: function(response) {
                         if ($('#repartitions .card-footer').text() != 'Aucune erreur')
-                            $('#repartitions .card-footer').append(d.id + ': ' + d.name + ' (' + response.message +')<br />');
+                            $('#repartitions .card-footer').append(d.id + ': ' + d.name + ' (' + response.message.add +'|' + response.message.remove + ')<br />');
                         else
-                            $('#repartitions .card-footer').text(d.id + ': ' + d.name + ' (' + response.message +')<br />');
+                            $('#repartitions .card-footer').text(d.id + ': ' + d.name + ' (' + response.message + '|' + response.message.remove + ')<br />');
                         count++;
                         ongoing = Math.round(count*100/departments.length);
                         $('#repartitions .progress-bar').attr('aria-valuenow', ongoing).css('width', ongoing + '%').text(ongoing + '%');

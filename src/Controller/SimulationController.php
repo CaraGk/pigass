@@ -516,7 +516,7 @@ class SimulationController extends AbstractController
                     $left = $this->em->getRepository('App:Simulation')->getNumberLeft($simul->getDepartment()->getId(), $simulation->getRank());
                     if (null === $left) {
                         $simul_period = $this->em->getRepository('App:SimulPeriod')->getLast()->getPeriod();
-                        $repartition = $this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($simul_period, $simul->getDepartment()->getId());
+                        $repartition = $this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($simul_period, $simul->getDepartment());
                         if (isset($repartition))
                             $extra = (int) $repartition->getNumber() - 1;
                         else

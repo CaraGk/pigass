@@ -14,7 +14,8 @@ namespace App\Repository;
 use Doctrine\ORM\EntityRepository;
 use App\Entity\Period,
     App\Entity\Sector,
-    App\Entity\Structure;
+    App\Entity\Structure,
+    App\Entity\Department;
 
 /**
  * RepartitionRepository
@@ -131,16 +132,17 @@ class RepartitionRepository extends EntityRepository
         ;
     }
 
-    public function getByPeriodAndDepartment(Structure $structure, Period $period, $department_id)
+    public function getByPeriodAndDepartment(Structure $structure, Period $period, Department $department)
     {
         $query = $this->getByPeriodQuery($structure, $period);
-        $query->andWhere('d.id = :department_id')
-            ->setParameter('department_id', $department_id)
-            ->setMaxResults(1)
+        $query
+            ->andWhere('d.id = :department_id')
+            ->setParameter('department_id', $department->getId())
         ;
 
-        return $query->getQuery()
-                     ->getOneOrNullResult()
+        return $query
+            ->getQuery()
+            ->getResult()
         ;
     }
 

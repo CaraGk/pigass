@@ -403,26 +403,40 @@ class PlacementController extends AbstractController
                 throw $this->createNotFoundException('Unable to find department entity.');
         }
 
-        $count = 0;
+        $add_count = 0;
+        $remove_count = 0;
         foreach ($periods as $period) {
-            if (!$this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($structure, $period, $department->getId())) {
+            $repartitions = $this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($structure, $period, $department);
+            if (!$repartitions) {
                 $repartition = new Repartition();
                 $repartition->setDepartment($department);
                 $repartition->setPeriod($period);
                 $repartition->setNumber(0);
                 $repartition->setStructure($structure);
                 $this->em->persist($repartition);
-                $count++;
+                $add_count++;
+            } elseif(count($repartitions) > 1) {
+                $do_not_delete = 0;
+                foreach ($repartitions as $id => $repartition) {
+                    if ($repartiton->getNumber())
+                        $do_not_delete = $id;
+                }
+                for ($i = 0; count($repartitions); $i++) {
+                    if ($i != $do_not_delete) {
+                        $this->em->remove($repartitions[$i]);
+                        $remove_count++;
+                    }
+                }
             }
         }
         $this->em->flush();
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(array(
-                'message' => $count,
+                'message' => ['add' => $add_count, 'remove' => $remove_count],
             ), 200);
         } else {
-            $this->session->getFlashBag()->add('notice', 'Maintenance : ' . $department . ' -> ' . $count . ' répartition(s) ajoutée(s)');
+            $this->session->getFlashBag()->add('notice', 'Maintenance : ' . $department . ' -> ' . $add_count . ' répartition(s) ajoutée(s), ' . $remove_count . ' supprimée(s).');
 
             return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartment', array(
                 'department_id' => $department->getId(),

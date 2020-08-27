@@ -27,7 +27,6 @@
                     method: "GET",
                     data: {department_id: d.id},
                     success: function(response) {
-                        console.debug(response.message.add);
                         $('#repartitions .info').text(d.id + '. ' + d.name);
                         repartitions_added = repartitions_added + parseInt(response.message.add);
                         repartitions_removed = repartitions_removed + parseInt(response.message.remove);

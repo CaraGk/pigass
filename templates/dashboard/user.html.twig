@@ -44,7 +44,7 @@
             {% endif %}
         </div>
         <div class="card-footer text-center">
-            <a class="btn btn-primary btn-sm" href="{{ path('user_person_edit_me') }}?{{ app.request.queryString }}" title="Modifier">
+            <a class="btn btn-primary btn-sm" href="{{ path('user_person_edit_me', {'slug': structure.slug}) }}?{{ app.request.queryString }}" title="Modifier">
                 <i class='fas fa-pencil-alt'></i> Modifier
             </a>
             <a class="btn btn-primary btn-sm" href="{{ path('fos_user_change_password') }}?{{ app.request.queryString }}" title="Modifier le mot de passe">

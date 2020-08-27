@@ -281,10 +281,10 @@ class PersonController extends AbstractController
     /**
      * Edit own infos
      *
-     * @Route("/user/edit", name="user_person_edit_me")
+     * @Route("/{slug}/user/edit", name="user_person_edit_me")
      * @Template()
      */
-    public function editMeAction(Request $request)
+    public function editMeAction(Structure $structure, Request $request)
     {
         if (!$this->security->isGranted('ROLE_MEMBER'))
             throw new AccessDeniedException();
@@ -293,18 +293,17 @@ class PersonController extends AbstractController
         $userid = $request->query->get('userid', null);
         $person = $this->testAdminTakeOver($user, $userid);
         $redirect = $request->query->get('redirect', 'app_dashboard_user', ['slug' => $person->getStructure()->getSlug()]);
-        $slug = $request->query->get('slug');
 
         if (!$person)
             throw $this->createNotFoundException('Unable to find person entity.');
 
-        if (!$slug) {
+/*        if (!$slug) {
             $membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
             if (!$membership)
                 throw $this->createNotFoundException('Unable to find membership entity.');
             $slug = $membership->getStructure()->getSlug();
         }
-
+ */
         $form = $this->createForm(PersonUserType::class, $person);
         $formHandler = new PersonHandler($form, $request, $this->em, $this->um);
 
@@ -313,7 +312,7 @@ class PersonController extends AbstractController
                 $this->session->getFlashBag()->add('notice', 'Le compte de ' . $person . ' a bien été modifié.');
             else
                 $this->session->getFlashBag()->add('notice', 'Votre compte a bien été modifié.');
-            return $this->redirect($this->generateUrl($redirect, array('slug' => $slug, 'userid' => $userid)));
+            return $this->redirect($this->generateUrl($redirect, array('slug' => $structure->getSlug(), 'userid' => $userid)));
         }
 
         return array(

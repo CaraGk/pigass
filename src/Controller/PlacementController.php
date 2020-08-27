@@ -388,10 +388,10 @@ class PlacementController extends AbstractController
     /**
      * Maintenance for department's repartitions
      *
-     * @Route("/{slug}/maintenance/departement/repartitions", name="GCore_PARepartitionsDepartmentMaintenance")
+     * @Route("/{slug}/maintenance/department/repartitions", name="GCore_PARepartitionsDepartmentMaintenance")
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
-    public function repartitionsForDepartmentMaintenanceAction(Structure $structure, Request $request)
+    public function maintenanceForRepartitionsByDepartmentAction(Structure $structure, Request $request)
     {
         $periods = $this->em->getRepository('App:Period')->findBy(['structure' => $structure->getId()]);
         $department = $this->em->getRepository('App:Department')->find($request->get('department_id'));
@@ -410,6 +410,7 @@ class PlacementController extends AbstractController
                 $repartition->setDepartment($department);
                 $repartition->setPeriod($period);
                 $repartition->setNumber(0);
+                $repartition->setStructure($structure);
                 $this->em->persist($repartition);
                 $count++;
             }

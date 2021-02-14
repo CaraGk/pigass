@@ -74,6 +74,9 @@
     "egulias/email-validator": {
         "version": "2.1.6"
     },
+    "ezyang/htmlpurifier": {
+        "version": "v4.13.0"
+    },
     "friendsofsymfony/user-bundle": {
         "version": "v2.1.2"
     },
@@ -310,6 +313,9 @@
             "version": "3.3",
             "ref": "1717e67afa995e4f01a25ba9ae7aca5b2327bcaa"
         }
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
     },
     "symfony/http-foundation": {
         "version": "v4.1.6"

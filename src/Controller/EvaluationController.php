@@ -120,7 +120,7 @@ class EvaluationController extends AbstractController
      *
      * @Route("/{slug}/eval/placement/{id}", name="GEval_DEval", requirements={"id" = "\d+"})
      * @Template()
-     * @Security("has_role('ROLE_STUDENT')")
+     * @Security("is_granted('ROLE_MEMBER') or is_granted('ROLE_STUDENT')")
      * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
     public function evaluateAction(Structure $structure, Placement $placement, Request $request)

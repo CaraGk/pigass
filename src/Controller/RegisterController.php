@@ -766,7 +766,7 @@ class RegisterController extends AbstractController
             } else {
                 if ($user->hasRole('ROLE_ADMIN') or $user->hasRole('ROLE_STRUCTURE')) {
                     $adminPerson = $this->em->getRepository('App:Person')->getByUser($user);
-                    $adminMembership = $this->em->getRepository('App:Membership')->getCurrentForPerson($adminPerson, true);
+                    $adminMembership = $this->em->getRepository('App:Membership')->getLastForPerson($adminPerson, true);
                     if (!$user->hasRole('ROLE_ADMIN') and $adminMembership->getStructure()->getSlug() != $slug) {
                         $this->session->getFlashBag()->add('error', 'Vous n\'avez pas les droits pour accéder à cette structure.');
                         return $this->redirect($this->generateUrl('user_register_join', ["slug" => $slug, "rejoin" => true]));

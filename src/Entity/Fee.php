@@ -36,7 +36,13 @@ class Fee
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string", length=20)
+     * @ORM\Column(name="title", type="string", length=30)
+     * @Assert\Length(
+     *   min=3,
+     *   max=30,
+     *   minMessage="L'étiquette doit comporter au moins {{ limit }} caractères",
+     *   maxMessage="L'étiquette doit comporter au maximum {{ limit }} caractères"
+     * )
      *
      * @var string $title
      */
@@ -44,6 +50,10 @@ class Fee
 
     /**
      * @ORM\Column(name="amount", type="smallint")
+     * @Assert\LessThan(
+     *   value=32700,
+     *   message="Le montant doit être inférieur à 327,00 €"
+     * )
      *
      * @var smallint $amount
      */

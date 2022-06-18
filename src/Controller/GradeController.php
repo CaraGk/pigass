@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -20,10 +20,12 @@ use Symfony\Component\Routing\Annotation\Route,
     Doctrine\ORM\EntityManagerInterface,
     FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\Response;
-use App\Entity\Grade;
+use App\Entity\Grade,
+    App\Entity\Structure;
 use App\Form\GradeType;
-use App\Form\GradeHandler;
+use App\FormHandler\GradeHandler;
 
 /**
  * Grade controller.
@@ -41,10 +43,11 @@ class GradeController extends AbstractController
     }
 
   /**
-   * @Route("/{slug}/grade/list", name="GUser_GAIndex")
+   * @Route("/{slug}/grade/list", name="GUser_GAIndex", requirements={"slug" = "\w+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template()
    */
-  public function indexAction()
+  public function indexAction(Structure $structure)
   {
     $grades = $this->em->getRepository('App:Grade')->getAll();
 
@@ -52,65 +55,71 @@ class GradeController extends AbstractController
       'grades'       => $grades,
       'grade_id'     => null,
       'grade_form'   => null,
+      'structure'    => $structure,
     );
   }
 
   /**
-   * @Route("/{slug}/grade/new", name="GUser_GANew")
-   * @Template("App:GradeAdmin:index.html.twig")
+   * @Route("/{slug}/grade/new", name="GUser_GANew", requirements={"slug" = "\w+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
+   * @Template("grade/index.html.twig")
    */
-  public function newAction()
+  public function newAction(Structure $structure, Request $request)
   {
     $grades = $this->em->getRepository('App:Grade')->getAll();
 
     $grade = new Grade();
     $grade->setRank($this->em->getRepository('App:Grade')->getLastActiveRank() + 1);
     $form = $this->createForm(GradeType::class, $grade);
-    $formHandler = new GradeHandler($form, $this->get('request'), $this->em);
+    $formHandler = new GradeHandler($form, $request, $this->em, $structure);
 
     if ( $formHandler->process() ) {
       $this->session->getFlashBag()->add('notice', 'Promotion "' . $grade . '" enregistrée.');
 
-      return $this->redirect($this->generateUrl('GUser_GAIndex'));
+      return $this->redirect($this->generateUrl('GUser_GAIndex', ['slug' => $structure->getSlug()]));
     }
 
     return array(
       'grades'       => $grades,
       'grade_id'     => null,
       'grade_form'   => $form->createView(),
+      'structure'    => $structure,
     );
   }
 
   /**
-   * @Route("/{slug}/grade/{id}/edit", name="GUser_GAEdit", requirements={"id" = "\d+"})
-   * @Template("App:GradeAdmin:index.html.twig")
+   * @Route("/{slug}/grade/{id}/edit", name="GUser_GAEdit", requirements={"id" = "\d+", "slug" = "\w+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
+   * @Template("grade/index.html.twig")
    */
-  public function editAction($slug, $grade)
+  public function editAction(Structure $structure, Grade $grade, Request $request)
   {
     $grades = $this->em->getRepository('App:Grade')->getAll();
 
     $form = $this->createForm(GradeType::class, $grade);
-    $formHandler = new GradeHandler($form, $this->get('request'), $this->em);
+    $formHandler = new GradeHandler($form, $request, $this->em, $structure);
 
     if ( $formHandler->process() ) {
       $this->session->getFlashBag()->add('notice', 'Promotion "' . $grade . '" modifiée.');
 
-      return $this->redirect($this->generateUrl('GUser_GAIndex'));
+      return $this->redirect($this->generateUrl('GUser_GAIndex', ['slug' => $structure->getSlug()]));
     }
 
     return array(
       'grades'       => $grades,
-      'grade_id'     => $id,
+      'grade_id'     => $grade->getId(),
       'grade_form'   => $form->createView(),
+      'structure'    => $structure,
     );
   }
 
   /**
-   * @Route("/{slug}/grade/{id}/delete", name="GUser_GADelete", requirements={"id" = "\d+"})
+   * @Route("/{slug}/grade/{id}/delete", name="GUser_GADelete", requirements={"id" = "\d+", "slug" = "\w+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteAction($slug, $grade)
+  public function deleteAction(Structure $structure, Grade $grade)
   {
-    if ($rules = $this->em->getRepository('App:SectorRule')->getByGrade($id)) {
+    if ($rules = $this->em->getRepository('App:SectorRule')->getByGrade($grade->getId())) {
         foreach ($rules as $rule) {
             $this->em->remove($rule);
             $this->session->getFlashBag()->add('notice', 'Règle "' . $rule . '" supprimée.');
@@ -122,13 +131,14 @@ class GradeController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Promotion "' . $grade . '" supprimée.');
 
-    return $this->redirect($this->generateUrl('GUser_GAIndex'));
+    return $this->redirect($this->generateUrl('GUser_GAIndex', ['slug' => $structure->getSlug()]));
   }
 
   /**
-   * @Route("/{slug}/grade/next", name="GUser_GAUpdateNext")
+   * @Route("/{slug}/grade/next", name="GUser_GAUpdateNext", requirements={"slug" = "\w+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function updateAllPersonsToNextAction()
+  public function updateAllPersonsToNextAction(Structure $structure)
   {
     $grades = $this->em->getRepository('App:Grade')->getAllActiveInverted();
 
@@ -141,6 +151,6 @@ class GradeController extends AbstractController
 
     $this->session->getFlashBag()->add('notice', 'Étudiants passés dans la promotion supérieure.');
 
-    return $this->redirect($this->generateUrl('GUser_GAIndex'));
+    return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
   }
 }

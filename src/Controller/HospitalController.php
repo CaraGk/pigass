@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2017 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Annotation\Route,
     Doctrine\ORM\EntityManagerInterface,
     FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\Response;
 use App\Entity\Hospital,
     App\Form\HospitalType,
@@ -72,12 +73,12 @@ class HospitalController extends AbstractController
 
     /* Filtre sur le username pour l'entrée du menu Teacher */
     $arg['limit'] = $request->query->get('limit', $limit_default);
-    if ($arg['limit']['type'] == 'u.id' and $arg['limit']['value'] == '') {
+    if ($arg['limit'] and $arg['limit']['type'] == 'u.id' and $arg['limit']['value'] == '') {
         $arg['limit']['value'] = $user->getId();
         $arg['limit']['description'] = $user->getUsername();
     }
 
-    $period = $this->em->getRepository('App:Period')->getLast();
+    $period = $this->em->getRepository('App:Period')->getLast($structure);
     if($period) {
         $arg['period'] = $period->getId();
     } else {
@@ -96,41 +97,42 @@ class HospitalController extends AbstractController
     );
   }
 
-  /**
-   * @Route("/{slug}/hospital/{id}/show", name="GCore_FSShowDepartment", requirements={"id" = "\d+"})
-   * @Template()
-   */
-  public function showAction($slug, Department $department, Request $request)
-  {
-      $user = $this->getUser();
-    $limit = $request->query->get('limit', null);
-    $clusters = null;
+    /**
+     * @Route("/{slug}/hospital/{id}/show", name="GCore_FSShowDepartment", requirements={"id" = "\d+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
+     * @Template()
+     */
+    public function showAction(Structure $structure, Department $department, Request $request)
+    {
+        $user = $this->getUser();
+        $limit = $request->query->get('limit', null);
+        $clusters = null;
 
-    foreach($department->getRepartitions() as $repartition) {
-        if ($cluster_name = $repartition->getCluster()) {
-            $period = $repartition->getPeriod();
-            $clusters[] = array(
-                'period'       => $period,
-                'repartitions' => $this->em->getRepository('App:Repartition')->getByPeriodAndCluster($period, $cluster_name),
-            );
+        foreach($department->getRepartitions() as $repartition) {
+            if ($cluster_name = $repartition->getCluster()) {
+                $period = $repartition->getPeriod();
+                $clusters[] = array(
+                    'period'       => $period,
+                    'repartitions' => $this->em->getRepository('App:Repartition')->getByPeriodAndCluster($structure, $period, $cluster_name),
+                );
+            }
         }
-    }
 
-    $evaluated = array();
-    $placements = $this->em->getRepository('App:Placement')->getByUsernameAndDepartment($user?$user->getUsername():null, $department->getId());
-    if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $slug . '_active')->getValue() and null !== $placements) {
-        foreach ($placements as $placement) {
-            $evaluated[$placement->getId()] = $this->em->getRepository('App:Evaluation')->getByPlacement($placement->getId());
+        $evaluated = array();
+        $placements = $this->em->getRepository('App:Placement')->getByUsernameAndDepartment($user?$user->getUsername():null, $department->getId());
+        if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue() and null !== $placements) {
+            foreach ($placements as $placement) {
+                $evaluated[$placement->getId()] = $this->em->getRepository('App:Evaluation')->getByPlacement($structure, $placement->getId());
+            }
         }
-    }
 
-    return array(
-        'department' => $department,
-        'evaluated'  => $evaluated,
-        'limit'      => $limit,
-        'clusters'   => $clusters,
-    );
-  }
+        return array(
+            'department' => $department,
+            'evaluated'  => $evaluated,
+            'limit'      => $limit,
+            'clusters'   => $clusters,
+        );
+    }
 
   /**
    * Displays a form to create a new Hospital entity.
@@ -163,13 +165,13 @@ class HospitalController extends AbstractController
    * Displays a form to edit an existing Hospital entity.
    *
    * @Route("/{slug}/hospital/{id}/edit", name="GCore_FSAEditHospital", requirements={"id" = "\d+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template("hospital/form.html.twig")
    */
-  public function editHospitalAction($slug, Hospital $hospital, Request $request)
+  public function editHospitalAction(Structure $structure, Hospital $hospital, Request $request)
   {
     $limit = $request->query->get('limit', null);
     $periods = $this->em->getRepository('App:Period')->findAll();
-    $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
     if (!$structure)
         throw $this->createNotFoundException('Structure inconnue');
 
@@ -192,8 +194,9 @@ class HospitalController extends AbstractController
    * Deletes a Hospital entity.
    *
    * @Route("/{slug}/hospital/{id}/delete", name="GCore_FSADeleteHospital", requirements={"id" = "\d+"}))
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteHospitalAction($slug, Hospital $hospital, Request $request)
+  public function deleteHospitalAction(Structure $structure, Hospital $hospital, Request $request)
   {
     $limit = $request->query->get('limit', null);
 
@@ -209,8 +212,9 @@ class HospitalController extends AbstractController
    * Deletes a Department entity.
    *
    * @Route("/{slug}/department/{id}/delete", name="GCore_FSADeleteDepartment", requirements={"id" = "\d+"}))
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    */
-  public function deleteDepartmentAction($slug, Department $department, Request $request)
+  public function deleteDepartmentAction(Structure $structure, Department $department, Request $request)
   {
     $limit = $request->query->get('limit', null);
 
@@ -226,12 +230,12 @@ class HospitalController extends AbstractController
    * Edit the description of the Department entity.
    *
    * @Route("/{slug}/hospital/department/{id}", name="GCore_FSAEditDepartmentDescription", requirements={"id" = "\d+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template("hospital/departmentForm.html.twig")
    */
-  public function editDepartmentDescriptionAction($slug, Department $department, Request $request)
+  public function editDepartmentDescriptionAction(Structure $structure, Department $department, Request $request)
   {
       $limit = $request->query->get('limit', null);
-      $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
       if (!$structure)
         throw $this->createNotFoundException('Structure inconnue');
 
@@ -255,15 +259,13 @@ class HospitalController extends AbstractController
    * Edit the description of the Hospital entity.
    *
    * @Route("/{slug}/hospital/{id}", name="GCore_FSAEditHospitalDescription", requirements={"id" = "\d+"})
+   * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
    * @Template("App:FieldSetAdmin:editDescription.html.twig")
    */
-  public function editHospitalDescriptionAction($slug, Hospital $hospital, Request $request)
+  public function editHospitalDescriptionAction(Structure $structure, Hospital $hospital, Request $request)
   {
     $limit = $request->query->get('limit', null);
     $periods = $this->em->getRepository('App:Period')->findAll();
-    $structure = $this->em->getRepository('App:Structure')->findOneBy(['slug' => $slug]);
-    if (!$structure)
-        throw $this->createNotFoundException('Structure inconnue');
 
     $editForm = $this->createForm(HospitalDescriptionType::class, $hospital);
     $formHandler = new HospitalHandler($editForm, $request, $this->em, $periods, $structure);

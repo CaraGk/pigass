@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2016-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -55,7 +55,7 @@ class AccreditationHandler
             $accreditation->setDepartment($this->department);
             if ($user = $this->um->findUserByEmail($accreditation->getUser()->getEmail())) {
                 $user->addRole('ROLE_TEACHER');
-                if ($user->isEnabled() == false) {
+                if ($user->isEnabled() == false and !$accreditation->isRevoked()) {
                     $user->setEnabled(true);
                     $user->setPlainPassword($this->generatePwd(8));
                 }
@@ -64,7 +64,8 @@ class AccreditationHandler
             } else {
                 $user = $accreditation->getUser();
                 $user->addRole('ROLE_TEACHER');
-                $user->setEnabled(true);
+                if (!$accreditation->isRevoked())
+                    $user->setEnabled(true);
                 $user->setConfirmationToken(null);
                 $user->setUsername($user->getEmail());
                 $user->setPlainPassword($this->generatePwd(8));
@@ -73,13 +74,16 @@ class AccreditationHandler
             }
         } else {
             $user = $accreditation->getUser();
-            if ($user->isEnabled() == false) {
+            if ($user->isEnabled() == false and !$accreditation->isRevoked()) {
                 $user->setEnabled(true);
                 $user->setPlainPassword($this->generatePwd(8));
             }
             $user->setUsername($user->getEmail());
             $this->um->updateUser($user);
         }
+
+        if ($accreditation->isRevoked() and ($accreditation->getEnd() == null or $accreditation->getEnd() > new \DateTime('now')))
+            $accreditation->setEnd(new \DateTime('now'));
 
         $accreditation->setStructure($accreditation->getDepartment()->getHospital()->getStructure());
 

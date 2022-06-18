@@ -1,0 +1,35 @@
+<ul class="entities wishes list-group">
+    {% for simulation in simulations %}
+        <li class="entity wish list-group-item">
+            <div class="">
+            <div class="">{{ simulation.rank }}. {{ simulation.person }} :
+            {% if simulation.department is not null %}
+                <a href="{{ path('GSimul_SListDept', {'id': simulation.department.id, 'slug': structure.slug}) }}" title="Afficher les simulations pour ce poste">{{ simulation.department }}</a>
+            {% elseif not simulation.active %}
+                Ne participe pas à la simulation
+            {% elseif simulation.countWishes > 0 and is_granted('ROLE_ADMIN') %}
+                Aucun choix valide
+            {% else %}
+                Aucun choix valide
+            {% endif %}
+            </div>
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="entity_item field label label-info">{{ simulation.countWishes }} vœu{% if simulation.countWishes > 1 %}x{% endif %}</div>
+            {% endif %}
+            </div>
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="btn-group float-right">
+                    <a class="btn btn-primary" href="{{ path('app_dashboard_user', {'person_id': simulation.person.id, 'slug': structure.slug}) }}" title="Afficher les vœux de l'étudiant {{ simulation.person }}">
+                        <i class="fas fa-bullseye"></i>
+                    </a>
+                    <a class="btn btn-primary" href="{{ path('GSimul_SAUp', {'id': simulation.id, 'slug': structure.slug}) }}" title="Monter le rang de l'étudiant {{ simulation.person }}">
+                        <i class="fas fa-arrow-up"></i>
+                    </a>
+                    <a class="btn btn-primary" href="{{ path('GSimul_SADown', {'id': simulation.id, 'slug': structure.slug}) }}" title="Descendre le rang de l'étudiant {{ simulation.person }}">
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

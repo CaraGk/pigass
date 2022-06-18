@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -21,27 +21,27 @@ class WishRepository extends EntityRepository
   public function getWishPersonQuery($person_id)
   {
     return $this->createQueryBuilder('w')
-                ->join('w.simperson', 't')
+                ->join('w.simulation', 't')
                 ->where('t.person = :person')
                   ->setParameter('person', $person_id);
   }
 
   public function getWishQuery()
   {
-    return $this->createQueryBuilder('w')
-                ->join('w.simperson', 't')
-                ->join('w.department', 'd')
-                ->join('d.hospital', 'h')
-                ->join('d.accreditations', 'a')
-                ->join('a.sector', 'u')
-                ->where('a.end > :now')
-                ->setParameter('now', new \DateTime('now'))
-                ->addSelect('d')
-                ->addSelect('h')
-                ->addSelect('t')
-                ->addSelect('a')
-                ->addSelect('u')
-    ;
+      return $this
+          ->createQueryBuilder('w')
+          ->join('w.simulation', 't')
+          ->join('w.department', 'd')
+          ->join('d.hospital', 'h')
+          ->join('d.accreditations', 'a')
+          ->join('a.sector', 'u')
+          ->where('a.revoked = false')
+          ->addSelect('d')
+          ->addSelect('h')
+          ->addSelect('t')
+          ->addSelect('a')
+          ->addSelect('u')
+      ;
   }
 
   public function getByPerson($person_id, $period_id)
@@ -70,19 +70,20 @@ class WishRepository extends EntityRepository
     return $query->getQuery()->getResult();
   }
 
-  public function getPersonWishList($simperson_id)
+  public function getPersonWishList($simulation_id)
   {
-    $query = $this->createQueryBuilder('w')
-                  ->join('w.department', 'd')
-                  ->join('d.accreditations', 'a')
-                  ->join('a.sector', 's')
-                  ->where('w.simperson = :simperson_id')
-                  ->setParameter('simperson_id', $simperson_id)
-                  ->andWhere('a.end > :now')
-                  ->setParameter('now', new \DateTime('now'))
-                  ->addSelect('d')
-                  ->addSelect('a')
-                  ->addSelect('s');
+      $query = $this
+          ->createQueryBuilder('w')
+          ->join('w.department', 'd')
+          ->join('d.accreditations', 'a')
+          ->join('a.sector', 's')
+          ->where('w.simulation = :simulation_id')
+          ->setParameter('simulation_id', $simulation_id)
+          ->andWhere('a.revoked = false')
+          ->addSelect('d')
+          ->addSelect('a')
+          ->addSelect('s')
+      ;
 
     return $query->getQuery()->getResult();
   }

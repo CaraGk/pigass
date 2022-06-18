@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -12,6 +12,8 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Simulation,
+    App\Entity\Person;
 
 /**
  * SimulationRepository
@@ -47,13 +49,13 @@ class SimulationRepository extends EntityRepository
     return $query->getQuery()->getOneOrNullResult();
   }
 
-  public function getSimPerson($id)
+  public function getSimulation(Person $person)
   {
     $query = $this->getSimulationQuery();
-    $query->where('t.id = :id')
-            ->setParameter('id', $id);
+    $query->where('s.id = :id')
+            ->setParameter('id', $person->getId());
 
-    return $query->getQuery()->getSingleResult();
+    return $query->getQuery()->getOneOrNullResult();
   }
 
   public function setSimulationTable($persons, $em)
@@ -93,7 +95,9 @@ class SimulationRepository extends EntityRepository
             $sim->setDepartment(null);
             $sim->setExtra(null);
             foreach ($sim->getWishes() as $wish) {
-                if (null === $sim->getDepartment() and $department_table[$wish->getDepartment()->getId()] > 0) {
+                if (null === $sim->getDepartment()
+                    and isset($department_table[$wish->getDepartment()->getId()])
+                    and $department_table[$wish->getDepartment()->getId()] > 0) {
                     if($current_repartition = $wish->getDepartment()->findRepartition($period)) {
                         if ($cluster_name = $current_repartition->getCluster()) {
                             foreach ($department_table['cl_' . $cluster_name] as $department_id) {
@@ -136,54 +140,54 @@ class SimulationRepository extends EntityRepository
       return $query->getQuery()->getSingleScalarResult();
   }
 
-  public function countMissing($simperson = null)
+  public function countMissing($simulation = null)
   {
     $query = $this->createQueryBuilder('t')
                   ->select('COUNT(t.id)')
                   ->where('t.department IS NULL');
 
-    if ($simperson !== null) {
+    if ($simulation !== null) {
       $query->andWhere('t.rank < :rank')
-              ->setParameter('rank', $simperson->getRank());
+              ->setParameter('rank', $simulation->getRank());
     }
 
     return $query->getQuery()->getSingleScalarResult();
   }
 
-  public function countNotActive($simperson = null)
+  public function countNotActive($simulation = null)
   {
     $query = $this->createQueryBuilder('t')
                   ->select('COUNT(t.id)')
                   ->where('t.active = false');
 
-    if ($simperson !== null) {
+    if ($simulation !== null) {
       $query->andWhere('t.rank < :rank')
-              ->setParameter('rank', $simperson->getRank());
+              ->setParameter('rank', $simulation->getRank());
     }
 
     return $query->getQuery()->getSingleScalarResult();
   }
 
-  public function countFromGradeAfter($simperson)
+  public function countFromGradeAfter($simulation)
   {
     $query = $this->createQueryBuilder('t')
                   ->join('t.person', 's')
                   ->select('COUNT(t.id)')
-                  ->where('t.rank > :simperson_rank')
-                    ->setParameter('simperson_rank', $simperson->getRank())
+                  ->where('t.rank > :simulation_rank')
+                    ->setParameter('simulation_rank', $simulation->getRank())
                   ->andWhere('s.grade = :grade_id')
-                    ->setParameter('grade_id', $simperson->getPerson()->getGrade()->getId());
+                    ->setParameter('grade_id', $simulation->getPerson()->getGrade()->getId());
 
     return $query->getQuery()->getSingleScalarResult();
   }
 
-  public function countValidPersonAfter($simperson, $not_grades_rule = null)
+  public function countValidPersonAfter($simulation, $not_grades_rule = null)
   {
     $query = $this->createQueryBuilder('t')
                   ->join('t.person', 's')
                   ->select('COUNT(t.id)')
-                  ->where('t.rank > :simperson_rank')
-                    ->setParameter('simperson_rank', $simperson->getRank())
+                  ->where('t.rank > :simulation_rank')
+                    ->setParameter('simulation_rank', $simulation->getRank())
                   ->andWhere('t.active = true');
 
     if (isset($not_grades_rule)) {
@@ -195,11 +199,11 @@ class SimulationRepository extends EntityRepository
     return $query->getQuery()->getSingleScalarResult();
   }
 
-  public function getDepartmentExtraForPerson($simperson, $department)
+  public function getDepartmentExtraForPerson($simulation, $department)
   {
     $query = $this->createQueryBuilder('t')
-                  ->where('t.rank < :simperson_rank')
-                    ->setParameter('simperson_rank', $simperson->getRank())
+                  ->where('t.rank < :simulation_rank')
+                    ->setParameter('simulation_rank', $simulation->getRank())
                   ->andWhere('t.department = :department_id')
                     ->setParameter('department_id', $department->getId())
                   ->orderBy('t.extra', 'asc')
@@ -208,16 +212,15 @@ class SimulationRepository extends EntityRepository
     return $query->getQuery()->getOneOrNullResult();
   }
 
-  public function checkNotFullInSector($simperson, $sector)
+  public function checkNotFullInSector($simulation, $sector)
   {
-    $person_after = $this->countFromGradeAfterWithValidSector($simperson, $sector);
+    $person_after = $this->countFromGradeAfterWithValidSector($simulation, $sector);
 
     $query = $this->createQueryBuilder('t')
                   ->join('t.department', 'd')
                   ->join('d.accreditations', 'a')
                   ->join('a.sector', 's')
-                  ->where('a.end > :now')
-                  ->setParameter('now', new \DateTime('now'))
+                  ->where('a.revoked = false')
                   ->andWhere('s.id = :sector_id')
                     ->setParameter('sector_id', $sector->getId())
                   ->andWhere('t.extra > :person_after')

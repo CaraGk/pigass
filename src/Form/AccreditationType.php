@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2016-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -16,6 +16,7 @@ use Symfony\Component\Form\AbstractType,
     Symfony\Bridge\Doctrine\Form\Type\EntityType,
     Symfony\Component\Form\Extension\Core\Type\DateType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\CheckboxType,
     Symfony\Component\Form\Extension\Core\Type\TextareaType,
     Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Form\UserType;
@@ -42,17 +43,21 @@ class AccreditationType extends AbstractType
                 'html5'  => true,
                 'attr'   => ['placeholder' => 'AAAA-MM-JJ'],
             ])
-            ->add('sector', EntityType::class, array(
+            ->add('revoked', CheckboxType::class, [
+                'label'    => 'Révoquée ?',
+                'required' => false,
+            ])
+            ->add('sector', EntityType::class, [
                 'required' => true,
                 'label'    => 'Type d\'agrément',
                 'class'    => 'App\Entity\Sector',
-            ))
+            ])
             ->add('supervisor', TextType::class, [
                 'label' => 'Nom du référent pédagogique',
             ])
-            ->add('user', UserType::class, array(
+            ->add('user', UserType::class, [
                 'label' => ' ',
-            ))
+            ])
             ->add('comment', TextAreatype::class, [
                 'label' => 'Remarques diverses',
                 'required' => false,

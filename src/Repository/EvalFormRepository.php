@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -31,7 +31,7 @@ class EvalFormRepository extends EntityRepository
             ->where('p.id = :placement_id')
             ->setParameter('placement_id', $placement_id)
             ->andWhere('a.begin <= q.begin')
-            ->andWhere('a.end >= q.end')
+            ->andWhere('a.revoked = false')
         ;
 
         return $query->getQuery()

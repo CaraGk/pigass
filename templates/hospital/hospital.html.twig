@@ -7,7 +7,7 @@
                     {% for department in hospital.departments %}
                         {% set isSupervisor = false %}
                         {% for repartition in department.repartitions|slice(-1, 1) %}
-                            {% if is_granted('ROLE_ADMIN') or repartition.number > 0 %}
+                            {% if param('placement_' ~ structure.slug ~ '_number') == false or is_granted('ROLE_ADMIN') or repartition.number > 0 %}
                             <a class="list-group-item list-group-item-action d-flex justify-content-between w-100 {% if repartition.number < 1 %}text-muted{% endif %}" href="{{ path('GCore_FSShowDepartment', {'slug': structure.slug, 'id': department.id, 'limit': limit }) }}" title="Afficher les informations du service '{{ department.name }}'">
                                 <div class="">
                                     <h3 class="h5">

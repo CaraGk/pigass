@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -13,6 +13,8 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType,
+    Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * WishType
@@ -23,12 +25,12 @@ class WishType extends AbstractType
     {
         $rules = $options['rules'];
 
-        $builder->add('department', 'entity', array(
+        $builder->add('department', EntityType::class, array(
             'class'         => 'App:Department',
-            'query_builder' => function (\App\Entity\DepartmentRepository $er) use ($rules) { return $er->getAdaptedUserList($rules); },
+            'query_builder' => function (\App\Repository\DepartmentRepository $er) use ($rules) { return $er->getAdaptedUserList($rules); },
             'label'         => ' ',
         ));
-        $builder->add('Ajouter', 'submit');
+        $builder->add('Ajouter', SubmitType::class);
     }
 
     public function getName()
@@ -40,6 +42,7 @@ class WishType extends AbstractType
   {
     $resolver->setDefaults(array(
         'data_class' => 'App\Entity\Wish',
+        'rules' => null,
     ));
   }
 }

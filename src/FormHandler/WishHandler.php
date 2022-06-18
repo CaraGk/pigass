@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -50,10 +50,10 @@ class WishHandler
   {
     $rank = $this->em->getRepository('App:Wish')->getMaxRank($this->simulation->getPerson());
 
-    $wish->setSimperson($this->simulation);
+    $wish->setSimulation($this->simulation);
     $wish->setRank($rank+1);
     if (!$wish->getStructure())
-        $wish->setStructure($simulation->getStructure());
+        $wish->setStructure($this->simulation->getStructure());
 
     $this->em->persist($wish);
     $this->em->flush();

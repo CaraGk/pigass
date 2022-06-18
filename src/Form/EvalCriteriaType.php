@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType,
     Symfony\Component\Form\Extension\Core\Type\TextType,
+    Symfony\Component\Form\Extension\Core\Type\HiddenType,
     Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 /**
@@ -25,8 +26,9 @@ class EvalCriteriaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('rank', IntegerType::class, [
+            ->add('rank', HiddenType::class, [
                 'label' => 'Rang',
+                'attr'  => [ 'class' => 'criteria_position' ]
             ])
             ->add('name', TextType::class, [
                 'label' => 'Intitulé de la question',

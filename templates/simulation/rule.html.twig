@@ -1,0 +1,26 @@
+{% extends 'layout.html.twig' %}
+
+{% block headline %}
+    Règles de maquette
+    <span><a href="{{ path('GSimul_SANewRule', {slug: structure.slug}) }}" title="Ajouter une nouvelle relation"><img src="{{ asset('bundles/gessehcore/images/Add.png') }}" alt="Ajouter" /></a></span>
+{% endblock %}
+
+{% block content %}
+    <ul class="entities rules">
+        {% for rule in rules %}
+            <li class="entity rule">
+                <div class="field"><strong>{{ rule.grade.name }}</strong></div>
+                <div class="field"><em>{{ rule.relationExplained }}</em></div>
+                <div class="field"><strong>{{ rule.sector.name }}</strong></div>
+                <ul class="actions">
+                    <li><a href="{{ path('GSimul_SADeleteRule', {'id': rule.id, slug: structure.slug}) }}" title="Supprimer la règle de simulation"><img src="{{ asset('bundles/gessehcore/images/Trash_Delete.png') }}" alt="Supprimer" /></a></li>
+                </ul>
+            </li>
+        {% else %}
+            <li class="noentity rule">Aucune règle à afficher.</li>
+        {% endfor %}
+    </ul>
+    {% if rule_form is not empty %}
+        <div>{{ form(rule_form) }}</div>
+    {% endif %}
+{% endblock %}

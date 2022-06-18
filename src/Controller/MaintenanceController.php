@@ -4,7 +4,7 @@
  * This file is part of PIGASS project
  *
  * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
- * @copyright: Copyright 2013-2018 Pierre-François Angrand
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -115,6 +115,7 @@ class MaintenanceController extends AbstractController
                 13 => array('setName' => 'eval_' . $slug . '_min', 'setValue' => 3, 'setActive' => true, 'setLabel' => 'Nombre d\'évaluations minimal pour l\'affichage aux étudiants et enseignants', 'setCategory' => 'Module Evaluation', 'setType' => 1, 'setMore' => null, 'setStructure' => $structure),
                 14 => array('setName' => 'eval_' . $slug . '_teacher', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Autoriser l\'affichage des évaluations aux enseignants', 'setCategory' => 'Module Evaluation', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
                 15 => array('setName' => 'placement_' . $slug . '_active', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Activer le module de gestion des stages', 'setCategory' => 'Module Stage', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
+                15 => array('setName' => 'placement_' . $slug . '_number', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Limiter l\'affichage des terrains de stage sans poste proposé aux administrateurs', 'setCategory' => 'Module Stage', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
                 16 => array('setName' => 'reg_' . $slug . '_notification', 'setValue' => false, 'setActive' => true, 'setLabel' => 'Envoyer un mail de notification à chaque adhésion', 'setCategory' => 'Module Adhesion', 'setType' => 2, 'setMore' => null, 'setStructure' => $structure),
             );
 

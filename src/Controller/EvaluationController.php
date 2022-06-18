@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -73,7 +73,9 @@ class EvaluationController extends AbstractController
 
             /* Vérification de l'évaluation de tous ses stages (sauf le courant) par l'étudiant */
             $person = $this->em->getRepository('App:Person')->getByUser($user);
-            $current_period = $this->em->getRepository('App:Period')->getCurrent();
+            $current_period = $this->em->getRepository('App:Period')->getCurrent($structure);
+            if (!$current_period)
+                $current_period = $this->em->getRepository('App:Period')->getLast($structure);
             $count_placements = $this->em->getRepository('App:Placement')->getCountByPersonWithoutCurrentPeriod($person, $current_period);
             if ($this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_unevaluated')->getValue() and $this->em->getRepository('App:Evaluation')->personHasNonEvaluated($structure, $person, $current_period, $count_placements)) {
                 $this->session->getFlashBag()->add('error', 'Il y a des évaluations non réalisées. Veuillez évaluer tous vos stages avant de pouvoir accéder aux autres évaluations.');
@@ -118,7 +120,7 @@ class EvaluationController extends AbstractController
      *
      * @Route("/{slug}/eval/placement/{id}", name="GEval_DEval", requirements={"id" = "\d+"})
      * @Template()
-     * @Security("has_role('ROLE_STUDENT')")
+     * @Security("is_granted('ROLE_MEMBER') or is_granted('ROLE_STUDENT')")
      * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      */
     public function evaluateAction(Structure $structure, Placement $placement, Request $request)

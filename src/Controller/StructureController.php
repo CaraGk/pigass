@@ -4,7 +4,7 @@
  * This file is part of PIGASS project
  *
  * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
- * @copyright: Copyright 2016-2018 Pierre-François Angrand
+ * @copyright: Copyright 2016-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -60,6 +60,8 @@ class StructureController extends AbstractController
                 $last_membership = $this->em->getRepository('App:Membership')->getLastForPerson($person);
                 $current_membership = $this->em->getRepository('App:Membership')->getCurrentForPerson($person);
                 if (!$last_membership) {
+                    $slug = $person->getStructure()->getSlug();
+                    $this->session->set('slug', $slug);
                     return $this->redirect($this->generateUrl('app_structure_map'));
                 } else {
                     $slug = $last_membership->getStructure()->getSlug();

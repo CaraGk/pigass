@@ -4,7 +4,7 @@
         "@symfony/webpack-encore": "^0.20.0",
         "bootstrap": "^4.1.3",
         "css-loader": "^1.0.0",
-        "node-sass": "^4.9.4",
+        "node-sass": "^4.13.1",
         "popper.js": "^1.14.4",
         "sass-loader": "^7.1.0",
         "vue": "^2.5.17",
@@ -21,7 +21,7 @@
         "build": "encore production"
     },
     "dependencies": {
-        "jquery": "^3.3.1",
+        "jquery": "^3.5.0",
         "jquery-mapael": "^2.2.0",
         "raphael": "^2.2.7"
     }

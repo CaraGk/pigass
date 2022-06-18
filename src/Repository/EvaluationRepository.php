@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2017 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -12,7 +12,9 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Structure;
+use App\Entity\Structure,
+    App\Entity\Person,
+    App\Entity\Period;
 
 /**
  * EvaluationRepository
@@ -46,7 +48,7 @@ class EvaluationRepository extends EntityRepository
     {
         $query = $this->getBaseQuery($structure);
         $query->join('r.period', 'q')
-            ->where('d.id = :id')
+            ->andWhere('d.id = :id')
             ->setParameter('id', $id)
             ->andWhere('not(c.moderate = true and e.validated = false)')
             ->addOrderBy('c.rank', 'asc')
@@ -213,7 +215,7 @@ class EvaluationRepository extends EntityRepository
     public function getToModerate(Structure $structure, $eval_id = null)
     {
         $query = $this->getBaseQuery($structure);
-        $query->where('e.validated = false')
+        $query->andWhere('e.validated = false')
               ->andWhere('e.moderated = false')
               ->addOrderBy('e.created_at', 'asc')
               ;
@@ -232,7 +234,7 @@ class EvaluationRepository extends EntityRepository
     {
         $query = $this->getBaseQuery($structure);
         $query->select('COUNT(DISTINCT p.id)')
-              ->where('p.person = :person')
+              ->andWhere('p.person = :person')
               ->setParameter('person', $person);
 
         if ($current_period != null) {
@@ -256,9 +258,9 @@ class EvaluationRepository extends EntityRepository
      */
     public function getByPlacement(Structure $structure, $id, $limit = null)
     {
-        $query = $this->getBaseQuery();
+        $query = $this->getBaseQuery($structure);
         $query->join('r.period', 'q')
-            ->where('p.id = :id')
+            ->andWhere('p.id = :id')
             ->setParameter('id', $id)
             ->addOrderBy('c.rank', 'asc')
             ->addOrderBy('q.begin', 'asc')

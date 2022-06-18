@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -14,6 +14,7 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType,
+    Symfony\Component\Form\Extension\Core\Type\SubmitType,
     Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Form\EvalCriteriaType,
     App\Form\EvalSectorType;
@@ -49,7 +50,12 @@ class EvalFormType extends AbstractType
                 'delete_empty' => true,
                 'prototype'    => true,
                 'by_reference' => false,
-          ]);
+                'attr'         => ['class' => 'criterias_collection'],
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Enregistrer',
+            ])
+        ;
     }
 
     public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)

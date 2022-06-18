@@ -4,7 +4,7 @@
  * This file is part of PIGASS project
  *
  * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
- * @copyright: Copyright 2018 Pierre-François Angrand
+ * @copyright: Copyright 2018-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -20,8 +20,12 @@ use Symfony\Component\Routing\Annotation\Route,
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
+    Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
     Symfony\Component\HttpFoundation\Response;
-use App\Entity\Structure;
+use App\Entity\Structure,
+    App\Entity\Wish,
+    App\Form\WishType,
+    App\FormHandler\WishHandler;
 
 /**
  * Dashboard controller.
@@ -43,6 +47,7 @@ class DashboardController extends AbstractController
      * Person dashboard
      *
      * @Route("/{slug}/user", name="app_dashboard_user", requirements={"slug" = "\w+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      * @Template
      * @security("is_granted('ROLE_MEMBER') or is_granted('ROLE_STUDENT') or is_granted('ROLE_STRUCTURE') or is_granted('ROLE_ADMIN')")
      */
@@ -90,6 +95,26 @@ class DashboardController extends AbstractController
         if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue())
             $modules['stages']['evaluated'] = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array', $person);
 
+        /* Load simulations */
+        $period = $this->em->getRepository('App:Period')->getLast($structure);
+        $modules['simulation']['period'] = $this->em->getRepository('App:Period')->getSimulationActive($structure);
+        if($simulation = $this->em->getRepository('App:Simulation')->getSimulation($person)) {
+            $modules['simulation']['simulation'] = $simulation;
+            $modules['simulation']['wishes'] = $this->em->getRepository('App:Wish')->getByPerson($person, $period->getId());
+            $modules['simulation']['rules'] = $this->em->getRepository('App:SectorRule')->getForPerson($simulation, $period, $this->em);
+            $modules['simulation']['missing'] = $this->em->getRepository('App:Simulation')->countMissing($simulation);
+            $new_wish = new Wish();
+            $form = $this->createForm(WishType::class, $new_wish, ['rules' => $modules['simulation']['rules']]);
+            $formHandler = new WishHandler($form, $request, $this->em, $simulation);
+            if ($formHandler->process()) {
+                $this->session->getFlashBag()->add('notice', 'Nouveau vœu : "' . $new_wish->getDepartment() . '" enregistré.');
+                return $this->redirect($this->generateUrl('app_dashboard_user', ['person_id' => $simulation->getPerson()->getId(), 'slug' => $structure->getSlug()]));
+            }
+            $modules['simulation']['wish_form'] = $form->createView();
+        } else {
+            $modules['simulation']['simulation'] = null;
+        }
+
         return [
             'structure'   => $structure,
             'person'      => $person,
@@ -103,6 +128,7 @@ class DashboardController extends AbstractController
      * Admin dashboard
      *
      * @Route("/{slug}/admin", name="app_dashboard_admin", requirements={"slug" = "\w+"})
+     * @Entity("structure", expr="repository.findOneBy({'slug': slug})")
      * @Template
      * @Security("is_granted('ROLE_ADMIN') or (is_granted('ROLE_STRUCTURE') and  is_granted(structure.getRole()))")
      */
@@ -160,6 +186,7 @@ class DashboardController extends AbstractController
         $modules['stage']['hospitals'] = $this->em->getRepository('App:Hospital')->countAll($structure);
         $modules['stage']['departments'] = $this->em->getRepository('App:Department')->countAll($structure);
         $modules['stage']['periods'] = $this->em->getRepository('App:Period')->findBy(['structure' => $structure]);
+        $modules['stage']['grades'] = $this->em->getRepository('App:Grade')->findBy(['structure' => $structure]);
 
         $clusters = [];
         foreach ($modules['stage']['periods'] as $period) {
@@ -182,6 +209,7 @@ class DashboardController extends AbstractController
         $modules['evaluation']['toModerate'] = $this->em->getRepository('App:Evaluation')->countAll($structure, ['toModerate' => true]);
 
         $modules['simulation']['rules'] = $this->em->getRepository('App:SectorRule')->findBy(['structure' => $structure]);
+        $modules['simulation']['count'] = $this->em->getRepository('App:Simulation')->countTotal();
 
         return [
             'structure' => $structure,

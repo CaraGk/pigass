@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -41,9 +41,7 @@ class HospitalRepository extends EntityRepository
         foreach ($orderBy as $col => $order) {
             $query->addOrderBy($col . '.name', $order);
         }
-        $query->andWhere('a.end > :now')
-              ->setParameter('now', new \DateTime('now'))
-        ;
+        $query->andWhere('a.revoked = false');
 
         return $query->getQuery()
                      ->getResult()
@@ -76,9 +74,7 @@ class HospitalRepository extends EntityRepository
         }
 
         if (!isset($arg['admin'])) {
-            $query->andWhere('a.end > :now')
-                  ->setParameter('now', new \DateTime('now'))
-            ;
+            $query->andWhere('a.revoked = false');
         }
 
         return $query->getQuery()

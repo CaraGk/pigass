@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -22,7 +22,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Security,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted,
     Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity,
-    Symfony\Component\HttpFoundation\Response;
+    Symfony\Component\HttpFoundation\Response,
+    Symfony\Component\HttpFoundation\JsonResponse;
+;
 use App\Entity\Structure;
 use App\Entity\Period,
     App\Form\PeriodType,
@@ -33,6 +35,7 @@ use App\Entity\Placement,
 use App\Entity\Repartition,
     App\Form\RepartitionsType,
     App\FormHandler\RepartitionsHandler;
+use App\Entity\Department;
 
 
 /**
@@ -74,7 +77,7 @@ class PlacementController extends AbstractController
         $periods = $this->em->getRepository('App:Period')->findBy(['structure' => $structure->getId()]);
 
         return array(
-            'slug'           => $structure->getSlug(),
+            'structure'  => $structure,
             'periods'        => $periods,
             'period_id'      => null,
             'period_form'    => null,
@@ -87,8 +90,8 @@ class PlacementController extends AbstractController
      */
     public function newPeriodAction(Structure $structure, Request $request)
     {
-        $periods = $this->em->getRepository('App:Period')->findAll();
-        $last_period = $this->em->getRepository('App:Period')->getLast();
+        $periods = $this->em->getRepository('App:Period')->findAll(['structure' => $structure]);
+        $last_period = $this->em->getRepository('App:Period')->getLast($structure);
 
         $period = new Period();
         $form = $this->createForm(PeriodType::class, $period, [
@@ -111,13 +114,16 @@ class PlacementController extends AbstractController
 
           $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" enregistrée.');
 
-          return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
+          return $this->redirect($this->generateUrl('app_dashboard_admin', [
+              'slug' => $structure->getSlug()
+          ]));
       }
 
       return array(
-        'periods'        => $periods,
-        'form'    => $form->createView(),
-        'structure'      => $structure,
+        'periods'     => $periods,
+        'period_form' => $form->createView(),
+        'structure'   => $structure,
+        'period_id'   => null,
       );
     }
 
@@ -138,14 +144,16 @@ class PlacementController extends AbstractController
         if ( $formHandler->process() ) {
             $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" modifiée.');
 
-            return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+            return $this->redirect($this->generateUrl('app_dashboard_admin', [
+                'slug' => $structure->getSlug(),
+            ]));
         }
 
         return array(
-            'periods'        => $periods,
-            'period_id'      => $period->getId(),
-            'form'    => $form->createView(),
-            'structure'      => $structure,
+            'periods'     => $periods,
+            'period_id'   => $period->getId(),
+            'period_form' => $form->createView(),
+            'structure'   => $structure,
         );
     }
 
@@ -160,7 +168,7 @@ class PlacementController extends AbstractController
 
       $this->session->getFlashBag()->add('notice', 'Session "' . $period . '" supprimée.');
 
-      return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+      return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
     }
 
     /**
@@ -173,7 +181,7 @@ class PlacementController extends AbstractController
       $placements = $this->em->getRepository('App:Placement')->getAll($structure, $limit);
 
       if (true == $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active')->getValue()) { // Si les évaluations sont activées
-        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array');
+        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array');
       } else {
           $evaluated = null;
       }
@@ -206,7 +214,7 @@ class PlacementController extends AbstractController
       if ( $formHandler->process() ) {
         $this->session->getFlashBag()->add('notice', 'Stage "' . $placement->getPerson() . ' : ' . $placement->getRepartition()->getDepartment() . $placement->getRepartition()->getPeriod() . '" modifié.');
 
-        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex'));
+        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex', ['slug' => $structure->getSlug()]));
       }
 
       $manager = $this->container->get('kdb_parameters.manager');
@@ -223,34 +231,36 @@ class PlacementController extends AbstractController
         'placement_form' => $form->createView(),
         'evaluated'      => $evaluated,
         'limit'          => $limit,
+        'structure'  => $structure,
       );
     }
 
     /**
      * @Route("/{slug}/placement/new", name="GCore_PAPlacementNew")
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
-     * @Template("App:PlacementAdmin:edit.html.twig")
+     * @Template("placement/edit.html.twig")
      */
     public function newPlacementAction(Structure $structure, Request $request)
     {
-      $limit = $request->query->get('limit', null);
-      $paginator = $this->get('knp_paginator');
-      $placements_query = $this->em->getRepository('App:Placement')->getAll($limit);
-      $placements = $paginator->paginate( $placements_query, $request->query->get('page', 1), 20);
+        $user = $this->getUser();
+        $userid = $request->query->get('userid', null);
+        $person = $this->testAdminTakeOver($user, $userid);
 
-      $form = $this->createForm(PlacementType::class);
+      $limit = $request->query->get('limit', null);
+      $placements = $this->em->getRepository('App:Placement')->getAll($structure, $limit);
+
+      $form = $this->createForm(PlacementType::class, null, ['person' => $person->getId()]);
       $formHandler = new PlacementHandler($form, $request, $this->em);
 
       if ( $placement = $formHandler->process() ) {
         $this->session->getFlashBag()->add('notice', 'Stage de '. $placement->getPerson() . ' à ' . $placement->getRepartition()->getDepartment() . ' en ' . $placement->getRepartition()->getPeriod() . '" enregistré.');
 
-        return $this->redirect($this->generateUrl('GCore_PAPlacementIndex'));
+        return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug(), 'userid' => $placement->getPerson()->getUser()->getId()]));
       }
 
-      $manager = $this->container->get('kdb_parameters.manager');
-      $mod_eval = $this->em->getRepository('App:Parameter')->findByName('eval_active');
+      $mod_eval = $this->em->getRepository('App:Parameter')->findByName('eval_' . $structure->getSlug() . '_active');
       if (true == $mod_eval->getValue()) { // Si les évaluations sont activées
-        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList('array');
+        $evaluated = $this->em->getRepository('App:Evaluation')->getEvaluatedList($structure, 'array');
       } else {
           $evaluated = null;
       }
@@ -261,6 +271,7 @@ class PlacementController extends AbstractController
         'placement_form' => $form->createView(),
         'evaluated'      => $evaluated,
         'limit'          => $limit,
+        'structure'  => $structure,
       );
     }
 
@@ -277,7 +288,7 @@ class PlacementController extends AbstractController
 
       $this->session->getFlashBag()->add('notice', 'Stage "' . $placement->getPerson() . ' : ' . $placement->getRepartition()->getDepartment() . $placement->getRepartition()->getPeriod() . '" supprimé.');
 
-      return $this->redirect($this->generateUrl('GCore_PAPlacementIndex'));
+      return $this->redirect($this->generateUrl('app_dashboard_user', ['slug' => $structure->getSlug(), 'userid' => $placement->getPerson()->getUser()->getId()]));
     }
 
     /**
@@ -293,7 +304,7 @@ class PlacementController extends AbstractController
         $hospital_total = $this->em->getRepository('App:Hospital')->countAll($structure);
 
         if (!$next_hospital)
-            return $this->redirect($this->generateUrl('GCore_PAPeriodIndex'));
+            return $this->redirect($this->generateUrl('app_dashboard_admin', ['slug' => $structure->getSlug()]));
 
         $repartitions = $this->em->getRepository('App:Repartition')->getByPeriod($period, $next_hospital->getId());
 
@@ -335,9 +346,10 @@ class PlacementController extends AbstractController
         $repartitions = $this->em->getRepository('App:Repartition')->getByDepartment($department_id);
         $periods = $this->em->getRepository('App:Period')->findAll();
         if (count($repartitions) < count($periods)) {
-            return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartmentMaintenance', array(
+            return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartmentMaintenance', [
                 'department_id' => $department->getId(),
-            )));
+                'slug'          => $structure->getSlug(),
+            ]));
         }
 
         $form = $this->createForm(RepartitionsType::class, $repartitions, ['type' => 'department', 'repartitions' => $repartitions]);
@@ -349,8 +361,10 @@ class PlacementController extends AbstractController
         }
 
         return array(
-            'origin'     => $department,
-            'form' => $form->createView(),
+            'origin'       => $department,
+            'form'         => $form->createView(),
+            'structure'    => $structure,
+            'repartitions' => $repartitions,
         );
     }
 
@@ -367,18 +381,19 @@ class PlacementController extends AbstractController
 
         return array(
             'departments' => $departments,
+            'structure'  => $structure,
         );
     }
 
     /**
      * Maintenance for department's repartitions
      *
-     * @Route("/{slug}/department/repartitions/", name="GCore_PARepartitionsDepartmentMaintenance")
+     * @Route("/{slug}/maintenance/department/repartitions", name="GCore_PARepartitionsDepartmentMaintenance")
      * @Entity("structure", expr="repository.findOneBySlug(slug)")
      */
-    public function repartitionsForDepartmentMaintenanceAction(Structure $structure, Request $request)
+    public function maintenanceForRepartitionsByDepartmentAction(Structure $structure, Request $request)
     {
-        $periods = $this->em->getRepository('App:Period')->findAll();
+        $periods = $this->em->getRepository('App:Period')->findBy(['structure' => $structure->getId()]);
         $department = $this->em->getRepository('App:Department')->find($request->get('department_id'));
 
         if(!$department) {
@@ -386,32 +401,70 @@ class PlacementController extends AbstractController
                 return new JsonResponse(array('message' => 'Error: Unknown entity.'), 404);
             else
                 throw $this->createNotFoundException('Unable to find department entity.');
-
         }
 
-        $count = 0;
+        $add_count = 0;
+        $remove_count = 0;
         foreach ($periods as $period) {
-            if (!$this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($period, $department->getId())) {
+            $repartitions = $this->em->getRepository('App:Repartition')->getByPeriodAndDepartment($structure, $period, $department);
+            if (!$repartitions) {
                 $repartition = new Repartition();
                 $repartition->setDepartment($department);
                 $repartition->setPeriod($period);
                 $repartition->setNumber(0);
+                $repartition->setStructure($structure);
                 $this->em->persist($repartition);
-                $count++;
+                $add_count++;
+            } elseif(count($repartitions) > 1) {
+                $do_not_delete = 0;
+                foreach ($repartitions as $id => $repartition) {
+                    if ($repartiton->getNumber())
+                        $do_not_delete = $id;
+                }
+                for ($i = 0; count($repartitions); $i++) {
+                    if ($i != $do_not_delete) {
+                        $this->em->remove($repartitions[$i]);
+                        $remove_count++;
+                    }
+                }
             }
         }
         $this->em->flush();
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(array(
-                'message' => $count,
+                'message' => ['add' => $add_count, 'remove' => $remove_count],
             ), 200);
         } else {
-            $this->session->getFlashBag()->add('notice', 'Maintenance : ' . $department . ' -> ' . $count . ' répartition(s) ajoutée(s)');
+            $this->session->getFlashBag()->add('notice', 'Maintenance : ' . $department . ' -> ' . $add_count . ' répartition(s) ajoutée(s), ' . $remove_count . ' supprimée(s).');
 
             return $this->redirect($this->generateUrl('GCore_PARepartitionsDepartment', array(
                 'department_id' => $department->getId(),
+                'slug'          => $structure->getSlug(),
             )));
+        }
+    }
+
+    /**
+     * Test for admin take over function
+     *
+     * @return Person
+     */
+    private function testAdminTakeOver($user, $userid = null)
+    {
+        if ($user->hasRole('ROLE_ADMIN') and $userid != null) {
+            $user = $this->um->findUserBy(array(
+                'id' => $userid,
+            ));
+        }
+
+        $person = $this->em->getRepository('App:Person')->getByUsername($user->getUsername());
+
+        if (!$person) {
+            $this->session->getFlashBag()->add('error', 'Adhérent inconnu.');
+            return $this->redirect($this->generateUrl('user_register_index'));
+        } else {
+            return $person;
         }
     }
 }

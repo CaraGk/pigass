@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -13,6 +13,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Structure;
 
 /**
  * App\Entity\Grade
@@ -59,7 +60,7 @@ class Grade
   private $persons;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Entity\Structure", inversedBy="receipts", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Structure", inversedBy="grades", cascade={"persist"})
      * @ORM\JoinColumn(name="structure_id", referencedColumnName="id")
      *
      * @var Structure $structure
@@ -179,7 +180,7 @@ class Grade
      *
      * @param \App\Entity\Structure $structure
      *
-     * @return Fee
+     * @return Grade
      */
     public function setStructure(\App\Entity\Structure $structure = null)
     {

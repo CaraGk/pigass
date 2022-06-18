@@ -3,6 +3,7 @@
 {% block headline %}Ajouter/modifier un terrain de stage{% endblock %}
 
 {% block content %}
+    {% form_theme hospital_form 'jquery.collection.html.twig' %}
     <div class="card">
         <div class="card-body">
             {{ form(hospital_form) }}
@@ -12,5 +13,16 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('bundles/gessehcore/js/addSub.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/jquery.collection.js') }}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $('.departments_collection').collection({
+            allow_up: false,
+            allow_down: false,
+            add_at_the_end: true,
+            add: '<a href="#"><i class="fas fa-plus"></i></a>',
+            remove: '<a href="#"><i class="fas fa-trash"></i></a>',
+        });
+        $('#hospital_departments .col-form-label').hide();
+        $('.hospital_departments-collection-actions').addClass('float-right');
+    </script>
 {% endblock %}

@@ -3,8 +3,8 @@
 /**
  * This file is part of GESSEH project
  *
- * @author: Pierre-François ANGRAND <gesseh@medlibre.fr>
- * @copyright: Copyright 2013-2016 Pierre-François Angrand
+ * @author: Pierre-François ANGRAND <pigass@medlibre.fr>
+ * @copyright: Copyright 2013-2020 Pierre-François Angrand
  * @license: GPLv3
  * See LICENSE file or http://www.gnu.org/licenses/gpl.html
  */
@@ -91,15 +91,15 @@ class DepartmentRepository extends EntityRepository
   public function getBySectorForPeriod($sector_id, $period_id)
   {
     $query = $this->getBaseQuery();
-    $query->join('d.repartitions', 'r')
-          ->join('r.period', 'p')
-          ->addSelect('r')
-          ->where('a.end > :now')
-          ->setParameter('now', new \DateTime('now'))
-          ->andWhere('s.id = :sector_id')
-          ->setParameter('sector_id', $sector_id)
-          ->andWhere('p.id = :period_id')
-          ->setParameter('period_id', $period_id)
+    $query
+        ->join('d.repartitions', 'r')
+        ->join('r.period', 'p')
+        ->addSelect('r')
+        ->where('a.revoked = false')
+        ->andWhere('s.id = :sector_id')
+        ->setParameter('sector_id', $sector_id)
+        ->andWhere('p.id = :period_id')
+        ->setParameter('period_id', $period_id)
     ;
 
     return $query->getQuery()
@@ -121,11 +121,11 @@ class DepartmentRepository extends EntityRepository
     public function getAvailableQuery()
     {
         $query = $this->getBaseQueryWithRepartitions();
-        $query->where('r.number > 0')
-              ->andWhere('a.end > :now')
-              ->setParameter('now', new \DateTime('now'))
-              ->addOrderBy('h.name', 'asc')
-              ->addOrderBy('d.name', 'asc')
+        $query
+            ->where('r.number > 0')
+            ->andWhere('a.revoked = false')
+            ->addOrderBy('h.name', 'asc')
+            ->addOrderBy('d.name', 'asc')
         ;
         return $query;
     }

@@ -1,0 +1,29 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ parent() }} - Simulation{% endblock %}
+
+{% block headline %}Résultats de la simulation{% endblock %}
+
+{% block action %}
+    <li class="btn btn-primary">
+        <a href="{{ path('app_dashboard_user', {slug: structure.slug}) }}" title="Retour à mes vœux">
+            <i class="fas fa-screenshot"></i> Mes vœux
+        </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    {{ include('simulation/simulations.html.twig', {'simulations': simulations}) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/gessehcore/js/actions.js') }}" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+            $('.valid').parent('li').addClass('valid');
+            $('.invalid').parent('li').addClass('invalid');
+            $('.grey').parent('li').addClass('grey');
+        });
+    </script>
+{% endblock %}

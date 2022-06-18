@@ -39,7 +39,7 @@ class MemberInfo
 
     /**
      * @ORM\ManyToOne(targetEntity="MemberQuestion")
-     * @ORM\JoinColumn(name="memberquestion_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="memberquestion_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $question;
 

@@ -67,8 +67,8 @@ class ReceiptController extends AbstractController
             throw $this->createNotFoundException('Structure inconnue');
 
         $receipts = $this->em->getRepository('App:Receipt')->getForStructure($structure);
-
-        return array(
+	
+	return array(
             'structure' => $structure,
             'receipts'  => $receipts,
         );
